@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Script from 'next/script';
 import { PropsWithChildren } from 'react';
 
 /**
@@ -18,6 +19,11 @@ export function Layout(props: PropsWithChildren) {
       <div className="container mx-auto max-w-4xl font-serif">
         {props.children}
       </div>
+      <Script
+        src="/scripts/deeplinks/deeplinks.js"
+        type="module"
+        strategy="afterInteractive"
+      />
     </>
   );
 }
