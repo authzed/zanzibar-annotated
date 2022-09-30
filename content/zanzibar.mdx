@@ -151,3 +151,33 @@ ACL checks must respect the order in which users modify ACLs and object contents
 </Column>
 </Page>
 <PageFooter numberLabel="2" />
+
+<Page>
+
+**Table 1: Example relation tuples**
+
+| Example Tuple in Text Notation | Semantics |
+| ------------------------------ | --------- |
+| doc:readme#owner@10            | User 10 is an owner of doc:readme |
+| group:eng#member@11            | User 11 is a member of group:eng |
+| doc:readme#viewer@group:eng#member | Members of group:eng are viewers of doc:readme |
+| doc:readme#parent@folder:A#... | doc:readme is in folder:A |
+
+_"#..." represents a relation that does not affect the semantics of the tuple._
+
+<Column>
+
+</Column>
+<Column>
+</Column>
+</Page>
+<PageFooter numberLabel="3" />
+
+
+<Page>
+<Column>
+</Column>
+<Column>
+</Column>
+</Page>
+<PageFooter numberLabel="x" />
