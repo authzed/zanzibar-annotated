@@ -1,6 +1,8 @@
 {
-  "name": "zanzibar-paper",
+  "name": "zanzibar-annotated",
   "version": "0.1.0",
+  "repository": "https://github.com/authzed/zanzibar-annotated",
+  "license": "Apache-2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,6 +11,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mdx-js/loader": "^2.1.3",
+    "@mdx-js/react": "^2.1.3",
+    "@next/mdx": "^12.3.1",
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -17,8 +22,11 @@
     "@types/node": "18.7.23",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
+    "autoprefixer": "^10.4.12",
     "eslint": "8.24.0",
     "eslint-config-next": "12.3.1",
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8",
     "typescript": "4.8.4"
   }
 }

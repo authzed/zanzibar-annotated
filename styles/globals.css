@@ -1,26 +1,35 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@layer base {
+  /* Headings style */
+  h1 {
+    @apply text-2xl font-bold my-6;
   }
-  body {
-    color: white;
-    background: black;
+  h2 {
+    @apply text-xl font-bold mt-4 mb-2;
+  }
+  h3 {
+    @apply text-xl font-bold my-2;
+  }
+
+  /* Monospace styling */
+  pre {
+    @apply my-4;
+  }
+  code {
+    @apply leading-tight text-sm;
+  }
+
+  /* Paragraph indentation */
+  p {
+    @apply indent-4;
+  }
+  h2 + p, h3 + p {
+    @apply indent-0;
+  }
+  div.page-column > p:first-child {
+    @apply indent-0;
   }
 }
