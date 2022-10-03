@@ -19,7 +19,8 @@
     "react-dom": "18.2.0",
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",
-    "remark-math": "^5.1.1"
+    "remark-math": "^5.1.1",
+    "slugify": "^1.6.5"
   },
   "devDependencies": {
     "@types/node": "18.7.23",

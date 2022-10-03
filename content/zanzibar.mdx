@@ -133,7 +133,7 @@ Relation tuples have efficient binary encodings, but in this paper we represent 
 〈userset〉::= 〈object〉'#'〈relation〉
 ```
 
-where `〈namespace〉` and `〈relation〉` are predefined in client configurations [§2.3], `〈object id〉` is a string, and `〈user id〉` is an integer.
+where `〈namespace〉` and `〈relation〉` are predefined in client configurations [(§2.3)](#2.3-namespace-configuration), `〈object id〉` is a string, and `〈user id〉` is an integer.
 The primary keys required to identify a relation tuple are `〈namespace〉`, `〈object id〉`, `〈relation〉`, and `〈user〉`.
 One feature worth noting is that a `〈userset〉` allows ACLs to refer to groups and thus supports representing nested group membership.
 

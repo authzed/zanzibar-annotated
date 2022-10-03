@@ -22,11 +22,16 @@
     @apply leading-tight text-sm;
   }
 
+  a {
+    @apply text-blue-500;
+  }
+
   /* Paragraph indentation */
   p {
     @apply indent-4;
   }
-  h2 + p, h3 + p {
+  h2 + p,
+  h3 + p {
     @apply indent-0;
   }
   div.page-column > p:first-child {

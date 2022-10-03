@@ -2,7 +2,13 @@ import { MDXProvider } from '@mdx-js/react';
 import 'katex/dist/katex.min.css';
 import type { AppProps } from 'next/app';
 import { Layout } from '../components/layout';
-import { ListItem, Paragraph, UnorderedList } from '../components/markdown';
+import {
+  H2,
+  H3,
+  ListItem,
+  Paragraph,
+  UnorderedList,
+} from '../components/markdown';
 import '../styles/globals.css';
 
 function ZanzibarPaper({ Component, pageProps }: AppProps) {
@@ -13,6 +19,8 @@ function ZanzibarPaper({ Component, pageProps }: AppProps) {
         p: Paragraph,
         ul: UnorderedList,
         li: ListItem,
+        h2: H2,
+        h3: H3,
       }}
     >
       <Layout>
