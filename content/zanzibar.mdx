@@ -152,9 +152,8 @@ ACL checks must respect the order in which users modify ACLs and object contents
 </Page>
 <PageFooter numberLabel="2" />
 
-<Page>
 
-**Table 1: Example relation tuples**
+<div className="w-3/4 mx-auto text-left">
 
 | Example Tuple in Text Notation | Semantics |
 | ------------------------------ | --------- |
@@ -163,12 +162,65 @@ ACL checks must respect the order in which users modify ACLs and object contents
 | doc:readme#viewer@group:eng#member | Members of group:eng are viewers of doc:readme |
 | doc:readme#parent@folder:A#... | doc:readme is in folder:A |
 
-_"#..." represents a relation that does not affect the semantics of the tuple._
+<p className="indent-0">_Table 1: Example relation tuples** "#..." represents a relation that does not affect the semantics of the tuple._</p>
 
+</div>
+
+<Page>
 <Column>
+
+“new enemy” problem, which can arise when we fail to respect the ordering between ACL updates or when we apply old ACLs to new content.
+
+Consider these two examples:
+
+<a name="example-a"></a>
+
+**Example A: Neglecting ACL update order**
+
+1. Alice removes Bob from the ACL of a folder;
+2. Alice then asks Charlie to move new documents to the folder, where document ACLs inherit from folder ACLs;
+3. Bob should not be able to see the new documents, but may do so if the ACL check neglects the ordering between the two ACL changes.
+
+<a name="example-b"></a>
+
+**Example B: Misapplying old ACL to new content**
+
+1. Alice removes Bob from the ACL of a document;
+2. Alice then asks Charlie to add new contents to the document;
+3. Bob should not be able to see the new contents, but may do so if the ACL check is evaluated with a stale ACL from before Bob's removal.
+
+Preventing the "new enemy" problem requires Zanzibar to understand and respect the causal ordering between ACL or content updates, including updates on different ACLs or objects and those coordinated via channels invisible to Zanzibar.
+Hence Zanzibar must provide two key consistency properties: external consistency [^18] and snapshot reads with bounded staleness.
+
+External consistency allows Zanzibar to assign a timestamp to each ACL or content update, such that two causally related updates $x \prec y$ will be assigned timestamps that reflect the causal order: $T_x \lt T_y$.
+With causally meaningful timestamps, a snapshot read of the ACL database at timestamp $T$, which observes all updates with timestamps $\leq T$, will respect ordering between ACL updates.
+That is, if the read observes an update $x$, it will observe all updates that happen causally before $x$.
+
+Furthermore, to avoid applying old ACLs to new contents, the ACL check evaluation snapshot must not be staler than the causal timestamp assigned to the content update.
+Given a content update at timestamp $T_c$, a snapshot read at timestamp
 
 </Column>
 <Column>
+
+$\geq T_c$ ensures that all ACL updates that happen causally before the content update will be observed by the ACL check.
+
+To provide external consistency and snapshot reads with bounded staleness, we store ACLs in the Spanner global database system[^15].
+Spanner's TrueTime mechanism assigns each ACL write a microsecond-resolution timestamp, such that the timestamps of writes reflect the causal ordering between writes, and thereby provide external consistency.
+We evaluate each ACL check at a single snapshot timestamp across multiple database reads, so that all writes with timestamps up to the check snapshot, and only those writes, are visible to the ACL check.
+
+To avoid evaluating checks for new contents using stale ACLs, one could try to always evaluate at the latest snapshot such that the check result reflects all ACL writes up to the check call.
+However, such evaluation would require global data synchronization with high-latency round trips and limited availability.
+Instead, we design the following protocol to allow most checks to be evaluated on already replicated data with cooperation from Zanzibar clients:
+
+1. A Zanzibar client requests an opaque consistency token called a zookie for each content version, via a content- change ACL check (§2.4.4) when the content modification is about to be saved.
+Zanzibar encodes a current global timestamp in the zookie and ensures that all prior ACL writes have lower timestamps.
+The client stores the zookie with the content change in an atomic write to the client storage.
+Note that the content-change check does not need to be evaluated in the same transaction as the application content modification, but only has to be triggered when the user modifies the contents.
+2. The client sends this zookie in subsequent ACL check requests to ensure that the check snapshot is at least as fresh as the timestamp for the content version.
+
+External consistency and snapshot reads with staleness bounded by zookie prevent the "new enemy" problem.
+In [Example A](#example-a), ACL updates $A1$ and $A2$ will be assigned timestamps $T_{A1} \leq T_{A2}$, respectively.
+Bob will not be able to see the new documents added by Charlie: if a check is evaluated at $T \leq T_{A2}$, the document ACLs will not include the folder ACL; if a check is evaluated at $T \geq T_{A2} \gt T_{A1}$, the check will observe update $A1$, which removed Bob from the
 </Column>
 </Page>
 <PageFooter numberLabel="3" />
