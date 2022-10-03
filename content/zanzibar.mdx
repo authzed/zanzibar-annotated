@@ -1,6 +1,8 @@
 import { Column, Header, Page } from '../components/layout';
 import PageFooter from '../components/PageFooter';
 
+<Page>
+
 <Header>
 
 # Zanzibar: Google's Consistent, Global Authorization System
@@ -16,8 +18,6 @@ import PageFooter from '../components/PageFooter';
 </div>
 
 </Header>
-
-<Page>
 
 <Column>
 
@@ -69,8 +69,9 @@ For example, an application can specify that users granted editing rights on a d
 
 </Column>
 
-</Page>
 <PageFooter numberLabel="1" />
+</Page>
+
 
 <Page>
 <Column>
@@ -149,11 +150,15 @@ Defining our data model around tuples, instead of per- object ACLs, allows us to
 ACL checks must respect the order in which users modify ACLs and object contents to avoid unexpected sharing be- haviors. Specifically, our clients care about preventing the
 
 </Column>
-</Page>
+
 <PageFooter numberLabel="2" />
 
+</Page>
 
-<div className="w-3/4 mx-auto text-left">
+
+<Page>
+
+<div className="w-3/4 col-span-2 mx-auto text-left">
 
 | Example Tuple in Text Notation | Semantics |
 | ------------------------------ | --------- |
@@ -162,11 +167,10 @@ ACL checks must respect the order in which users modify ACLs and object contents
 | doc:readme#viewer@group:eng#member | Members of group:eng are viewers of doc:readme |
 | doc:readme#parent@folder:A#... | doc:readme is in folder:A |
 
-<p className="indent-0">_Table 1: Example relation tuples** "#..." represents a relation that does not affect the semantics of the tuple._</p>
+<p className="indent-0  mb-20">_Table 1: Example relation tuples** "#..." represents a relation that does not affect the semantics of the tuple._</p>
 
 </div>
 
-<Page>
 <Column>
 
 “new enemy” problem, which can arise when we fail to respect the ordering between ACL updates or when we apply old ACLs to new content.
@@ -222,8 +226,11 @@ External consistency and snapshot reads with staleness bounded by zookie prevent
 In [Example A](#example-a), ACL updates $A1$ and $A2$ will be assigned timestamps $T_{A1} \leq T_{A2}$, respectively.
 Bob will not be able to see the new documents added by Charlie: if a check is evaluated at $T \leq T_{A2}$, the document ACLs will not include the folder ACL; if a check is evaluated at $T \geq T_{A2} \gt T_{A1}$, the check will observe update $A1$, which removed Bob from the
 </Column>
-</Page>
+
 <PageFooter numberLabel="3" />
+
+</Page>
+
 
 
 <Page>
@@ -231,5 +238,6 @@ Bob will not be able to see the new documents added by Charlie: if a check is ev
 </Column>
 <Column>
 </Column>
-</Page>
 <PageFooter numberLabel="x" />
+</Page>
+

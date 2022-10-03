@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    @apply bg-gray-200;
+  }
+  a {
+    @apply text-blue-500;
+  }
+
   /* Headings style */
   h1 {
     @apply text-2xl font-bold my-6;
@@ -20,10 +27,6 @@
   }
   code {
     @apply leading-tight text-sm;
-  }
-
-  a {
-    @apply text-blue-500;
   }
 
   /* Paragraph indentation */
