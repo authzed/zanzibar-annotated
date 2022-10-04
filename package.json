@@ -26,6 +26,7 @@
     "slugify": "^1.6.5"
   },
   "devDependencies": {
+    "@svgr/webpack": "^6.4.0",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "18.7.23",
     "@types/react": "18.0.21",

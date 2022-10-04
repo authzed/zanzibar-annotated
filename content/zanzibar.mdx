@@ -1,5 +1,6 @@
 import { Column, Header, Page } from '../components/layout';
 import PageFooter from '../components/PageFooter';
+import Table1 from './Table1.svg';
 
 <Page>
 
@@ -23,7 +24,7 @@ import PageFooter from '../components/PageFooter';
 
 ## Abstract
 
-Determining whether online users are authorized to access digital objects is central to preserving privacy.
+<span className="highlight" style={{color:'red'}}>Determining whether online users</span> are authorized to access digital objects is central to preserving privacy.
 This paper presents the design, implementation, and deployment of Zanzibar, a global system for storing and evaluating access control lists.
 Zanzibar provides a uniform data model and configuration language for expressing a wide range of access control policies from hundreds of client services at Google, including Calendar, Cloud, Drive, Maps, Photos, and YouTube.
 Its authorization decisions respect causal ordering of user actions and thus provide external consistency amid changes to access control lists and object contents.
@@ -158,16 +159,9 @@ ACL checks must respect the order in which users modify ACLs and object contents
 
 <Page>
 
-<div className="w-3/4 col-span-2 mx-auto text-left">
+<div className="col-span-2 mb-10 mx-auto">
 
-| Example Tuple in Text Notation | Semantics |
-| ------------------------------ | --------- |
-| doc:readme#owner@10            | User 10 is an owner of doc:readme |
-| group:eng#member@11            | User 11 is a member of group:eng |
-| doc:readme#viewer@group:eng#member | Members of group:eng are viewers of doc:readme |
-| doc:readme#parent@folder:A#... | doc:readme is in folder:A |
-
-<p className="indent-0  mb-20">_Table 1: Example relation tuples** "#..." represents a relation that does not affect the semantics of the tuple._</p>
+<Table1 />
 
 </div>
 
