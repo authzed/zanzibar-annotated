@@ -10,6 +10,7 @@ import {
   UnorderedList,
 } from '../components/markdown';
 import '../styles/globals.css';
+import '../styles/popper.css';
 
 function ZanzibarPaper({ Component, pageProps }: AppProps) {
   return (

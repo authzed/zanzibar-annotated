@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Script from 'next/script';
 import { PropsWithChildren } from 'react';
+import SelectionShare from './SelectionShare';
 
 /**
  * Paper layout
@@ -18,6 +19,7 @@ export function Layout(props: PropsWithChildren) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <div className="container mx-auto max-w-5xl font-serif">
+        <SelectionShare />
         {props.children}
       </div>
       <Script
