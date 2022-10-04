@@ -28,4 +28,7 @@ export default withMDX({
 
     return config;
   },
+  publicRuntimeConfig: {
+    GAMeasurementId: 'G-SPCEM7FV1Z',
+  },
 });
