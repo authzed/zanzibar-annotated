@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Script from 'next/script';
 import { PropsWithChildren } from 'react';
+import { Gtag } from './Gtag';
 import SelectionShare from './SelectionShare';
 
 /**
@@ -17,6 +18,7 @@ export function Layout(props: PropsWithChildren) {
         />
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <Gtag />
       </Head>
       <div className="container mx-auto max-w-5xl font-serif">
         <SelectionShare />

@@ -1,6 +1,13 @@
+import { LinkIcon } from '@heroicons/react/24/solid';
 import debounce from 'lodash.debounce';
 import { useEffect, useMemo, useState } from 'react';
+import ClickAwayListener from 'react-click-away-listener';
 import { usePopper } from 'react-popper';
+
+import HNIcon from '../content/HNIcon.svg';
+import RedditIcon from '../content/RedditIcon.svg';
+import TwitterIcon from '../content/TwitterIcon.svg';
+import popperStyles from '../styles/Popper.module.css';
 
 type VirtualElement = {
   getBoundingClientRect: () => DOMRect;
@@ -17,30 +24,58 @@ function SelectionShare() {
   );
   const [visible, setVisible] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
+  const [statusMsg, setStatusMsg] = useState('');
   const { styles, attributes } = usePopper(virtualRef, popperElement, {
     placement: 'top',
     modifiers: [{ name: 'arrow', options: { element: arrowElement } }],
   });
 
-  function selectionHandler() {
-    const selection = document.getSelection();
-    if (selection && selection.rangeCount > 0 && !selection?.isCollapsed) {
-      const range = selection.getRangeAt(0);
-      setVirtualRef(range);
-      setVisible(true);
-      setShareUrl(document.URL);
-      return;
-    }
-
-    setVisible(false);
-  }
   const debouncedSelectionHandler = useMemo(
-    () => debounce(selectionHandler, 200),
+    () =>
+      debounce(() => {
+        const selection = document.getSelection();
+        if (selection && selection.rangeCount > 0 && !selection?.isCollapsed) {
+          const range = selection.getRangeAt(0);
+          setVirtualRef(range);
+          setVisible(true);
+          setShareUrl(document.URL);
+          setStatusMsg('');
+          return;
+        }
+      }, 200),
     []
   );
 
   function copyToClipboard() {
     navigator.clipboard.writeText(shareUrl);
+    setStatusMsg('URL copied to your clipboard!');
+  }
+
+  function shareToTwitter() {
+    window.open(
+      `https://twitter.com/intent/tweet/?url=${encodeURIComponent(
+        shareUrl
+      )}&text=Shared from the Annotated Zanzibar Paper`,
+      '_blank'
+    );
+  }
+
+  function shareToReddit() {
+    window.open(
+      `https://reddit.com/submit/?url=${encodeURIComponent(
+        shareUrl
+      )}&resubmit=true&title=Selection from the Annotated Zanzibar Paper`,
+      '_blank'
+    );
+  }
+
+  function shareToHN() {
+    window.open(
+      `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
+        shareUrl
+      )}&t=Selection from the Annotated Zanzibar Paper`,
+      '_blank'
+    );
   }
 
   useEffect(() => {
@@ -57,26 +92,56 @@ function SelectionShare() {
   return (
     <>
       {visible && (
-        <div
-          className="tooltip shadow-md"
-          ref={setPopperElement}
-          style={styles.popper}
-          {...attributes.popper}
-        >
-          <input
-            className="p-2 border border-grey-500 rounded transition"
-            value={shareUrl}
-            readOnly
-          />
-          <button
-            className="text-sm border border-grey-500 rounded p-2 transition"
-            onClick={copyToClipboard}
+        <ClickAwayListener onClickAway={() => setVisible(false)}>
+          <div
+            className={popperStyles.tooltip}
+            ref={setPopperElement}
+            style={styles.popper}
+            {...attributes.popper}
           >
-            Copy
-          </button>
+            {!statusMsg && (
+              <>
+                <button
+                  className={`${popperStyles.button} border-l-0`}
+                  onClick={copyToClipboard}
+                  title="Copy share URL to clipboard"
+                >
+                  <LinkIcon className={popperStyles.icon} />
+                </button>
+                <button
+                  className={popperStyles.button}
+                  onClick={shareToTwitter}
+                  title="Tweet your selection"
+                >
+                  <TwitterIcon className={popperStyles.icon} />
+                </button>
+                <button
+                  className={popperStyles.button}
+                  onClick={shareToHN}
+                  title="Post to HackerNews"
+                >
+                  <HNIcon className={popperStyles.icon} />
+                </button>
+                <button
+                  className={popperStyles.button}
+                  onClick={shareToReddit}
+                  title="Submit on Reddit"
+                >
+                  <RedditIcon className={popperStyles.icon} />
+                </button>
 
-          <div className="arrow" ref={setArrowElement} style={styles.arrow} />
-        </div>
+                <div
+                  ref={setArrowElement}
+                  className={popperStyles.arrow}
+                  style={styles.arrow}
+                />
+              </>
+            )}
+            {statusMsg && (
+              <div className={popperStyles.statusMsg}>{statusMsg}</div>
+            )}
+          </div>
+        </ClickAwayListener>
       )}
     </>
   );
