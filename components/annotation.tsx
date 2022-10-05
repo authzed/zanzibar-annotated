@@ -99,7 +99,7 @@ function Annotation(props: {
       {
         name: 'flip',
         options: {
-          fallbackPlacements: ['top', 'right', 'left'],
+          fallbackPlacements: ['top', 'bottom', 'right', 'left'],
         },
       },
     ],
