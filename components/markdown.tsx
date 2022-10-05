@@ -9,17 +9,24 @@ export function Paragraph(props: PropsWithChildren) {
 }
 
 /**
+ * Markdown component for ol
+ */
+ export function OrderedList(props: PropsWithChildren) {
+  return <ol className="my-2 list-decimal">{props.children}</ol>;
+}
+
+/**
  * Markdown component for ul
  */
 export function UnorderedList(props: PropsWithChildren) {
-  return <ol className="my-2">{props.children}</ol>;
+  return <ol className="my-2 list-disc">{props.children}</ol>;
 }
 
 /**
  * Markdown component for li
  */
 export function ListItem(props: PropsWithChildren) {
-  return <li className="ml-8 list-disc leading-tight">{props.children}</li>;
+  return <li className="ml-8 leading-tight">{props.children}</li>;
 }
 
 /**
@@ -42,6 +49,18 @@ export function H3(props: PropsWithChildren) {
     <>
       <a id={slugify(props.children as string, { lower: true })} />
       <h3>{props.children}</h3>
+    </>
+  );
+}
+
+/**
+ * Markdown component for h4
+ */
+export function H4(props: PropsWithChildren) {
+  return (
+    <>
+      <a id={slugify(props.children as string, { lower: true })} />
+      <h4 className="text-md font-bold my-2">{props.children}</h4>
     </>
   );
 }

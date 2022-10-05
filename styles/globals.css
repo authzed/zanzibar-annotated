@@ -37,7 +37,8 @@
     @apply indent-4;
   }
   h2 + p,
-  h3 + p {
+  h3 + p,
+  h4 + p {
     @apply indent-0;
   }
   div.page-column > p:first-child {

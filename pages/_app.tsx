@@ -5,7 +5,9 @@ import { Layout } from '../components/layout';
 import {
   H2,
   H3,
+  H4,
   ListItem,
+  OrderedList,
   Paragraph,
   UnorderedList,
 } from '../components/markdown';
@@ -17,10 +19,12 @@ function ZanzibarPaper({ Component, pageProps }: AppProps) {
       components={{
         // p: (props) => <p {...props} style={{ color: 'rebeccapurple' }} />,
         p: Paragraph,
+        ol: OrderedList,
         ul: UnorderedList,
         li: ListItem,
         h2: H2,
         h3: H3,
+        h4: H4,
       }}
     >
       <Layout>
