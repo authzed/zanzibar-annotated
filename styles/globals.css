@@ -9,6 +9,9 @@
   a {
     @apply text-blue-500;
   }
+  a:hover {
+    @apply text-blue-600;
+  }
 
   /* Headings style */
   h1 {
@@ -38,6 +41,9 @@
     @apply indent-0;
   }
   div.page-column > p:first-child {
+    @apply indent-0;
+  }
+  .annotation {
     @apply indent-0;
   }
 }

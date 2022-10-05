@@ -38,7 +38,7 @@ export function Layout(props: PropsWithChildren) {
  */
 export function Page(props: PropsWithChildren) {
   return (
-    <div className="md:grid md:grid-cols-2 gap-x-10 px-20 py-20 mt-20 break-words bg-white">
+    <div className="md:grid md:grid-cols-2 gap-x-10 p-20 mt-20 break-words bg-white shadow">
       {props.children}
     </div>
   );

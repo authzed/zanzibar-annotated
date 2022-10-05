@@ -4,7 +4,7 @@
 
 .arrow,
 .arrow::before {
-  @apply absolute bg-inherit w-3 h-3
+  @apply absolute bg-inherit w-3 h-3;
 }
 
 .arrow {
@@ -32,7 +32,6 @@
 .tooltip[data-popper-placement^='right'] > .arrow {
   left: -4px;
 }
-
 
 .button {
   @apply text-sm p-2 border-l border-gray-500 ;
