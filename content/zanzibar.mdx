@@ -9,7 +9,6 @@ import Figure3 from './Figure3.svg';
 import Figure4 from './Figure4.svg';
 import Figure5 from './Figure5.svg';
 
-
 <AnnotationsProvider>
 
 <Page>
@@ -142,12 +141,15 @@ In Zanzibar, ACLs are collections of object-user or object-object relations repr
 Groups are simply ACLs with membership semantics.
 Relation tuples have efficient binary encodings, but in this paper we represent them using a convenient text notation:
 
-```
-〈tuple〉  ::= 〈object〉'#'〈relation〉'@'〈user〉
-〈object〉 ::= 〈namespace〉':'〈object id〉
-〈user〉   ::= 〈user id〉 | 〈userset〉
-〈userset〉::= 〈object〉'#'〈relation〉
-```
+<br/>
+$〈tuple〉 \coloncolonequals 〈object〉 \text{\textquoteleft} \# \text{\textquoteright} 〈relation〉 \text{\textquoteleft} @ \text{\textquoteright}〈user〉$
+
+$〈object〉 \coloncolonequals 〈namespace〉 \text{\textquoteleft} : \text{\textquoteright} 〈object id〉$
+
+$〈user〉 \coloncolonequals 〈user\_id〉 | 〈userset〉$
+
+$〈userset〉 \coloncolonequals 〈object〉 \text{\textquoteleft} \# \text{\textquoteright} 〈relation〉$
+<br/>
 
 where _〈namespace〉_ and _〈relation〉_ are predefined in client configurations [(§2.3)](#2.3-namespace-configuration), _〈object id〉_ is a string, and _〈user id〉_ is an integer.
 The primary keys required to identify a relation tuple are _〈naespace〉_, _〈object id〉_, _〈relation〉_, and _〈user〉_.
