@@ -8,6 +8,7 @@ module.exports = {
   theme: {
     fontFamily: {
       serif: ['Times New Roman', 'serif'],
+      sans: ['ui-sans-serif', 'system-ui'],
     },
     extend: {},
   },

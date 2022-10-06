@@ -75,7 +75,7 @@ We have the following goals for the Zanzibar system:
 * _High availability_: It must reliably respond to requests because, in the absence of explicit authorizations, client services would be forced to deny their users access.
 * _Large scale_: It needs to protect billions of objects shared by billions of users. It must be deployed around the globe to be near its clients and their end users.
 
-<Highlight annotationId="example2" annotationPlacement="right">Zanzibar achieves these goals through a combination of notable features.</Highlight>
+<Highlight annotationId="example2" annotationPlacement="right" bgColorClass="bg-amber-200">Zanzibar achieves these goals through a combination of notable features.</Highlight>
 To provide flexibility, Zanzibar pairs a simple data model with a powerful configuration language.
 The language allows clients to define arbitrary relations between users and objects, such as `owner`, `editor`, `commenter`, and `viewer`.
 It includes set-algebraic operators such as intersection and union for specifying potentially complex access control policies in terms of those user-object relations.
@@ -174,7 +174,7 @@ ACL checks must respect the order in which users modify ACLs and object contents
 
 <Page>
 
-<div className="md:col-span-2 mb-10 mx-auto">
+<div className="md:col-span-2 mb-10 mx-auto overflow-scroll">
 
 <a id="table-1" />
 <Table1 />
@@ -407,7 +407,7 @@ Because changes to namespace configs can change the results of ACL evaluations, 
 
 Each server independently loads namespace configs from storage continuously as they change ([§3.1.3](#3.1.3-namespace-config-storage)). Therefore, each server in a cluster may have access to a different range of config timestamps due to restarts or network latency. Zanzibar must pick a timestamp that is available across all of them. To facilitate this, a monitoring job tracks the timestamp range available to every server and aggregates them, reporting a globally available range to every other server. On each incoming request the server picks a time from this range, ensuring that all servers can continue serving even if they are no longer able to read from the config storage.
 
-### 3.2.3 Check Evaluation
+#### 3.2.3 Check Evaluation
 
 Zanzibar evaluates ACL checks by converting check requests to boolean expressions. In a simple case, when there are no userset rewrite rules, checking a user $U$ against a userset _⟨object#relation⟩_ can be expressed as
 
