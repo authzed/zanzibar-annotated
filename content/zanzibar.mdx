@@ -262,7 +262,7 @@ While relation tuples reflect relationships between objects and users, they do n
 
 Userset rewrite rules are defined per relation in a namespace. Each rule specifies a function that takes an object ID as input and outputs a userset expression tree. Each leaf node of the tree can be any of the following:
 
-* `_this`: Returns all users from stored relation tuples for the _⟨object#relation⟩_ pair, including indirect ACLs referenced by usersets from the tuples. This is the default behavior when no rewrite rule is specified.
+* `_this`: Returns all users from stored relation tuples for the ⟨_object#relation_⟩ pair, including indirect ACLs referenced by usersets from the tuples. This is the default behavior when no rewrite rule is specified.
 * `computed_userset`: Computes, for the input object, a new userset. For example, this allows the userset expression for a `viewer` relation to refer to the `editor` userset on the same object, thus offering an ACL inheritance capability between relations.
 
 </Column>
@@ -317,13 +317,13 @@ Some clients maintain secondary indices of relation tuples in Zanzibar. They can
 
 #### 2.4.4 Check
 
-A check request specifies a userset, represented by _⟨object#relation⟩_, a putative user, often represented by an authentication token, and a zookie corresponding to the desired object version. Like reads, a check is always evaluated at a consistent snapshot no earlier than the given zookie.
+A check request specifies a userset, represented by ⟨_object#relation_⟩, a putative user, often represented by an authentication token, and a zookie corresponding to the desired object version. Like reads, a check is always evaluated at a consistent snapshot no earlier than the given zookie.
 
 To authorize application content modifications, our clients send a special type of check request, a _content-change_ check. A content-change check request does not carry a zookie and is evaluated at the latest snapshot. If a content change is authorized, the check response includes a zookie for clients to store along with object contents and use for subsequent checks of the content version. The zookie encodes the evaluation snapshot and captures any possible causality from ACL changes to content changes, because the zookie’s timestamp will be greater than that of the ACL updates that protect the new content ([§2.2](#2.2-consistency-model)).
 
 #### 2.4.5 Expand
 
-The Expand API returns the effective userset given an _⟨object#relation⟩_ pair and an optional zookie. Unlike the Read API, Expand follows indirect references expressed through userset rewrite rules. The result is represented by a _userset tree_ whose leaf nodes are user IDs or usersets pointing to other _⟨object#relation⟩_ pairs, and intermediate nodes represent union, intersection, or exclusion operators. Expand is crucial for our clients to reason about the complete set of users and groups that have access to their objects, which allows them to build efficient search indices for access-controlled content.
+The Expand API returns the effective userset given an ⟨_object#relation_⟩ pair and an optional zookie. Unlike the Read API, Expand follows indirect references expressed through userset rewrite rules. The result is represented by a _userset tree_ whose leaf nodes are user IDs or usersets pointing to other ⟨_object#relation_⟩ pairs, and intermediate nodes represent union, intersection, or exclusion operators. Expand is crucial for our clients to reason about the complete set of users and groups that have access to their objects, which allows them to build efficient search indices for access-controlled content.
 
 ## 3 Architecture and Implementation
 
@@ -408,7 +408,7 @@ Each server independently loads namespace configs from storage continuously as t
 
 #### 3.2.3 Check Evaluation
 
-Zanzibar evaluates ACL checks by converting check requests to boolean expressions. In a simple case, when there are no userset rewrite rules, checking a user $U$ against a userset _⟨object#relation⟩_ can be expressed as
+Zanzibar evaluates ACL checks by converting check requests to boolean expressions. In a simple case, when there are no userset rewrite rules, checking a user $U$ against a userset ⟨_object#relation_⟩ can be expressed as
 
 <br/>
 $
@@ -479,7 +479,7 @@ Zanzibar servers in each cluster form a distributed cache for both reads and che
 </Column>
 <Column>
 
-quests to the corresponding Zanzibar servers via an internal RPC interface. To minimize the number of internal RPCs, for most namespaces we compute the forwarding key from the object ID, since processing a check on _⟨object#relation⟩_ often involves indirect ACL checks on other relations of the same object and reading relation tuples of the object. These checks and reads can be processed by the same server since they share the same forwarding key with the parent check request. To handle hot forwarding keys, we cache results at both the caller and the callee of internal RPCs, effectively forming cache trees. We also use Slicer [[12]](#referencs-12) to help distribute hot keys to multiple servers.
+quests to the corresponding Zanzibar servers via an internal RPC interface. To minimize the number of internal RPCs, for most namespaces we compute the forwarding key from the object ID, since processing a check on ⟨_object#relation_⟩ often involves indirect ACL checks on other relations of the same object and reading relation tuples of the object. These checks and reads can be processed by the same server since they share the same forwarding key with the parent check request. To handle hot forwarding keys, we cache results at both the caller and the callee of internal RPCs, effectively forming cache trees. We also use Slicer [[12]](#referencs-12) to help distribute hot keys to multiple servers.
 
 We avoid reusing results evaluated from a different snapshot by encoding snapshot timestamps in cache keys. We choose evaluation timestamps rounded up to a coarse granularity, such as one or ten seconds, while respecting staleness constraints from request zookies. This timestamp quantization allows the vast majority of recent checks and reads to be evaluated at the same timestamps and to share cache results, despite having microsecond-resolution timestamps in cache keys. It is worth noting that rounding up timestamps does not affect Zanzibar’s consistency properties, since Spanner ensures that a snapshot read at timestamp $T$ will observe all writes up to $T$ —-this holds even if $T$ is in the future, in which case the read will wait until TrueTime has moved past $T$.
 
@@ -487,7 +487,7 @@ To handle the “cache stampede” problem [[3]](#references-3), where concurren
 
 We can effectively handle the vast majority of hot spots with distributed caches and lock tables. Over time we made the following two improvements.
 
-First, direct membership checks of a user for an object and relation (i.e. _⟨object#relation@user⟩_) are usually handled by a single relation tuple lookup. However, occasionally a very popular object invites many concurrent checks for different users, causing a hot spot on the storage server hosting relation tuples for the object. To avoid these hot spots, we read and cache all relation tuples of _⟨object#relation⟩_ for the hot object, trading read bandwidth for cacheability. We dynamically detect hot objects to apply this method to by tracking the number of outstanding reads on each object.
+First, direct membership checks of a user for an object and relation (i.e. ⟨_object#relation@user_⟩) are usually handled by a single relation tuple lookup. However, occasionally a very popular object invites many concurrent checks for different users, causing a hot spot on the storage server hosting relation tuples for the object. To avoid these hot spots, we read and cache all relation tuples of ⟨_object#relation_⟩ for the hot object, trading read bandwidth for cacheability. We dynamically detect hot objects to apply this method to by tracking the number of outstanding reads on each object.
 
 Second, indirect ACL checks are frequently cancelled when the result of the parent ACL check is already determined. This leaves the cache key unpopulated. While eager cancellation reduces resource usage significantly, it negatively affects latency of concurrent requests that are blocked by the lock table entry. To prevent this latency impact, we delay eager cancellation when there are waiters on the corresponding lock table entry.
 
