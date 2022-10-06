@@ -142,17 +142,16 @@ Groups are simply ACLs with membership semantics.
 Relation tuples have efficient binary encodings, but in this paper we represent them using a convenient text notation:
 
 <br/>
-$〈tuple〉 \coloncolonequals 〈object〉 \text{\textquoteleft} \# \text{\textquoteright} 〈relation〉 \text{\textquoteleft} @ \text{\textquoteright}〈user〉$
+$\lang tuple \rang \coloncolonequals \lang object \rang \text{\textquoteleft} \# \text{\textquoteright} \lang relation \rang \text{\textquoteleft} @ \text{\textquoteright}\lang user \rang \\ \nobreakspace$
 
-$〈object〉 \coloncolonequals 〈namespace〉 \text{\textquoteleft} : \text{\textquoteright} 〈object id〉$
+$\lang object \rang \coloncolonequals \lang namespace \rang \text{\textquoteleft} : \text{\textquoteright} \lang object id \rang \\ \nobreakspace$
 
-$〈user〉 \coloncolonequals 〈user\_id〉 | 〈userset〉$
+$\lang user \rang \coloncolonequals \lang user\_id \rang \space | \space \lang userset \rang \\ \nobreakspace$
 
-$〈userset〉 \coloncolonequals 〈object〉 \text{\textquoteleft} \# \text{\textquoteright} 〈relation〉$
-<br/>
+$\lang userset \rang \coloncolonequals \lang object \rang \text{\textquoteleft} \# \text{\textquoteright} \lang relation \rang \\ \nobreakspace$
 
 where _〈namespace〉_ and _〈relation〉_ are predefined in client configurations [(§2.3)](#2.3-namespace-configuration), _〈object id〉_ is a string, and _〈user id〉_ is an integer.
-The primary keys required to identify a relation tuple are _〈naespace〉_, _〈object id〉_, _〈relation〉_, and _〈user〉_.
+The primary keys required to identify a relation tuple are _〈namespace〉_, _〈object id〉_, _〈relation〉_, and _〈user〉_.
 One feature worth noting is that a _〈userset〉_ allows ACLs to refer to groups and thus supports representing nested group membership.
 
 [Table 1](#table-1) shows some example tuples and corresponding semantics.
@@ -413,14 +412,14 @@ Zanzibar evaluates ACL checks by converting check requests to boolean expression
 
 <br/>
 $
-  \text{CHECK}(U, ⟨object\#relation⟩) = \\
-  \hspace{5em} \exist \space tuple \space ⟨object\#relation@U⟩ \\
-  \hspace{4em} \lor \space \exist \space tuple \space ⟨object\#relation@U'⟩, where \\
-  \hspace{6em} U' = ⟨object'\#relation'⟩ \space s.t. \space \small CHECK(U, U').
+  \mathrm{CHECK}(U, \lang object\#relation \rang) = \\
+  \hspace{4.6em} \exist \space tuple \space \lang object\#relation@U \rang \\
+  \hspace{3.7em} \lor \space \exist \space tuple \space \lang object\#relation@U' \rang, where \\
+  \hspace{6.2em} U' = \lang object'\#relation' \rang \space s.t. \space \small \mathrm{CHECK}(U, U').
 $
 <br/>
 
-Finding a valid $U'=⟨\text{object}'\#\text{relation}'⟩$ involves evaluating membership on all indirect ACLs or groups, recursively. This kind of “pointer chasing” works well for most types of ACLs and groups, but can be expensive when indirect ACLs or groups are deep or wide. [§3.2.4](#3.2.4-leopard-indexing-system) explains how we handle this problem. Userset rewrite rules are also translated to boolean expressions as part of check evaluation.
+Finding a valid $U'=\lang\text{object}'\#\text{relation}'\rang$ involves evaluating membership on all indirect ACLs or groups, recursively. This kind of “pointer chasing” works well for most types of ACLs and groups, but can be expensive when indirect ACLs or groups are deep or wide. [§3.2.4](#3.2.4-leopard-indexing-system) explains how we handle this problem. Userset rewrite rules are also translated to boolean expressions as part of check evaluation.
 
 To minimize check latency, we evaluate all leaf nodes of the boolean expression tree concurrently. When the outcome
 

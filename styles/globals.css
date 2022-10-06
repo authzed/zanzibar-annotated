@@ -50,7 +50,7 @@
 }
 
 div.references > p {
-  @apply indent-0 mb-4 break-all;
+  @apply indent-0 mb-4 break-words;
 }
 
 .katex { font-size: 1em; }
