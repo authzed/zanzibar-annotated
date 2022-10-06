@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-200;
+    @apply bg-gray-200 tracking-normal;
   }
   a {
     @apply text-blue-500;
@@ -48,3 +48,9 @@
     @apply indent-0;
   }
 }
+
+div.references > p {
+  @apply indent-0 mb-4 break-all;
+}
+
+.katex { font-size: 1em; }

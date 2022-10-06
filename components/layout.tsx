@@ -49,7 +49,7 @@ export function Page(props: PropsWithChildren) {
  */
 export function Header(props: PropsWithChildren) {
   return (
-    <div className="w-3/4 my-10 mx-auto text-center md:col-span-2">
+    <div className="w-3/4 my-10 mx-auto md:col-span-2 text-center">
       {props.children}
     </div>
   );
