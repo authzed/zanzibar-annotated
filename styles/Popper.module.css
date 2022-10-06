@@ -1,10 +1,10 @@
 .tooltip {
-  @apply inline-block p-3 bg-gray-700 border rounded shadow-md align-middle;
+  @apply inline-block p-3 bg-gray-700 border rounded shadow-md align-middle z-50;
 }
 
 .arrow,
 .arrow::before {
-  @apply absolute bg-inherit w-3 h-3;
+  @apply absolute bg-inherit w-3 h-3 z-50;
 }
 
 .arrow {
@@ -12,9 +12,8 @@
 }
 
 .arrow::before {
-  visibility: visible;
   content: '';
-  transform: rotate(45deg);
+  @apply visible rotate-45 z-50;
 }
 
 .tooltip[data-popper-placement^='top'] > .arrow {

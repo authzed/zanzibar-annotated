@@ -113,7 +113,7 @@ function Annotation(props: {
         ref={setPopperElement}
         style={styles.popper}
         {...attributes.popper}
-        className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 rounded block`}
+        className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 rounded block z-10`}
       >
         <span className="bg-gray-600 text-white p-3 rounded-t block">
           {title}
