@@ -14,6 +14,25 @@ type VirtualElement = {
   contextElement?: Element;
 };
 
+type ShareButtonProps = {
+  onClick: () => void;
+  title: string;
+  className?: string;
+  icon: React.FC<{ className: string }>;
+};
+
+function ShareButton(props: ShareButtonProps) {
+  return (
+    <button
+      className={`${popperStyles.button} ${props.className}`}
+      onClick={props.onClick}
+      title={props.title}
+    >
+      <props.icon className={popperStyles.icon} />
+    </button>
+  );
+}
+
 function SelectionShare() {
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
     null
@@ -46,37 +65,37 @@ function SelectionShare() {
     []
   );
 
-  function copyToClipboard() {
+  const copyToClipboard = () => {
     navigator.clipboard.writeText(shareUrl);
     setStatusMsg('URL copied to your clipboard!');
-  }
+  };
 
-  function shareToTwitter() {
+  const shareToTwitter = () => {
     window.open(
       `https://twitter.com/intent/tweet/?url=${encodeURIComponent(
         shareUrl
-      )}&text=Shared from the Annotated Zanzibar Paper`,
+      )}&text=Shared from the Annotated Zanzibar Paper by Authzed`,
       '_blank'
     );
-  }
+  };
 
-  function shareToReddit() {
+  const shareToReddit = () => {
     window.open(
       `https://reddit.com/submit/?url=${encodeURIComponent(
         shareUrl
-      )}&resubmit=true&title=Selection from the Annotated Zanzibar Paper`,
+      )}&resubmit=true&title=Selection from the Annotated Zanzibar Paper by Authzed`,
       '_blank'
     );
-  }
+  };
 
-  function shareToHN() {
+  const shareToHN = () => {
     window.open(
       `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
         shareUrl
-      )}&t=Selection from the Annotated Zanzibar Paper`,
+      )}&t=Selection from the Annotated Zanzibar Paper by Authzed`,
       '_blank'
     );
-  }
+  };
 
   useEffect(() => {
     document.addEventListener('selectionchange', debouncedSelectionHandler);
@@ -101,35 +120,27 @@ function SelectionShare() {
           >
             {!statusMsg && (
               <>
-                <button
-                  className={`${popperStyles.button} border-l-0`}
+                <ShareButton
+                  className="border-l-0"
                   onClick={copyToClipboard}
                   title="Copy share URL to clipboard"
-                >
-                  <LinkIcon className={popperStyles.icon} />
-                </button>
-                <button
-                  className={popperStyles.button}
+                  icon={LinkIcon}
+                />
+                <ShareButton
                   onClick={shareToTwitter}
                   title="Tweet your selection"
-                >
-                  <TwitterIcon className={popperStyles.icon} />
-                </button>
-                <button
-                  className={popperStyles.button}
+                  icon={TwitterIcon}
+                />
+                <ShareButton
                   onClick={shareToHN}
                   title="Post to HackerNews"
-                >
-                  <HNIcon className={popperStyles.icon} />
-                </button>
-                <button
-                  className={popperStyles.button}
+                  icon={HNIcon}
+                />
+                <ShareButton
                   onClick={shareToReddit}
                   title="Submit on Reddit"
-                >
-                  <RedditIcon className={popperStyles.icon} />
-                </button>
-
+                  icon={RedditIcon}
+                />
                 <div
                   ref={setArrowElement}
                   className={popperStyles.arrow}

@@ -39,6 +39,9 @@
 .icon {
   @apply w-5 fill-white;
 }
+.icon:hover {
+  @apply w-5 fill-gray-400;
+}
 
 .statusMsg {
   @apply text-white

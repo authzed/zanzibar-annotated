@@ -44,13 +44,17 @@
   div.page-column > p:first-child {
     @apply indent-0;
   }
-  .annotation {
-    @apply indent-0;
-  }
 }
 
 div.references > p {
   @apply indent-0 mb-4 break-words;
+}
+
+div.annotation * {
+  @apply indent-0;
+}
+div.annotation div.content > p {
+  @apply mb-2;
 }
 
 .katex { font-size: 1em; }
