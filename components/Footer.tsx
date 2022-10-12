@@ -1,15 +1,10 @@
-const style = {
-  // clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 70%)',
-  // zIndex: 99999,
-};
-
+/**
+ * Displayed after the last page of the paper.
+ */
 export function Footer() {
   return (
     <>
-      <div
-        className="w-full p-3 bg-black text-white font-sans text-center"
-        style={style}
-      >
+      <div className="w-full p-3 bg-black text-white font-sans text-center">
         <div className="w-3/4 mx-auto">
           <p className="">
             Join the discussion on{' '}

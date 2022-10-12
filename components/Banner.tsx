@@ -1,3 +1,6 @@
+/**
+ * Banner displayed above the first page of the paper.
+ */
 export function Banner() {
   return (
     <>

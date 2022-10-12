@@ -8,33 +8,19 @@ import {
 } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-
 import { usePopper } from 'react-popper';
+import remarkGfm from 'remark-gfm';
+import annotations from '../content/annotations.yaml';
 import popperStyles from '../styles/Popper.module.css';
-
-const dummyData: { [index: string]: AnnotationData } = {
-  example1: {
-    title: 'Hello World',
-    content: `
-**Lorem** ipsum dolor sit amet, consectetur adipiscing elit. Donec at elit fringilla, luctus felis id, elementum quam. Aliquam viverra ligula id ultricies commodo. Mauris ut.
-
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Donec at elit fringilla](#hi), luctus felis id, elementum quam. Aliquam viverra ligula id ultricies commodo. Mauris ut.
-    `,
-  },
-  example2: {
-    title: 'Hello Again',
-    content:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Donec at elit fringilla](#hi), luctus felis id, elementum quam. Aliquam viverra ligula id ultricies commodo. Mauris ut.',
-  },
-};
 
 type AnnotationData = {
   title: string;
   content: string;
 };
 
+/**
+ * Annotation provider context
+ */
 export interface AnnotationsContextType {
   getAnnotation(id: string): AnnotationData;
 }
@@ -52,10 +38,12 @@ const AnnotationsContext = createContext<AnnotationsContextType>(
   NoopAnnotationsProvider
 );
 
+/**
+ * Yaml file backed annotation provider
+ */
 export const AnnotationsProvider: React.FC = (props: PropsWithChildren) => {
-  // TODO: Actually implement annotation data source
   function getAnnotation(id: string): AnnotationData {
-    return dummyData[id];
+    return annotations[id];
   }
 
   return (
@@ -72,6 +60,9 @@ type HighlightProps = {
   showAnnotation?: boolean;
 };
 
+/**
+ * Component that visually highlights child components and provides annotation content based on the annotation id.
+ */
 export function Highlight(props: PropsWithChildren<HighlightProps>) {
   const {
     annotationId,
