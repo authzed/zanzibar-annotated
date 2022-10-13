@@ -1,0 +1,1 @@
+const t=t=>{alert("You opened a link that highlighted multiple selections of text, but your browser does not support this — only the first selection is being shown.")};export{t as m};//# sourceMappingURL=e-d610c008.js.map

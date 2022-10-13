@@ -3,6 +3,16 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    @apply bg-gray-200 tracking-normal;
+  }
+  a {
+    @apply text-blue-500;
+  }
+  a:hover {
+    @apply text-blue-600;
+  }
+
   /* Headings style */
   h1 {
     @apply text-2xl font-bold my-6;
@@ -26,10 +36,25 @@
   p {
     @apply indent-4;
   }
-  h2 + p, h3 + p {
+  h2 + p,
+  h3 + p,
+  h4 + p {
     @apply indent-0;
   }
   div.page-column > p:first-child {
     @apply indent-0;
   }
 }
+
+div.references > p {
+  @apply indent-0 mb-4 break-words;
+}
+
+div.annotation * {
+  @apply indent-0;
+}
+div.annotation div.content > p {
+  @apply mb-2;
+}
+
+.katex { font-size: 1em; }

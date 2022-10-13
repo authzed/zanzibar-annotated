@@ -1,0 +1,48 @@
+.tooltip {
+  @apply inline-block p-3 bg-gray-700 border rounded shadow-md align-middle z-50;
+}
+
+.arrow,
+.arrow::before {
+  @apply absolute bg-inherit w-3 h-3 z-50;
+}
+
+.arrow {
+  visibility: hidden;
+}
+
+.arrow::before {
+  content: '';
+  @apply visible rotate-45 z-50;
+}
+
+.tooltip[data-popper-placement^='top'] > .arrow {
+  bottom: -4px;
+}
+
+.tooltip[data-popper-placement^='bottom'] > .arrow {
+  top: -4px;
+}
+
+.tooltip[data-popper-placement^='left'] > .arrow {
+  right: -4px;
+}
+
+.tooltip[data-popper-placement^='right'] > .arrow {
+  left: -4px;
+}
+
+.button {
+  @apply text-sm p-2 border-l border-gray-500 ;
+}
+
+.icon {
+  @apply w-5 fill-white;
+}
+.icon:hover {
+  @apply w-5 fill-gray-400;
+}
+
+.statusMsg {
+  @apply text-white
+}

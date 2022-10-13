@@ -1,5 +1,10 @@
 import Head from 'next/head';
+import Script from 'next/script';
 import { PropsWithChildren } from 'react';
+import { Banner } from './Banner';
+import { Footer } from './Footer';
+import { GTag } from './GTag';
+import SelectionShare from './SelectionShare';
 
 /**
  * Paper layout
@@ -8,16 +13,26 @@ export function Layout(props: PropsWithChildren) {
   return (
     <>
       <Head>
-        <title>The Annotated Zanzibar Paper</title>
+        <title>The Zanzibar Paper, annotated by Authzed</title>
         <meta
           name="description"
           content="Zanzibar: Google’s Consistent, Global Authorization System. This is an annotated copy of the original paper submitted to USENIX 2019."
         />
         <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <div className="container mx-auto max-w-4xl font-serif">
+      <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
+        <Banner />
+        <SelectionShare />
         {props.children}
+        <GTag />
       </div>
+      <Footer />
+      <Script
+        src="/scripts/deeplinks/deeplinks.js"
+        type="module"
+        strategy="afterInteractive"
+      />
     </>
   );
 }
@@ -27,7 +42,7 @@ export function Layout(props: PropsWithChildren) {
  */
 export function Page(props: PropsWithChildren) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 px-10 py-5 break-words">
+    <div className="md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow">
       {props.children}
     </div>
   );
@@ -38,7 +53,9 @@ export function Page(props: PropsWithChildren) {
  */
 export function Header(props: PropsWithChildren) {
   return (
-    <div className="w-3/4 my-10 mx-auto text-center">{props.children}</div>
+    <div className="w-3/4 my-10 mx-auto md:col-span-2 text-center">
+      {props.children}
+    </div>
   );
 }
 
