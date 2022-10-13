@@ -133,7 +133,7 @@ function SelectionShare() {
                 />
                 <ShareButton
                   onClick={shareToHN}
-                  title="Post to HackerNews"
+                  title="Post to Hacker News"
                   icon={HNIcon}
                 />
                 <ShareButton
