@@ -128,7 +128,7 @@ function Annotation(props: {
 
   return (
     <>
-      {title && content && (
+      {content && (
         <ClickAwayListener onClickAway={() => props.setVisible(false)}>
           <div
             ref={setPopperElement}
