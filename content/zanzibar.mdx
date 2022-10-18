@@ -162,15 +162,15 @@ $\lang user \rang \coloncolonequals \lang user\_id \rang \space | \space \lang u
 
 $\lang userset \rang \coloncolonequals \lang object \rang \text{\textquoteleft} \# \text{\textquoteright} \lang relation \rang \\ \nobreakspace$
 
-where <Highlight setId="intro" entryId="tuple-encoding-hint">_〈namespace〉_ and _〈relation〉_ are predefined in client configurations</Highlight> [(§2.3)](#2.3-namespace-configuration), _〈object id〉_ is a string, and _〈user id〉_ is an integer.
-The primary keys required to identify a relation tuple are _〈namespace〉_, _〈object id〉_, _〈relation〉_, and _〈user〉_.
-One feature worth noting is that a _〈userset〉_ allows ACLs to refer to groups and thus supports representing nested group membership.
+where <Highlight setId="intro" entryId="tuple-encoding-hint">〈_namespace_〉 and 〈_relation_〉 are predefined in client configurations</Highlight> [(§2.3)](#2.3-namespace-configuration), 〈_object id_〉 is a string, and 〈_user id_〉 is an integer.
+The primary keys required to identify a relation tuple are 〈_namespace_〉, 〈_object id_〉, 〈_relation_〉, and 〈_user_〉.
+One feature worth noting is that a 〈_userset_〉 allows ACLs to refer to groups and thus supports representing nested group membership.
 
 <PreviewLink previewComponent={<Table1 />}>[Table 1](#table-1)</PreviewLink> shows some example tuples and corresponding semantics.
 While some relations (e.g. `viewer`) define access control directly, others (e.g. `parent`, pointing to a folder) only define abstract relations between objects.
 <Highlight setId="intro" entryId="relation-rewrite-interpret-graph">These abstract relations may indirectly affect access control given userset rewrite rules specified in namespace configs</Highlight> ([§2.3.1](#2.3.1-relation-configs-and-userset-rewrites)).
 
-Defining our data model around tuples, instead of perobject ACLs, allows us to unify the concepts of ACLs and groups and to support efficient reads and incremental updates, as we will see in [§2.4](#2.4-api).
+Defining our data model around tuples, instead of per-object ACLs, allows us to unify the concepts of ACLs and groups and to support efficient reads and incremental updates, as we will see in [§2.4](#2.4-api).
 </Section>
 
 ### 2.2 Consistency Model
@@ -199,7 +199,7 @@ Specifically, our clients care about preventing the
 <Column>
 <Section titles={["2 Model, Language, and API", "2.2 Consistency Model"]}>
 
-“new enemy” problem, which can arise when we fail to respect the ordering between ACL updates or when we apply old ACLs to new content
+<Highlight setId="intro" entryId="new-enemy-intro">“new enemy” problem, which can arise when we fail to respect the ordering between ACL updates or when we apply old ACLs to new content</Highlight>.
 Consider these two examples:
 
 <a name="example-a"></a>
@@ -227,7 +227,7 @@ Consider these two examples:
 Preventing the “new enemy” problem requires Zanzibar to understand and respect the causal ordering between ACL or content updates, including updates on different ACLs or objects and those coordinated via channels invisible to Zanzibar.
 Hence Zanzibar must provide two key consistency properties: _external consistency_ [[18]](#references-18) and _snapshot reads with bounded staleness_.
 
-External consistency allows Zanzibar to assign a timestamp to each ACL or content update, such that two causally related updates $x \prec y$ will be assigned timestamps that reflect the causal order: $T_x \lt T_y$.
+External consistency allows Zanzibar to <Highlight setId="intro" entryId="timestamps-from-checks">assign a timestamp to each ACL or content update</Highlight>, such that two causally related updates $x \prec y$ will be assigned <Highlight setId="intro" entryId="causal-ordering-schemes">timestamps</Highlight> that reflect the causal order: $T_x \lt T_y$.
 With causally meaningful timestamps, a snapshot read of the ACL database at timestamp $T$, which observes all updates with timestamps $\leq T$, will respect ordering between ACL updates.
 That is, if the read observes an update $x$, it will observe all updates that happen causally before $x$.
 
@@ -243,16 +243,16 @@ Given a content update at timestamp $T_c$, a snapshot read at timestamp
 $\geq T_c$ ensures that all ACL updates that happen causally before the content update will be observed by the ACL check.
 
 To provide external consistency and snapshot reads with bounded staleness, we store ACLs in the Spanner global database system [[15]](#references-15).
-Spanner's TrueTime mechanism assigns each ACL write a microsecond-resolution timestamp, such that the timestamps of writes reflect the causal ordering between writes, and thereby provide external consistency.
+<Highlight setId="intro" entryId="truetime-spanner-requirement">Spanner's TrueTime mechanism</Highlight> assigns each ACL write a microsecond-resolution timestamp, such that the timestamps of writes reflect the causal ordering between writes, and thereby provide external consistency.
 We evaluate each ACL check at a single snapshot timestamp across multiple database reads, so that all writes with timestamps up to the check snapshot, and only those writes, are visible to the ACL check.
 
-To avoid evaluating checks for new contents using stale ACLs, one could try to always evaluate at the latest snapshot such that the check result reflects all ACL writes up to the check call.
+To avoid evaluating checks for new contents using stale ACLs, <Highlight setId="intro" entryId="presumed-immediately-consistent">one could try to always evaluate at the latest snapshot such that the check result reflects all ACL writes up to the check call</Highlight>.
 However, such evaluation would require global data synchronization with high-latency round trips and limited availability.
 Instead, we design the following protocol to allow most checks to be evaluated on already replicated data with cooperation from Zanzibar clients:
 
 1. A Zanzibar client requests an opaque consistency token called a _zookie_ for each content version, via a _content-change_ ACL check ([§2.4.4](#2.4.4-check)) when the content modification is about to be saved.
 Zanzibar encodes a current global timestamp in the zookie and ensures that all prior ACL writes have lower timestamps.
-The client stores the zookie with the content change in an atomic write to the client storage.
+The client <Highlight setId="intro" entryId="zookie-with-content-replication">stores the zookie with the content change in an atomic write to the client storage</Highlight>.
 Note that the content-change check does _not_ need to be evaluated in the same transaction as the application content modification, but only has to be triggered when the user modifies the contents.
 2. The client sends this zookie in subsequent ACL check requests to ensure that the check snapshot is at least as fresh as the timestamp for the content version.
 
@@ -278,7 +278,7 @@ For Bob to see the new contents, the check must be evaluated with a zookie $\geq
 Because $T_{B2} \gt T_{B1}$, such a check will also observe the ACL update $B1$, which removed Bob from the ACL.
 
 The zookie protocol is a key feature of Zanzibar’s consistency model.
-It ensures that Zanzibar respects causal ordering between ACL and content updates, but otherwise grants Zanzibar freedom to choose evaluation timestamps so as to meet its latency and availability goals.
+<Highlight setId="intro" entryId="relaxed-consistency-for-performance">It ensures that Zanzibar respects causal ordering between ACL and content updates, but otherwise grants Zanzibar freedom to choose evaluation timestamps so as to meet its latency and availability goals.</Highlight>
 The freedom arises from the protocol’s at-least-as-fresh semantics, which allow Zanzibar to choose any timestamp fresher than the one encoded in a zookie.
 Such freedom in turn allows Zanzibar to serve most checks at a default staleness with already replicated data ([§3.2.1](#3.2.1-evaluation-timestamp)) and to quantize evaluation timestamps to avoid hot spots ([§3.2.5](#3.2.5-handling-hot-spots)).
 
@@ -290,7 +290,7 @@ Such freedom in turn allows Zanzibar to serve most checks at a default staleness
 Before clients can store relation tuples in Zanzibar, they must configure their namespaces.
 A namespace configuration specifies its relations as well as its storage parameters.
 Each relation has a name, which is a client-defined string such as `viewer` or `editor`, and a relation config.
-Storage parameters include sharding settings and an encoding for object IDs that helps Zanzibar optimize storage of integer, string, and other object ID formats.
+Storage parameters include sharding settings and an <Highlight setId="intro" entryId="more-tuple-encoding-hints">encoding for object IDs that helps Zanzibar optimize storage of integer, string, and other object ID formats.</Highlight>
 </Section>
 
 <Section titles={["2 Model, Language, and API", "2.3 Namespace Configuration", "2.3.1 Relation Configs and Userset Rewrites"]}>
@@ -298,12 +298,12 @@ Storage parameters include sharding settings and an encoding for object IDs that
 
 While relation tuples reflect relationships between objects and users, they do not completely define the effective ACLs.
 For example, some clients specify that users with `editor` permissions on each object should have `viewer` permission on the same object.
-While such relationships between relations can be represented by a relation tuple per object, storing a tuple for each object in a namespace would be wasteful and make it hard to make modifications across all objects.
-Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs.
+While such relationships between relations can be represented by a relation tuple per object, <Highlight setId="intro" entryId="systems-without-rewrites">storing a tuple for each object in a namespace would be wasteful and make it hard to make modifications across all objects.
+Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs.</Highlight>
 <PreviewLink previewComponent={<Figure1 />}>[Figure 1](#figure-1)</PreviewLink> demonstrates a simple namespace configuration with concentric relations, where `viewer` contains `editor`, and `editor` contains `owner`.
 
 Userset rewrite rules are defined per relation in a namespace.
-Each rule specifies a function that takes an object ID as input and outputs a userset expression tree.
+<Highlight setId="intro" entryId="rewrites-are-important">Each rule specifies a function that takes an object ID as input and outputs a userset expression tree.</Highlight>
 Each leaf node of the tree can be any of the following:
 
 * `_this`: Returns all users from stored relation tuples for the ⟨_object#relation_⟩ pair, including indirect ACLs referenced by usersets from the tuples.
@@ -323,7 +323,7 @@ For example, this allows the userset expression for a `viewer` relation to refer
 from the input object, fetches relation tuples matching the tupleset, and computes a userset from every fetched relation tuple.
 This flexible primitive allows our clients to express complex policies such as “look up the parent folder of the document and inherit its viewers”.
 
-A userset expression can also be composed of multiple sub-expressions, combined by operations such as union, intersection, and exclusion.
+A userset expression can also be composed of multiple sub-expressions, combined by operations such as union, <Highlight setId="intro" entryId="negations-are-hard">intersection, and exclusion</Highlight>.
 </Section>
 
 ### 2.4 API
@@ -334,7 +334,7 @@ In addition to supporting ACL checks, Zanzibar also provides APIs for clients to
 A concept used throughout these API methods is that of a _zookie_.
 A zookie is an opaque byte sequence encoding a globally meaningful timestamp that reflects an ACL write, a client content version, or a read snapshot.
 Zookies in ACL read and check requests specify staleness bounds for snapshot reads, thus providing one of Zanzibar’s core consistency properties.
-We choose to use an opaque cookie instead of the actual timestamp to discourage our clients from choosing arbitrary timestamps and to allow future extensions.
+We <Highlight setId="intro" entryId="how-opaque-are-zookies">choose to use an opaque cookie</Highlight> instead of the actual timestamp to discourage our clients from choosing arbitrary timestamps and to allow future extensions.
 
 </Section>
 </Column>
@@ -351,7 +351,7 @@ We choose to use an opaque cookie instead of the actual timestamp to discourage 
 Our clients read relation tuples to display ACLs or group membership to users, or to prepare for a subsequent write.
 A read request specifies one or multiple _tuplesets_ and an optional zookie.
 
-Each _tupleset_ specifies keys of a set of relation tuples.
+Each _tupleset_ specifies <Highlight setId="intro" entryId="spanner-keys-for-queries">keys of a set of relation tuples.</Highlight>
 The set can include a single tuple key, or all tuples with a given object ID or userset in a namespace, optionally constrained by a relation name.
 With the tuplesets, clients can look up a specific membership entry, read all entries in an ACL or group, or look up all groups with a given user as a direct member.
 All tuplesets in a read request are processed at a single snapshot.
@@ -372,7 +372,7 @@ Clients may modify a single relation tuple to add or remove an ACL.
 They may also modify all tuples related to an object via a read-modify-write process with optimistic concurrency control [[21]](#references-21) that uses a read RPC followed by a write RPC:
 
 1. Read all relation tuples of an object, including a per-object “lock” tuple.
-2. Generate the tuples to write or delete. Send the writes, along with a touch on the lock tuple, to Zanzibar, with the condition that the writes will be committed only if the lock tuple has not been modified since the read.
+2. Generate the tuples to write or delete. Send the writes, along with a touch on the lock tuple, to Zanzibar, with the condition that the writes will be committed <Highlight setId="intro" entryId="tuple-versioning-implication">only if the lock tuple has not been modified since the read</Highlight>.
 3. If the write condition is not met, go back to step 1.
 
 The lock tuple is just a regular relation tuple used by clients to detect write races.
@@ -393,11 +393,11 @@ The client can use the heartbeat zookie to resume watching where the previous wa
 <Section titles={["2 Model, Language, and API", "2.4 API", "2.4.4 Check"]}>
 #### 2.4.4 Check
 
-A check request specifies a userset, represented by ⟨_object#relation_⟩, a putative user, often represented by an authentication token, and a zookie corresponding to the desired object version.
+A check request specifies a userset, represented by ⟨_object#relation_⟩, <Highlight setId="intro" entryId="putative-user-implication">a putative user, often represented by an authentication token</Highlight>, and a zookie corresponding to the desired object version.
 Like reads, a check is always evaluated at a consistent snapshot no earlier than the given zookie.
 
 To authorize application content modifications, our clients send a special type of check request, a _content-change_ check.
-A content-change check request does not carry a zookie and is evaluated at the latest snapshot.
+<Highlight setId="intro" entryId="content-change-check">A content-change check request does not carry a zookie and is evaluated at the latest snapshot.</Highlight>
 If a content change is authorized, the check response includes a zookie for clients to store along with object contents and use for subsequent checks of the content version.
 The zookie encodes the evaluation snapshot and captures any possible causality from ACL changes to content changes, because the zookie’s timestamp will be greater than that of the ACL updates that protect the new content ([§2.2](#2.2-consistency-model)).
 </Section>
@@ -405,7 +405,7 @@ The zookie encodes the evaluation snapshot and captures any possible causality f
 <Section titles={["2 Model, Language, and API", "2.4 API", "2.4.5 Expand"]}>
 #### 2.4.5 Expand
 
-The Expand API returns the effective userset given an ⟨_object#relation_⟩ pair and an optional zookie.
+<Highlight setId="intro" entryId="expand-usefulness">The Expand API returns the effective userset given an ⟨_object#relation_⟩ pair and an optional zookie.</Highlight>
 Unlike the Read API, Expand follows indirect references expressed through userset rewrite rules.
 The result is represented by a _userset tree_ whose leaf nodes are user IDs or usersets pointing to other ⟨_object#relation_⟩ pairs, and intermediate nodes represent union, intersection, or exclusion operators.
 Expand is crucial for our clients to reason about the complete set of users and groups that have access to their objects, which allows them to build efficient search indices for access-controlled content.
