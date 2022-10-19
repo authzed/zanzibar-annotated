@@ -1,6 +1,6 @@
 # Zanzibar Annotated
 
-[![Discord Server](https://img.shields.io/discord/844600078504951838?color=7289da&logo=discord "Discord Server")](https://discord.gg/jTysUaxXzM)
+[![Discord Server](https://img.shields.io/discord/844600078504951838?color=7289da&logo=discord "Discord Server")](https://authzed.com/discord)
 [![Twitter](https://img.shields.io/twitter/follow/authzed?color=%23179CF0&logo=twitter&style=flat-square&label=@authzed "@authzed on Twitter")](https://twitter.com/authzed)
 
 Zanzibar Annotated is a hosted copy of the [paper presented at USENIX ATC 2019](https://www.usenix.org/conference/atc19/presentation/pang) describing the Zanzibar authorization system. It includes annotations that provide commentary on notable portions of the paper.

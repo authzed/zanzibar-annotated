@@ -8,6 +8,12 @@ type PreviewLinkProps = {
   placement?: Placement;
 };
 
+const PREVIEW_TOOLTIP_OFFSET: [number, number] = [0, 10];
+
+/**
+ * Display the preview component as a tooltip when wrapped components are moused over.
+ * @param props previewComponent The component to show as a preview.
+ */
 export default function PreviewLink(
   props: PropsWithChildren<PreviewLinkProps>
 ) {
@@ -19,7 +25,7 @@ export default function PreviewLink(
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: props.placement || 'top',
     modifiers: [
-      { name: 'offset', options: { offset: [0, 10] } },
+      { name: 'offset', options: { offset: PREVIEW_TOOLTIP_OFFSET } },
       {
         name: 'flip',
         options: {
