@@ -6,7 +6,7 @@ example1:
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Donec at elit fringilla](#hi), luctus felis id, elementum quam. Aliquam viverra ligula id ultricies commodo. Mauris ut.
 
 example2:
-  title: Hello Again'
+  title:
   content: |
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Donec at elit fringilla](#hi), luctus felis id, elementum quam. Aliquam viverra ligula id ultricies commodo. Mauris ut.
 

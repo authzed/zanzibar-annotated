@@ -154,7 +154,7 @@ function Annotation(props: {
           className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 rounded block z-10`}
         >
           <div className="title bg-gray-600 text-white indent-0 p-3 rounded-t block">
-            {title}
+            <span className="inline-block">{title}</span>
             <span
               onClick={() => props.setVisible(false)}
               className="cursor-pointer"
