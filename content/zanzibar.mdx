@@ -1,6 +1,7 @@
 import { Column, Header, Page } from '../components/layout';
 import { AnnotationsProvider, Highlight, Annotation } from '../components/annotation';
 import PageFooter from '../components/PageFooter';
+import PreviewLink from '../components/PreviewLink';
 import Table1 from './Table1.svg';
 import Table2 from './Table2.svg';
 import Figure1 from './Figure1.svg';
@@ -154,7 +155,7 @@ where _〈namespace〉_ and _〈relation〉_ are predefined in client configurat
 The primary keys required to identify a relation tuple are _〈namespace〉_, _〈object id〉_, _〈relation〉_, and _〈user〉_.
 One feature worth noting is that a _〈userset〉_ allows ACLs to refer to groups and thus supports representing nested group membership.
 
-[Table 1](#table-1) shows some example tuples and corresponding semantics.
+<PreviewLink previewComponent={<Table1 />}>[Table 1](#table-1)</PreviewLink> shows some example tuples and corresponding semantics.
 While some relations (e.g. `viewer`) define access control directly, others (e.g. `parent`, pointing to a folder) only define abstract relations between objects.
 These abstract relations may indirectly affect access control given userset rewrite rules specified in namespace configs ([§2.3.1](#2.3.1-relation-configs-and-userset-rewrites)).
 
@@ -173,7 +174,7 @@ ACL checks must respect the order in which users modify ACLs and object contents
 
 <Page>
 
-<div className="md:col-span-2 mb-10 mx-auto overflow-scroll">
+<div className="md:col-span-2 mb-10 mx-auto overflow-auto">
 
 <a id="table-1" />
 <Table1 />
@@ -258,7 +259,7 @@ Before clients can store relation tuples in Zanzibar, they must configure their 
 
 #### 2.3.1 Relation Configs and Userset Rewrites
 
-While relation tuples reflect relationships between objects and users, they do not completely define the effective ACLs. For example, some clients specify that users with `editor` permissions on each object should have `viewer` permission on the same object. While such relationships between relations can be represented by a relation tuple per object, storing a tuple for each object in a namespace would be wasteful and make it hard to make modifications across all objects. Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs. [Figure 1](#figure-1) demonstrates a simple namespace configuration with concentric relations, where `viewer` contains `editor`, and `editor` contains `owner`.
+While relation tuples reflect relationships between objects and users, they do not completely define the effective ACLs. For example, some clients specify that users with `editor` permissions on each object should have `viewer` permission on the same object. While such relationships between relations can be represented by a relation tuple per object, storing a tuple for each object in a namespace would be wasteful and make it hard to make modifications across all objects. Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs. <PreviewLink previewComponent={<Figure1 />}>[Figure 1](#figure-1)</PreviewLink> demonstrates a simple namespace configuration with concentric relations, where `viewer` contains `editor`, and `editor` contains `owner`.
 
 Userset rewrite rules are defined per relation in a namespace. Each rule specifies a function that takes an object ID as input and outputs a userset expression tree. Each leaf node of the tree can be any of the following:
 
@@ -268,7 +269,7 @@ Userset rewrite rules are defined per relation in a namespace. Each rule specifi
 </Column>
 <Column>
 <a id="figure-1" />
-<Figure1 className="mb-10 w-full" />
+<Figure1 className="mb-10 w-full mt-10 md:mt-0" />
 
 * `tuple_to_userset`: Computes a tupleset ([§2.4.1](#2.4.1-read))
 from the input object, fetches relation tuples matching the tupleset, and computes a userset from every fetched relation tuple. This flexible primitive allows our clients to express complex policies such as “look up the parent folder of the document and inherit its viewers”.
@@ -327,7 +328,7 @@ The Expand API returns the effective userset given an ⟨_object#relation_⟩ pa
 
 ## 3 Architecture and Implementation
 
-[Figure 2](#figure-2) shows the architecture of the Zanzibar system. `aclservers` are the main server type. They are organized in clusters and respond to Check, Read, Expand, and Write requests. Requests arrive at any server in a cluster and that server fans out the work to other servers in the cluster as necessary. Those servers may in turn contact other servers to compute intermediate results. The initial server gathers the final result and returns it to the client.
+<PreviewLink previewComponent={<Figure2 />}>[Figure 2](#figure-2)</PreviewLink> shows the architecture of the Zanzibar system. `aclservers` are the main server type. They are organized in clusters and respond to Check, Read, Expand, and Write requests. Requests arrive at any server in a cluster and that server fans out the work to other servers in the cluster as necessary. Those servers may in turn contact other servers to compute intermediate results. The initial server gathers the final result and returns it to the client.
 
 Zanzibar stores ACLs and their metadata in Spanner databases. There is one database to store relation tuples for each client namespace, one database to hold all namespace configurations, and one changelog database shared across all namespaces. `aclservers` read and write those databases in the course of responding to client requests.
 
@@ -522,7 +523,7 @@ Effective hedging requires the requests to have similar costs. In the case of Za
 </Column>
 <Column>
 <a id="figure-3" />
-<Figure3 className="mb-10 w-full" />
+<Figure3 className="mb-10 w-full mt-10 md:mt-0" />
 
 ## 4 Experience
 
@@ -552,7 +553,7 @@ We divide requests into two categories according to the required data freshness,
 
 is configured with replication heartbeats with 8-second intervals, we divide our requests into two categories: _Safe_ requests have zookies more than 10 seconds old and can be served within the region most of time, while _Recent_ requests have zookies less than 10 seconds old and often require interregion round trips. We report separate statistics for each.
 
-[Figure 3](#figure-3) shows the rate of Check Safe and Check Recent requests over 7 days. Both exhibit a diurnal cycle. The rate of Safe requests is about two orders of magnitude larger than that of Recent requests, which allows Zanzibar to serve the vast majority of ACL checks locally.
+<PreviewLink previewComponent={<Figure3 />}>[Figure 3](#figure-3)</PreviewLink> shows the rate of Check Safe and Check Recent requests over 7 days. Both exhibit a diurnal cycle. The rate of Safe requests is about two orders of magnitude larger than that of Recent requests, which allows Zanzibar to serve the vast majority of ACL checks locally.
 
 ### 4.2 Latency
 
@@ -560,14 +561,14 @@ Zanzibar’s latency budget is generally a small fraction of the few hundreds of
 
 We measure latency on the server side using live traffic because (1) latency is heavily influenced by our caching and de-duplication mechanisms so that it is only realistically reflected by live traffic, and (2) accurately measuring latency from clients requires well-behaving clients. Provisioning of client jobs is outside of Zanzibar’s control and sometimes client jobs are overloaded.
 
-[Figure 4](#figure-4) shows the latency of Check Safe responses over 7 days. At the 50th, 95th, 99th, and 99.9th percentiles it peaks at roughly 3, 11, 20, and 93 msec, respectively. This performance meets our latency goals for an operation that is frequently in the critical path of user interactions.
+<PreviewLink previewComponent={<Figure4 />}>[Figure 4](#figure-4)</PreviewLink> shows the latency of Check Safe responses over 7 days. At the 50th, 95th, 99th, and 99.9th percentiles it peaks at roughly 3, 11, 20, and 93 msec, respectively. This performance meets our latency goals for an operation that is frequently in the critical path of user interactions.
 
-[Table 2](#table-2) summarizes the latency distributions of Check, Read, Expand, and Write responses over the same 7 days. As intended, the more frequently used Safe versions of Check, Read, and Expand are significantly faster than the less frequently used Recent versions. Writes are the least frequently used of all the APIs, and the slowest because they always require distributed coordination among Spanner servers.
+<PreviewLink previewComponent={<Table2 />}>[Table 2](#table-2)</PreviewLink> summarizes the latency distributions of Check, Read, Expand, and Write responses over the same 7 days. As intended, the more frequently used Safe versions of Check, Read, and Expand are significantly faster than the less frequently used Recent versions. Writes are the least frequently used of all the APIs, and the slowest because they always require distributed coordination among Spanner servers.
 
 </Column>
 <Column>
 <a id="table-2" />
-<Table2 className="mb-10 w-full" />
+<Table2 className="mb-10 w-full mt-10 md:mt-0" />
 
 ### 4.3 Availability
 
@@ -575,7 +576,7 @@ We define availability as the fraction of “qualified” RPCs the service answe
 
 For these reasons, we cannot measure availability directly with live traffic, as our clients sometimes send RPCs with short deadlines or cancel their in-progress RPCs. Instead, we sample a small fraction of valid requests from live traffic and replay them later with our own probers. When replaying the requests, we set the timeout to be longer than the availability threshold. We also adjust the request zookie, if one is specified, so that the relative age of the zookie remains the same as when the request was received in the live traffic. Finally, we run 3 probers per cluster and exclude outliers to eliminate false alarms caused by rare prober failures.
 
-To compute availability, we aggregate success ratios over 90-day windows averaged across clusters. [Figure 5](#figure-5) shows Zanzibar’s availability as measured by these probers. Availability has remained above 99.999% over the past 3 years of operation at Google. In other words, for every quarter, Zanzibar has less than 2 minutes of global downtime and fewer than 13 minutes when the global error ratio exceeds 10%.
+To compute availability, we aggregate success ratios over 90-day windows averaged across clusters. <PreviewLink previewComponent={<Figure5 />}>[Figure 5](#figure-5)</PreviewLink> shows Zanzibar’s availability as measured by these probers. Availability has remained above 99.999% over the past 3 years of operation at Google. In other words, for every quarter, Zanzibar has less than 2 minutes of global downtime and fewer than 13 minutes when the global error ratio exceeds 10%.
 
 ### 4.4 Internals
 

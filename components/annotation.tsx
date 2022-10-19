@@ -6,7 +6,6 @@ import {
   useEffect,
   useState,
 } from 'react';
-import ClickAwayListener from 'react-click-away-listener';
 import ReactMarkdown from 'react-markdown';
 import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
@@ -97,6 +96,25 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
   );
 }
 
+function XIcon(props: { className: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className={props.className}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
+  );
+}
+
 function Annotation(props: {
   annotationId: string;
   referenceRef: HTMLElement | null;
@@ -128,24 +146,28 @@ function Annotation(props: {
 
   return (
     <>
-      {title && content && (
-        <ClickAwayListener onClickAway={() => props.setVisible(false)}>
-          <div
-            ref={setPopperElement}
-            style={styles.popper}
-            {...attributes.popper}
-            className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 rounded block z-10`}
-          >
-            <div className="title bg-gray-600 text-white indent-0 p-3 rounded-t block">
-              {title}
-            </div>
-            <div className="content px-3 pb-3 mt-2 block">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
-                {content}
-              </ReactMarkdown>
-            </div>
+      {content && (
+        <div
+          ref={setPopperElement}
+          style={styles.popper}
+          {...attributes.popper}
+          className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 rounded block z-10`}
+        >
+          <div className="title bg-gray-600 text-white indent-0 p-3 rounded-t block">
+            {title}
+            <span
+              onClick={() => props.setVisible(false)}
+              className="cursor-pointer"
+            >
+              <XIcon className="w-5 h-5 absolute top-3 right-2" />
+            </span>
           </div>
-        </ClickAwayListener>
+          <div className="content px-3 pb-3 mt-2 block">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
+              {content}
+            </ReactMarkdown>
+          </div>
+        </div>
       )}
     </>
   );
