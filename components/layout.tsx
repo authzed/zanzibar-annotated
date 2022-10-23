@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Script from 'next/script';
 import { PropsWithChildren } from 'react';
+import { AnnotationGroup, AnnotationManagerProvider } from './annotation';
 import { Banner } from './Banner';
 import { Footer } from './Footer';
 import { GTag } from './GTag';
@@ -24,7 +25,9 @@ export function Layout(props: PropsWithChildren) {
       <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
         <Banner />
         <SelectionShare />
-        {props.children}
+
+        <AnnotationManagerProvider>{props.children}</AnnotationManagerProvider>
+
         <GTag />
       </div>
       <Footer />
@@ -40,10 +43,26 @@ export function Layout(props: PropsWithChildren) {
 /**
  * Single page layout
  */
-export function Page(props: PropsWithChildren) {
+export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
   return (
-    <div className="md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow">
-      {props.children}
+    <div className="relative z-0">
+      <div className="hidden xl:block absolute h-full w-80 -left-[20rem] top-0 z-10">
+        <AnnotationGroup
+          pageNumber={props.pageNumber}
+          groupId="col-1"
+          orientation="left"
+        />
+      </div>
+      <div className="md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow z-0">
+        {props.children}
+      </div>
+      <div className="hidden xl:block absolute h-full w-80 -right-[20rem] top-0 z-10">
+        <AnnotationGroup
+          pageNumber={props.pageNumber}
+          groupId="col-2"
+          orientation="right"
+        />
+      </div>
     </div>
   );
 }

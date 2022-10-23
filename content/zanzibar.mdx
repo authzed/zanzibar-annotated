@@ -1,5 +1,5 @@
 import { Column, Header, Page } from '../components/layout';
-import { AnnotationsProvider, Highlight, Annotation } from '../components/annotation';
+import { Highlight, Annotation } from '../components/annotation';
 import PageFooter from '../components/PageFooter';
 import PreviewLink from '../components/PreviewLink';
 import Table1 from './Table1.svg';
@@ -10,9 +10,7 @@ import Figure3 from './Figure3.svg';
 import Figure4 from './Figure4.svg';
 import Figure5 from './Figure5.svg';
 
-<AnnotationsProvider>
-
-<Page>
+<Page pageNumber={1}>
 
 <Header>
 
@@ -35,7 +33,7 @@ import Figure5 from './Figure5.svg';
 ## Abstract
 
 Determining whether online users are authorized to access digital objects is central to preserving privacy.
-<Highlight annotationId="example1" annotationPlacement="left" showAnnotation={true}>This paper presents the design, implementation, and deployment of Zanzibar, a global system for storing and evaluating access control lists.</Highlight>
+This paper presents the design, implementation, and deployment of Zanzibar, a global system for storing and evaluating access control lists.
 Zanzibar provides a uniform data model and configuration language for expressing a wide range of access control policies from hundreds of client services at Google, including Calendar, Cloud, Drive, Maps, Photos, and YouTube.
 Its authorization decisions respect causal ordering of user actions and thus provide external consistency amid changes to access control lists and object contents.
 Zanzibar scales to trillions of access control lists and millions of authorization requests per second to support services used by billions of people.
@@ -62,9 +60,9 @@ First, it helps establish consistent
 </Column>
 <Column>
 
-semantics and user experience across applications.
-Second, it makes it easier for applications to interoperate, for example, to coordinate access control when an object from one application embeds an object from another application.
-Third, useful common infrastructure can be built on top of a unified access control system, in particular, a search index that respects access control and works across applications.
+semantics and user experience <Highlight annotationId="across-applications">across applications</Highlight>.
+Second, it makes it easier for applications to interoperate, <Highlight annotationId="gmail-example">for example, to coordinate access control when an object from one application embeds an object from another application.</Highlight>
+Third, useful common infrastructure can be built on top of a unified access control system, <Highlight annotationId="search-index-paper-plea">in particular, a search index that respects access control and works across applications.</Highlight>
 Finally, as we show below, authorization poses unique challenges involving data consistency and scalability.
 It saves engineering resources to tackle them once across applications.
 
@@ -76,10 +74,10 @@ We have the following goals for the Zanzibar system:
 * _High availability_: It must reliably respond to requests because, in the absence of explicit authorizations, client services would be forced to deny their users access.
 * _Large scale_: It needs to protect billions of objects shared by billions of users. It must be deployed around the globe to be near its clients and their end users.
 
-<Highlight annotationId="example2" annotationPlacement="right" bgColorClass="bg-amber-200">Zanzibar achieves these goals through a combination of notable features.</Highlight>
+Zanzibar achieves these goals through a combination of notable features.
 To provide flexibility, Zanzibar pairs a simple data model with a powerful configuration language.
 The language allows clients to define arbitrary relations between users and objects, such as `owner`, `editor`, `commenter`, and `viewer`.
-It includes set-algebraic operators such as intersection and union for specifying potentially complex access control policies in terms of those user-object relations.
+It includes set-algebraic operators <Highlight annotationId="set-operations-list">such as intersection and union</Highlight> for specifying potentially complex access control policies in terms of those user-object relations.
 For example, an application can specify that users granted editing rights on a document are also allowed to comment on the
 
 </Column>
@@ -88,33 +86,33 @@ For example, an application can specify that users granted editing rights on a d
 </Page>
 
 
-<Page>
+<Page pageNumber={2}>
 <Column>
 
 document, but not all commenters are given editing rights.
 
 At runtime, Zanzibar allows clients to create, modify, and evaluate access control lists (ACLs) through a remote procedure call (RPC) interface.
-A simple ACL takes the form of “user _U_ has relation _R_ to object _O_”.
+A simple ACL takes the form of <Highlight annotationId="gaia-ids-shortcut">“user _U_ has relation _R_ to object _O_”</Highlight>.
 More complex ACLs take the form of “set of users _S_ has relation _R_ to object _O_”, where _S_ is itself specified in terms of another object-relation pair.
 ACLs can thus refer to other ACLs, for example to specify that the set of users who can comment on a video consists of the users who have been granted viewing rights on that specific video along with those with viewing permissions on the video channel.
 
 Group memberships are an important class of ACL where the object is a group and the relation is semantically equivalent to `member`.
-Groups can contain other groups, which illustrates one of the challenges facing Zanzibar, namely that evaluating whether a user belongs to a group can entail following a long chain of nested group memberships.
+<Highlight annotationId="pointer-chasing">Groups can contain other groups, which illustrates one of the challenges facing Zanzibar, namely that evaluating whether a user belongs to a group can entail following a long chain of nested group memberships.</Highlight>
 
 Authorization checks take the form of “does user _U_ have relation _R_ to object _O_?” and are evaluated by a collection of distributed servers.
-When a check request arrives to Zanzibar, the work to evaluate the check may fan out to multiple servers, for example when a group contains both individual members and other groups.
+<Highlight annotationId="dispatch-introduction">When a check request arrives to Zanzibar, the work to evaluate the check may fan out to multiple servers</Highlight>, for example when a group contains both individual members and other groups.
 Each of those servers may in turn contact other servers, for example to recursively traverse a hierarchy of group memberships.
 
 Zanzibar operates at a global scale along multiple dimensions.
 It stores more than two trillion ACLs and performs millions of authorization checks per second.
-The ACL data does not lend itself to geographic partitioning because authorization checks for any object can come from anywhere in the world.
+<Highlight annotationId="globally-available-requirement">The ACL data does not lend itself to geographic partitioning because authorization checks for any object can come from anywhere in the world</Highlight>.
 Therefore, Zanzibar replicates all ACL data in tens of geographically distributed data centers and distributes load across thousands of servers around the world.
 
 Zanzibar supports global consistency of access control decisions through two interrelated features.
 One, it respects the order in which ACL changes are committed to the underlying data store.
 Two, it can ensure that authorization checks are based on ACL data no older than a client-specified change.
 Thus, for example, a client can remove a user from a group and be assured that subsequent membership checks reflect that removal.
-Zanzibar provides these ordering properties by storing ACLs in a globally distributed database system with external consistency guarantees. [[15](#references-15), [18](#references-18)]
+Zanzibar provides these ordering properties by storing ACLs in a <Highlight annotationId="spanner-wags-the-dog">globally distributed database system with external consistency guarantees</Highlight>. [[15](#references-15), [18](#references-18)]
 
 Zanzibar employs an array of techniques to achieve low latency and high availability in this globally distributed environment.
 Its consistency protocol allows the vast majority of requests to be served with locally replicated data, without requiring cross-region round trips.
@@ -173,7 +171,7 @@ Specifically, our clients care about preventing the
 </Page>
 
 
-<Page>
+<Page pageNumber={3}>
 
 <div className="md:col-span-2 mb-10 mx-auto overflow-auto">
 
@@ -248,7 +246,7 @@ Bob will not be able to see the new documents added by Charlie: if a check is ev
 </Page>
 
 
-<Page>
+<Page pageNumber={4}>
 <Column>
 
 folder ACL.
@@ -309,7 +307,7 @@ We choose to use an opaque cookie instead of the actual timestamp to discourage 
 </Page>
 
 
-<Page>
+<Page pageNumber={5}>
 <Column>
 
 #### 2.4.1 Read
@@ -392,7 +390,7 @@ One such function is to produce dumps of the relation tuples in each namespace a
 </Page>
 
 
-<Page>
+<Page pageNumber={6}>
 
 <div className="md:col-span-2 mx-auto mb-10">
 <a id="figure-2" />
@@ -461,7 +459,7 @@ Each server tracks the frequency of such out-of-zone reads for data at a default
 </Page>
 
 
-<Page>
+<Page pageNumber={7}>
 <Column>
 
 and staler data, and uses these frequencies to compute a binomial proportion confidence interval of the probability that any given piece of data is available locally at each staleness.
@@ -547,7 +545,7 @@ Shards are usually served entirely from memory, but they
 </Page>
 
 
-<Page>
+<Page pageNumber={8}>
 <Column>
 
 can also be served from a mix of hot and cold data spread between memory and remote solid-state devices.
@@ -614,7 +612,7 @@ To prevent this latency impact, we delay eager cancellation when there are waite
 </Page>
 
 
-<Page>
+<Page pageNumber={9}>
 <Column>
 
 #### 3.2.6 Performance Isolation
@@ -687,7 +685,7 @@ As our storage
 </Page>
 
 
-<Page>
+<Page pageNumber={10}>
 <Column>
 <a id="figure-4" />
 <Figure4 className="mb-10 w-full" />
@@ -749,7 +747,7 @@ Caching for
 </Page>
 
 
-<Page>
+<Page pageNumber={11}>
 <Column>
 <a id="figure-5" />
 <Figure5 className="mb-10 w-full" />
@@ -816,7 +814,7 @@ See [§3.2.5](#3.2.5-handling-hot-spots).
 </Page>
 
 
-<Page>
+<Page pageNumber={12}>
 <Column>
 
 tended client behaviors could still overload our system or its underlying infrastructure.
@@ -891,7 +889,7 @@ It also does not provide snapshot reads with bounded staleness.
 </Page>
 
 
-<Page>
+<Page pageNumber={13}>
 <Column>
 
 ## 6 Conclusion
@@ -979,7 +977,7 @@ Finally, we thank the anonymous reviewers and our shepherd, Eric Eide, for their
 </Page>
 
 
-<Page>
+<Page pageNumber={14}>
 <Column>
 
 <div className="references">
@@ -1023,5 +1021,3 @@ _7th Symposium on Operating Systems Design and Implementation_ (Berkeley, CA, US
 </Column>
 <PageFooter numberLabel="14" />
 </Page>
-
-</AnnotationsProvider>
