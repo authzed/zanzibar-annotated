@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // Adapted from https://tailwindcomponents.com/component/nestable-dropdown-menu
-export function MenuButton() {
+export function PaperInfoMenu() {
   const [collapsed, setCollapsed] = useState(true);
 
   return (

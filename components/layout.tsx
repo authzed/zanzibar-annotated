@@ -5,9 +5,10 @@ import { AnnotationGroup, AnnotationManagerProvider } from './annotation';
 import { Banner } from './Banner';
 import { Footer } from './Footer';
 import { GTag } from './GTag';
-import { MenuButton } from './MenuButton';
+import { PaperInfoMenu } from './PaperInfoMenu';
 import SelectionShare from './SelectionShare';
 
+export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
 /**
  * Paper layout
  */
@@ -23,7 +24,7 @@ export function Layout(props: PropsWithChildren) {
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <MenuButton />
+      <PaperInfoMenu />
       <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
         <Banner />
         <SelectionShare />
@@ -31,7 +32,7 @@ export function Layout(props: PropsWithChildren) {
         <GTag />
       </div>
       <Footer />
-      <div id="annotations-root" />
+      <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
       <Script
         src="/scripts/deeplinks/deeplinks.js"
         type="module"

@@ -2,6 +2,7 @@ import { Placement } from '@popperjs/core';
 import React, {
   createContext,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -14,6 +15,7 @@ import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
 import annotations from '../content/annotations.yaml';
 import popperStyles from '../styles/Popper.module.css';
+import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 
 type AnnotationData = {
   id: string;
@@ -29,7 +31,7 @@ interface AnnotationManagerInterface {
   setAnnotationInactive(id: string): void;
   focusedAnnotationId: string;
   focusAnnotation(id: string): void;
-  unfocusAnnotation(id: string): void;
+  unfocusAnnotation(): void;
 }
 
 const NoopAnnotationManagerProvider = {
@@ -45,7 +47,7 @@ const NoopAnnotationManagerProvider = {
   setAnnotationInactive: (id: string) => {},
   focusedAnnotationId: '',
   focusAnnotation: (id: string) => {},
-  unfocusAnnotation: (id: string) => {},
+  unfocusAnnotation: () => {},
 };
 
 const AnnotationManagerContext = createContext<AnnotationManagerInterface>(
@@ -60,6 +62,9 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
 ) => {
   const [activeAnnotationId, setActiveAnnotationId] = useState('');
   const [focusedAnnotationId, setFocusedAnnotationId] = useState('');
+
+  // Note: This map is populated from an imported object so it should not be modified.
+  // TODO: Refactor YAML data file specific code into a separate data provider.
   const annotationMap: Map<string, AnnotationData> = useMemo(() => {
     const map = new Map<string, AnnotationData>();
     for (const [_, group] of Object.entries(annotations)) {
@@ -70,6 +75,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
     return map;
   }, []);
 
+  // Note: This function uses an imported data object for annotations.
   const getAnnotationGroup = (groupId: string): AnnotationData[] => {
     const data: { [key: string]: Omit<AnnotationData, 'id'> } | undefined =
       annotations[groupId];
@@ -80,19 +86,24 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
     });
   };
 
+  const getAnnotation = useCallback(
+    (id: string) => {
+      return annotationMap.get(id);
+    },
+    [annotationMap]
+  );
+
   return (
     <AnnotationManagerContext.Provider
       value={{
-        getAnnotation: (id: string) => {
-          return annotationMap.get(id);
-        },
+        getAnnotation,
         getAnnotationGroup,
         activeAnnotationId,
         setAnnotationActive: (id: string) => setActiveAnnotationId(id),
         setAnnotationInactive: (id: string) => setActiveAnnotationId(''),
         focusedAnnotationId,
         focusAnnotation: (id: string) => setFocusedAnnotationId(id),
-        unfocusAnnotation: (id: string) => setFocusedAnnotationId(''),
+        unfocusAnnotation: () => setFocusedAnnotationId(''),
       }}
     >
       {props.children}
@@ -148,11 +159,12 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
     setAnnotationActive,
     focusedAnnotationId,
     focusAnnotation,
+    unfocusAnnotation,
   } = useAnnotation();
 
   useEffect(() => {
     const annotationsRoot = document.getElementById(
-      'annotations-root'
+      ANNOTATIONS_PORTAL_CONTAINER_ID
     ) as HTMLElement;
     const portalId = `portal-${annotationId}`;
     let el = document.getElementById(portalId);
@@ -189,7 +201,7 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
           focusAnnotation(props.annotationId);
         }}
         onMouseOut={() => {
-          focusAnnotation('');
+          unfocusAnnotation();
         }}
       >
         {props.children}
@@ -240,7 +252,7 @@ function AnnotationPopper(props: {
   setVisible: (val: boolean) => void;
 }) {
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
-  const { getAnnotation } = useAnnotation();
+  const { getAnnotation, setAnnotationInactive } = useAnnotation();
   const { styles, attributes } = usePopper(props.referenceRef, popperElement, {
     placement: props.placement,
     modifiers: [
@@ -256,18 +268,25 @@ function AnnotationPopper(props: {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+
   useEffect(() => {
+    console.log(props.annotationId);
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
       setTitle(annotation.title ?? '');
       setContent(annotation.content);
     }
-  }, [props.annotationId, getAnnotation, content, title]);
+  }, [props.annotationId, getAnnotation, setTitle, setContent]);
 
   return (
     <>
       {content && (
-        <ClickAwayListener onClickAway={() => props.setVisible(false)}>
+        <ClickAwayListener
+          onClickAway={() => {
+            setAnnotationInactive(props.annotationId);
+            props.setVisible(false);
+          }}
+        >
           <div
             ref={setPopperElement}
             style={styles.popper}
@@ -328,6 +347,11 @@ function Annotation(props: {
   )
     ? ''
     : 'opacity-60';
+  const cursorStyle =
+    focusedAnnotationId === props.annotationId &&
+    activeAnnotationId !== props.annotationId
+      ? 'cursor-pointer'
+      : 'cursor-auto';
 
   return (
     <>
@@ -336,20 +360,21 @@ function Annotation(props: {
           className={`annotation mt-4 p-4 z-50
           bg-white border-t-4 border-sky-400 outline outline-slate-400
           transition transition-all
-          text-sm cursor-pointer
-
+          text-sm
           ${activeAnnotationId === props.annotationId ? activeStyle : ''}
           ${
             focusedAnnotationId === props.annotationId
               ? 'shadow-lg outline-2'
               : 'outline-1'
           }
+          ${cursorStyle}
           ${opacityStyle}
           `}
           onClick={() => setAnnotationActive(props.annotationId)}
           onMouseOver={() => focusAnnotation(props.annotationId)}
-          onMouseOut={() => unfocusAnnotation('')}
+          onMouseOut={() => unfocusAnnotation()}
         >
+          <a id={`annotation-${props.annotationId}`} />
           <div className={`content ${collapsed ? 'collapsed' : ''}`}>
             <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
               {content}
@@ -377,8 +402,7 @@ function Annotation(props: {
               </span>
             )}
             <a
-              id={props.annotationId}
-              href={`#${encodeURIComponent(props.annotationId)}`}
+              href={`#annotation-${encodeURIComponent(props.annotationId)}`}
               className="ml-2 font-bold absolute bottom-0 right-0"
             >
               #
