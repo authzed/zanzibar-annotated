@@ -272,18 +272,10 @@ function AnnotationPopper(props: {
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}
-            className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 rounded block z-10 lg:hidden`}
+            className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 block z-10 outline outline-1 outline-slate-400 border-t-4 border-sky-400 lg:hidden`}
           >
-            <div className="title bg-sky-400 text-white indent-0 p-1 block">
+            <div className="content px-3 pb-3 block text-sm">
               <span className="inline-block">{title}</span>
-              <span
-                onClick={() => props.setVisible(false)}
-                className="cursor-pointer"
-              >
-                <XIcon className="w-5 h-5 absolute top-1 right-1" />
-              </span>
-            </div>
-            <div className="content px-3 pb-3 mt-2 block text-sm">
               <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
                 {content}
               </ReactMarkdown>
@@ -307,6 +299,8 @@ function Annotation(props: {
     focusedAnnotationId,
     getAnnotation,
     setAnnotationActive,
+    focusAnnotation,
+    unfocusAnnotation,
   } = useAnnotation();
   const [visible, setVisible] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
@@ -327,21 +321,34 @@ function Annotation(props: {
 
   const activeStyle =
     props.orientation === 'left'
-      ? 'translate-x-10 -translate-y-1 shadow-lg opacity-100'
-      : '-translate-x-10 -translate-y-1 shadow-lg opacity-100';
+      ? 'translate-x-10 -translate-y-1 shadow-lg'
+      : '-translate-x-10 -translate-y-1 shadow-lg';
+  const opacityStyle = [activeAnnotationId, focusedAnnotationId].includes(
+    props.annotationId
+  )
+    ? ''
+    : 'opacity-60';
 
   return (
     <>
       {visible && (
         <div
-          className={`annotation mt-4 p-4 z-50 bg-white border-t-4 border-sky-400 outline outline-slate-400 transition transition-all text-sm
-      ${activeAnnotationId === props.annotationId ? activeStyle : 'opacity-60'}
-      ${
-        focusedAnnotationId === props.annotationId
-          ? 'shadow-lg outline-2 '
-          : ' outline-1'
-      }`}
+          className={`annotation mt-4 p-4 z-50
+          bg-white border-t-4 border-sky-400 outline outline-slate-400
+          transition transition-all
+          text-sm cursor-pointer
+
+          ${activeAnnotationId === props.annotationId ? activeStyle : ''}
+          ${
+            focusedAnnotationId === props.annotationId
+              ? 'shadow-lg outline-2'
+              : 'outline-1'
+          }
+          ${opacityStyle}
+          `}
           onClick={() => setAnnotationActive(props.annotationId)}
+          onMouseOver={() => focusAnnotation(props.annotationId)}
+          onMouseOut={() => unfocusAnnotation('')}
         >
           <div className={`content ${collapsed ? 'collapsed' : ''}`}>
             <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
