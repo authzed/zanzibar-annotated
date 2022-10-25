@@ -44,3 +44,24 @@ page-2-col-1:
       This is the first time that [Spanner](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf) comes up directly in the paper.
       While it is true that Spanner has some very unique properties that allow for solving these types of ordering problems with perfect consistency, it is likely that Google would have built a Zanzibar-like system even without access to Spanner.
       To an external observer, it appears that Spanner capabilities have directly influenced the way that Zanzibar was created in a multitude of ways.
+
+page-2-col-2:
+  uptime-fine-print:
+    content: |
+      Make sure to read the fine-print in [§4.3](#4.3-availability), which has an algorithm for defining if a request is "qualified" and therefore admissible for calculating uptime.
+  no-user-user:
+    content: |
+      Notice how there are no user-user relations in Zanzibar, this is a follow-on effect of using Gaia IDs as terminals always.
+  tuple-encodings:
+    content: |
+      The paper doesn't talk about _what_ the efficient binary encoding is anywhere.
+      Because Google loves [protocol buffers](https://en.wikipedia.org/wiki/Protocol_Buffers) we might assume that they are just binary protos, but that would potentially lead to indexing challenges.
+      They could also have some amount of compression, deduplication, and/or normalization.
+      It's an interesting area to explore.
+  tuple-encoding-hint:
+    content: |
+      This may be a hint that the namespaces and relations are normalized to a smaller representation in the binary encoding.
+  relation-rewrite-interpret-graph:
+    content: |
+      I like to conceptualize this by saying that the individual tuples represent relationships in a directed graph.
+      The userset rewrite rules therefore act as a set of instructions on how to interpret that graph for authorization decisions.
