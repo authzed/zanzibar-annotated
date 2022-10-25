@@ -334,7 +334,7 @@ function Annotation(props: {
     <>
       {visible && (
         <div
-          className={`annotation mt-4 p-4 z-50 bg-white border-t-8 border-sky-400 outline outline-slate-400 transition transition-all text-sm
+          className={`annotation mt-4 p-4 z-50 bg-white border-t-4 border-sky-400 outline outline-slate-400 transition transition-all text-sm
       ${activeAnnotationId === props.annotationId ? activeStyle : 'opacity-60'}
       ${
         focusedAnnotationId === props.annotationId

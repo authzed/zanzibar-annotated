@@ -4,7 +4,7 @@
 export function Footer() {
   return (
     <>
-      <div className="w-full p-3 bg-black text-white font-sans text-center">
+      <div className="w-full p-3 bg-black text-white font-sans text-center text-sm">
         <div className="w-3/4 mx-auto">
           <p className="">
             Join the discussion on{' '}
