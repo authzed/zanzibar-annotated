@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
+import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
@@ -141,12 +142,33 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
   } = props;
   const [popperVisible, setPopperVisible] = useState(showAnnotation);
   const [highlightRef, setHighlightRef] = useState<HTMLElement | null>(null);
+  const [portal, setPortal] = useState<HTMLElement | null>(null);
   const {
     activeAnnotationId,
     setAnnotationActive,
     focusedAnnotationId,
     focusAnnotation,
   } = useAnnotation();
+
+  useEffect(() => {
+    const annotationsRoot = document.getElementById(
+      'annotations-root'
+    ) as HTMLElement;
+    const portalId = `portal-${annotationId}`;
+    let el = document.getElementById(portalId);
+    if (!el) {
+      el = document.createElement('div');
+      el.setAttribute('id', portalId);
+      annotationsRoot.appendChild(el);
+    }
+    setPortal(el);
+
+    return () => {
+      if (portal) {
+        annotationsRoot.removeChild(portal);
+      }
+    };
+  }, [annotationId, portal, highlightRef]);
 
   return (
     <>
@@ -173,14 +195,17 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
         {props.children}
       </span>
 
-      {popperVisible && (
-        <AnnotationPopper
-          annotationId={annotationId}
-          referenceRef={highlightRef}
-          placement={popperPlacement}
-          setVisible={setPopperVisible}
-        />
-      )}
+      {popperVisible &&
+        portal &&
+        createPortal(
+          <AnnotationPopper
+            annotationId={annotationId}
+            referenceRef={highlightRef}
+            placement={popperPlacement}
+            setVisible={setPopperVisible}
+          />,
+          portal
+        )}
     </>
   );
 }
@@ -223,7 +248,7 @@ function AnnotationPopper(props: {
       {
         name: 'flip',
         options: {
-          fallbackPlacements: ['top', 'bottom', 'right', 'left'],
+          fallbackPlacements: ['right', 'left', 'top', 'bottom'],
         },
       },
     ],

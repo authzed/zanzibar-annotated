@@ -25,12 +25,11 @@ export function Layout(props: PropsWithChildren) {
       <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
         <Banner />
         <SelectionShare />
-
         <AnnotationManagerProvider>{props.children}</AnnotationManagerProvider>
-
         <GTag />
       </div>
       <Footer />
+      <div id="annotations-root" />
       <Script
         src="/scripts/deeplinks/deeplinks.js"
         type="module"
