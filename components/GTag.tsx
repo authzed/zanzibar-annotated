@@ -1,7 +1,7 @@
 import getConfig from 'next/config';
 import Script from 'next/script';
 
-export function GTag() {
+export function GTagScript() {
   const { publicRuntimeConfig } = getConfig();
 
   return (

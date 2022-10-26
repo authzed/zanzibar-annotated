@@ -6,7 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useState
 } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import { createPortal } from 'react-dom';
@@ -188,6 +188,14 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
     setActiveAnnotationSets(updated);
   };
 
+  const setAnnotationActive = (id: AnnotationId) => {
+    setActiveAnnotationId(id);
+    gtag('event', 'annotation_active', {
+      set_id: id.setId,
+      entry_id: id.entryId,
+    });
+  };
+
   return (
     <AnnotationManagerContext.Provider
       value={{
@@ -195,9 +203,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
         getAnnotationGroup,
         getAnnotationSet: (setId: string) => annotationSets.get(setId),
         activeAnnotationId,
-        setAnnotationActive: (id: AnnotationId) => {
-          setActiveAnnotationId(id);
-        },
+        setAnnotationActive,
         setAnnotationInactive: (id: AnnotationId) => {
           if (activeAnnotationId?.equalsId(id)) {
             setActiveAnnotationId(undefined);
