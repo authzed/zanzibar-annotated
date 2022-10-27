@@ -56,6 +56,7 @@ export function Layout(props: PropsWithChildren) {
           name="description"
           content="Zanzibar: Google’s Consistent, Global Authorization System. This is an annotated copy of the original paper submitted to USENIX 2019."
         />
+        <meta property="og:image" content="/api/og" />
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
