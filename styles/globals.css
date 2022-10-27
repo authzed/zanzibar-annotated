@@ -51,10 +51,16 @@ div.references > p {
 }
 
 div.annotation * {
-  @apply indent-0;
+  @apply font-sans text-justify indent-0;
 }
 div.annotation div.content > p {
-  @apply mb-2;
+  @apply mb-1;
+}
+div.annotation div.collapsed {
+  @apply line-clamp-2;
+}
+div.annotation div.collapsed *:not(:first-child) {
+  @apply hidden;
 }
 
 .katex { font-size: 1em; }

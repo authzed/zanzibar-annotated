@@ -4,7 +4,7 @@
 export function Banner() {
   return (
     <>
-      <div className="w-full mt-14 -mb-20 p-2 bg-black text-white font-sans text-center">
+      <div className="w-full mt-0 lg:mt-8 -mb-20 p-2 bg-black text-white font-sans text-center">
         The Zanzibar Paper, annotated by{' '}
         <a
           href="https://authzed.com"

@@ -1,5 +1,5 @@
 .tooltip {
-  @apply inline-block p-3 bg-gray-700 border rounded shadow-md align-middle z-50;
+  @apply inline-block p-3 bg-gray-700 shadow-md align-middle z-50;
 }
 
 .arrow,
