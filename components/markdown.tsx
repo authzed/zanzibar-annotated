@@ -11,7 +11,7 @@ export function Paragraph(props: PropsWithChildren) {
 /**
  * Markdown component for ol
  */
- export function OrderedList(props: PropsWithChildren) {
+export function OrderedList(props: PropsWithChildren) {
   return <ol className="my-2 list-decimal">{props.children}</ol>;
 }
 
