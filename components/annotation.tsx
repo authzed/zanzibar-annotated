@@ -57,6 +57,19 @@ const AnnotationManagerContext = createContext<AnnotationManagerInterface>(
 /**
  * Provider that holds global annotation view state and annotation data.
  */
+export const NoAnnotationManagerProvider: React.FC<PropsWithChildren> = (
+  props: PropsWithChildren
+) => {
+  return (
+    <AnnotationManagerContext.Provider value={NoopAnnotationManagerProvider}>
+      {props.children}
+    </AnnotationManagerContext.Provider>
+  );
+};
+
+/**
+ * Provider that holds global annotation view state and annotation data.
+ */
 export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   props: PropsWithChildren
 ) => {
@@ -166,6 +179,10 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
     const annotationsRoot = document.getElementById(
       ANNOTATIONS_PORTAL_CONTAINER_ID
     ) as HTMLElement;
+    if (annotationsRoot === null) {
+      return;
+    }
+
     const portalId = `portal-${annotationId}`;
     let el = document.getElementById(portalId);
     if (!el) {
@@ -270,7 +287,6 @@ function AnnotationPopper(props: {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    console.log(props.annotationId);
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
       setTitle(annotation.title ?? '');
