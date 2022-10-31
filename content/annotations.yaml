@@ -1,67 +1,69 @@
-page-1-col-2:
-  across-applications:
-    content: |
-      This can also come into play when you have multiple micro-services trying to access authorization data.
-  gmail-example:
-    content: |
-      Concrete example that I use in talks: sending an email through Gmail that includes a link to a document in Google Drive, can warn you that the recipient doesn't have access, _and allow you to grant it right from within Gmail_.
-  search-index-paper-plea:
-    content: |
-      Google, if you're listening, please write a paper about this too!
-  set-operations-list:
-    content: |
-      At no point in the paper is the full list of operators outlined. This is one of the reasons why when people throw around the term "Zanzibar spec" it's not necessarily concrete enough to consider.
+title: "General technical commentary"
+groups:
+  page-1-col-2:
+    across-applications:
+      content: |
+        This can also come into play when you have multiple micro-services trying to access authorization data.
+    gmail-example:
+      content: |
+        Concrete example that I use in talks: sending an email through Gmail that includes a link to a document in Google Drive, can warn you that the recipient doesn't have access, _and allow you to grant it right from within Gmail_.
+    search-index-paper-plea:
+      content: |
+        Google, if you're listening, please write a paper about this too!
+    set-operations-list:
+      content: |
+        At no point in the paper is the full list of operators outlined. This is one of the reasons why when people throw around the term "Zanzibar spec" it's not necessarily concrete enough to consider.
 
-page-2-col-1:
-  gaia-ids-shortcut:
-    content: |
-      This is one of the interesting Google-isms inherent in Zanzibar.
-      Google uses a system internally called [Gaia](https://developers.google.com/issue-tracker/concepts/access-control#users) to assign every entity a very long integer identifier.
-      Most are natural persons, but occasionally they represent role accounts, robots, and the like.
-      Because the subject of these relationships are overwhelmingly end-users, Zanzibar takes a shortcut and has a specialization for Gaia IDs specifically.
+  page-2-col-1:
+    gaia-ids-shortcut:
+      content: |
+        This is one of the interesting Google-isms inherent in Zanzibar.
+        Google uses a system internally called [Gaia](https://developers.google.com/issue-tracker/concepts/access-control#users) to assign every entity a very long integer identifier.
+        Most are natural persons, but occasionally they represent role accounts, robots, and the like.
+        Because the subject of these relationships are overwhelmingly end-users, Zanzibar takes a shortcut and has a specialization for Gaia IDs specifically.
 
-      Outside of Google, one can't make such strong claims about users and how one should refer to them.
-      For example, some users have identities being assigned by more than one identity provider, without a reconciliation layer.
-      Others are building products and platforms which have no natural persons as users at all!
-  pointer-chasing:
-    content: |
-      Outside of Google, this problem is not just for group membership.
-      It can occur any time you have recursive nesting, e.g. folders in folders, or sub-projects in projects.
-      We refer to this problem as it relates to Zanzibar resolution generically as "recursive pointer chasing."
+        Outside of Google, one can't make such strong claims about users and how one should refer to them.
+        For example, some users have identities being assigned by more than one identity provider, without a reconciliation layer.
+        Others are building products and platforms which have no natural persons as users at all!
+    pointer-chasing:
+      content: |
+        Outside of Google, this problem is not just for group membership.
+        It can occur any time you have recursive nesting, e.g. folders in folders, or sub-projects in projects.
+        We refer to this problem as it relates to Zanzibar resolution generically as "recursive pointer chasing."
 
-      The Leopard cache solution to this problem is specialized for group membership, but the approach can likely be extended to any recursive pointer chasing problem generically.
-  dispatch-introduction:
-    content: |
-      We refer to this concept colloquially as "dispatch."
-      Often users load testing such a system will find that isolated performance tests run faster with this option off, without realizing that it is a parallelization optimization, which are often slower at smaller scales but unlock higher throughputs at higher scales than would be possible without.
-      Particularly, if you think of the memory of every node in the cluster as a pool of resources, you can get better utilization of those resources by reducing contention of that memory through specialization.
-  globally-available-requirement:
-    content: |
-      This is another Google-ism.
-      Many real-world users don't have this exact requirement, having found ways to geographically partition their user-base and backing infrastructure.
-  spanner-wags-the-dog:
-    content: |
-      This is the first time that [Spanner](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf) comes up directly in the paper.
-      While it is true that Spanner has some very unique properties that allow for solving these types of ordering problems with perfect consistency, it is likely that Google would have built a Zanzibar-like system even without access to Spanner.
-      To an external observer, it appears that Spanner capabilities have directly influenced the way that Zanzibar was created in a multitude of ways.
+        The Leopard cache solution to this problem is specialized for group membership, but the approach can likely be extended to any recursive pointer chasing problem generically.
+    dispatch-introduction:
+      content: |
+        We refer to this concept colloquially as "dispatch."
+        Often users load testing such a system will find that isolated performance tests run faster with this option off, without realizing that it is a parallelization optimization, which are often slower at smaller scales but unlock higher throughputs at higher scales than would be possible without.
+        Particularly, if you think of the memory of every node in the cluster as a pool of resources, you can get better utilization of those resources by reducing contention of that memory through specialization.
+    globally-available-requirement:
+      content: |
+        This is another Google-ism.
+        Many real-world users don't have this exact requirement, having found ways to geographically partition their user-base and backing infrastructure.
+    spanner-wags-the-dog:
+      content: |
+        This is the first time that [Spanner](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf) comes up directly in the paper.
+        While it is true that Spanner has some very unique properties that allow for solving these types of ordering problems with perfect consistency, it is likely that Google would have built a Zanzibar-like system even without access to Spanner.
+        To an external observer, it appears that Spanner capabilities have directly influenced the way that Zanzibar was created in a multitude of ways.
 
-page-2-col-2:
-  uptime-fine-print:
-    content: |
-      Make sure to read the fine-print in [§4.3](#4.3-availability), which has an algorithm for defining if a request is "qualified" and therefore admissible for calculating uptime.
-  no-user-user:
-    content: |
-      Notice how there are no user-user relations in Zanzibar, this is a follow-on effect of using Gaia IDs as terminals always.
-  tuple-encodings:
-    content: |
-      The paper doesn't talk about _what_ the efficient binary encoding is anywhere.
-      Because Google loves [protocol buffers](https://en.wikipedia.org/wiki/Protocol_Buffers) we might assume that they are just binary protos, but that would potentially lead to indexing challenges.
-      They could also have some amount of compression, deduplication, and/or normalization.
-      It's an interesting area to explore.
-  tuple-encoding-hint:
-    content: |
-      This may be a hint that the namespaces and relations are normalized to a smaller representation in the binary encoding.
-  relation-rewrite-interpret-graph:
-    content: |
-      I like to conceptualize this by saying that the individual tuples represent relationships in a directed graph.
-      The userset rewrite rules therefore act as a set of instructions on how to interpret that graph for authorization decisions.
+  page-2-col-2:
+    uptime-fine-print:
+      content: |
+        Make sure to read the fine-print in [§4.3](#4.3-availability), which has an algorithm for defining if a request is "qualified" and therefore admissible for calculating uptime.
+    no-user-user:
+      content: |
+        Notice how there are no user-user relations in Zanzibar, this is a follow-on effect of using Gaia IDs as terminals always.
+    tuple-encodings:
+      content: |
+        The paper doesn't talk about _what_ the efficient binary encoding is anywhere.
+        Because Google loves [protocol buffers](https://en.wikipedia.org/wiki/Protocol_Buffers) we might assume that they are just binary protos, but that would potentially lead to indexing challenges.
+        They could also have some amount of compression, deduplication, and/or normalization.
+        It's an interesting area to explore.
+    tuple-encoding-hint:
+      content: |
+        This may be a hint that the namespaces and relations are normalized to a smaller representation in the binary encoding.
+    relation-rewrite-interpret-graph:
+      content: |
+        I like to conceptualize this by saying that the individual tuples represent relationships in a directed graph.
+        The userset rewrite rules therefore act as a set of instructions on how to interpret that graph for authorization decisions.

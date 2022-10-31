@@ -67,6 +67,30 @@ export const NoAnnotationManagerProvider: React.FC<PropsWithChildren> = (
   );
 };
 
+type AnnotationSet = {
+  title: string;
+  highlightColor?: string;
+  groups: Map<string, AnnotationData[]>;
+  annotations: Map<string, AnnotationData>;
+};
+
+function loadAnnotationData(data: any): AnnotationSet {
+  const annotationMap = new Map<string, AnnotationData>();
+  const annotationGroups = new Map<string, AnnotationData[]>();
+  for (const [groupId, group] of Object.entries(annotations['groups'])) {
+    annotationGroups.set(groupId, group as AnnotationData[]);
+    for (const [key, annotationData] of Object.entries(group as object)) {
+      annotationMap.set(key, { id: key, ...annotationData });
+    }
+  }
+
+  return {
+    title: data['title'],
+    groups: annotationGroups,
+    annotations: annotationMap,
+  };
+}
+
 /**
  * Provider that holds global annotation view state and annotation data.
  */
@@ -76,34 +100,20 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   const [activeAnnotationId, setActiveAnnotationId] = useState('');
   const [focusedAnnotationId, setFocusedAnnotationId] = useState('');
 
-  // Note: This map is populated from an imported object so it should not be modified.
-  // TODO: Refactor YAML data file specific code into a separate data provider.
-  const annotationMap: Map<string, AnnotationData> = useMemo(() => {
-    const map = new Map<string, AnnotationData>();
-    for (const [_, group] of Object.entries(annotations)) {
-      for (const [key, annotationData] of Object.entries(group as object)) {
-        map.set(key, { id: key, ...annotationData });
-      }
-    }
-    return map;
+  // Note: This is populated from an imported object so it should not be modified.
+  const annotationSet = useMemo(() => {
+    return loadAnnotationData(annotations);
   }, []);
 
-  // Note: This function uses an imported data object for annotations.
   const getAnnotationGroup = (groupId: string): AnnotationData[] => {
-    const data: { [key: string]: Omit<AnnotationData, 'id'> } | undefined =
-      annotations[groupId];
-    if (!data) return [];
-
-    return Object.entries(data).map(([id, annotation]) => {
-      return { ...annotation, id };
-    });
+    return annotationSet.groups.get(groupId) ?? [];
   };
 
   const getAnnotation = useCallback(
     (id: string) => {
-      return annotationMap.get(id);
+      return annotationSet.annotations.get(id);
     },
-    [annotationMap]
+    [annotationSet]
   );
 
   return (
