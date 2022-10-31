@@ -52,11 +52,13 @@ export function Layout(props: PropsWithChildren) {
     <>
       <Head>
         <title>The Zanzibar Paper, annotated by Authzed</title>
-        <meta
-          name="description"
-          content="Zanzibar: Google’s Consistent, Global Authorization System. This is an annotated copy of the original paper submitted to USENIX 2019."
-        />
+        <meta name="description" content="Testing: meta description" />
+        <meta property="og:title" content="Testing: og meta title" />
         <meta property="og:image" content="/api/og" />
+        <meta
+          property="og:description"
+          content="Testing: og meta description"
+        />
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
