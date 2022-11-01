@@ -1,5 +1,6 @@
-id: spicedb
+id: "spicedb"
 title: "SpiceDB comparisions"
+highlightColor: "sky"
 groups:
   page-1-col-2:
     across-applications:
