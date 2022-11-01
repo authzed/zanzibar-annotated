@@ -93,6 +93,7 @@ interface AnnotationManagerInterface {
   unfocusAnnotation(): void;
   setAnnotationSetActive(setId: string): void;
   setAnnotationSetInactive(setId: string): void;
+  toggleAnnotationSet(setId: string): void;
   activeAnnotationSetIds: string[];
   allAnnotationSetIds: string[];
 }
@@ -111,6 +112,7 @@ const NoopAnnotationManagerProvider = {
   unfocusAnnotation: () => {},
   setAnnotationSetActive: (setId: string) => {},
   setAnnotationSetInactive: (setId: string) => {},
+  toggleAnnotationSet: (setId: string) => {},
   activeAnnotationSetIds: [],
   allAnnotationSetIds: [],
 };
@@ -206,6 +208,11 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
         unfocusAnnotation: () => setFocusedAnnotationId(undefined),
         setAnnotationSetActive,
         setAnnotationSetInactive,
+        toggleAnnotationSet: (setId: string) => {
+          activeAnnotationSets.includes(setId)
+            ? setAnnotationSetInactive(setId)
+            : setAnnotationSetActive(setId);
+        },
         activeAnnotationSetIds: activeAnnotationSets,
         allAnnotationSetIds,
       }}
@@ -231,6 +238,7 @@ export function useAnnotation() {
     unfocusAnnotation,
     setAnnotationSetActive,
     setAnnotationSetInactive,
+    toggleAnnotationSet,
     activeAnnotationSetIds,
     allAnnotationSetIds,
   } = useContext(AnnotationManagerContext);
@@ -246,6 +254,7 @@ export function useAnnotation() {
     unfocusAnnotation,
     setAnnotationSetActive,
     setAnnotationSetInactive,
+    toggleAnnotationSet,
     activeAnnotationSetIds,
     allAnnotationSetIds,
   };

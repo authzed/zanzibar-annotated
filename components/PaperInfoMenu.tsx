@@ -9,6 +9,7 @@ export function PaperInfoMenu() {
     activeAnnotationSetIds,
     setAnnotationSetActive,
     setAnnotationSetInactive,
+    toggleAnnotationSet,
   } = useAnnotation();
 
   return (
@@ -54,9 +55,7 @@ export function PaperInfoMenu() {
               >
                 <a
                   onClick={() => {
-                    activeAnnotationSetIds.includes(setId)
-                      ? setAnnotationSetInactive(setId)
-                      : setAnnotationSetActive(setId);
+                    toggleAnnotationSet(setId);
                     return false;
                   }}
                   className="block text-black hover:text-gray-500"
