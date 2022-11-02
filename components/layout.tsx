@@ -59,14 +59,16 @@ export function Layout(props: PropsWithChildren) {
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <PaperInfoMenu />
-      <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
-        <Banner />
-        <SelectionShare />
-        <AnnotationManagerProvider>{props.children}</AnnotationManagerProvider>
-        <GTag />
-      </div>
-      <Footer />
+      <AnnotationManagerProvider>
+        <PaperInfoMenu />
+        <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
+          <Banner />
+          <SelectionShare />
+          {props.children}
+          <GTag />
+        </div>
+        <Footer />
+      </AnnotationManagerProvider>
       <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
       <HighlightProvidedSelection />
     </>

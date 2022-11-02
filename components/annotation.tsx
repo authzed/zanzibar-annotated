@@ -13,41 +13,108 @@ import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
+import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
 import annotations from '../content/annotations.yaml';
 import popperStyles from '../styles/Popper.module.css';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 
+class AnnotationId {
+  setId: string;
+  entryId: string;
+
+  constructor(setId: string, entryId: string) {
+    this.setId = setId;
+    this.entryId = entryId;
+  }
+
+  key() {
+    return `${this.setId}-${this.entryId}`;
+  }
+
+  equals(setId: string | undefined, entryId: string | undefined) {
+    return this.setId === setId && this.entryId === entryId;
+  }
+
+  equalsId(id: AnnotationId) {
+    return this.equals(id.setId, id.entryId);
+  }
+}
+
 type AnnotationData = {
-  id: string;
+  setId: string;
+  entryId: string;
   title?: string;
   content: string;
 };
 
+type AnnotationSet = {
+  id: string;
+  title: string;
+  highlightColor?: string;
+  groups: Map<string, AnnotationData[]>;
+  annotations: Map<string, AnnotationData>;
+};
+
+/**
+ * Parse annotation set data into groups and annotations.
+ */
+function loadAnnotationData(data: any): AnnotationSet {
+  const setId = data.id;
+  const annotationMap = new Map<string, AnnotationData>();
+  const annotationGroups = new Map<string, AnnotationData[]>();
+  for (const [groupId, group] of Object.entries(annotations['groups'])) {
+    const groupList = [];
+    for (const [key, annotationData] of Object.entries(group as object)) {
+      const obj = { setId, entryId: key, ...annotationData };
+      annotationMap.set(key, obj);
+      groupList.push(obj);
+    }
+    annotationGroups.set(groupId, groupList as AnnotationData[]);
+  }
+
+  return {
+    id: data['id'],
+    title: data['title'],
+    highlightColor: data['highlightColor'] ?? 'sky',
+    groups: annotationGroups,
+    annotations: annotationMap,
+  };
+}
+
 interface AnnotationManagerInterface {
-  getAnnotation(id: string): AnnotationData | undefined;
-  getAnnotationGroup(groupId: string): AnnotationData[];
-  activeAnnotationId: string;
-  setAnnotationActive(id: string): void;
-  setAnnotationInactive(id: string): void;
-  focusedAnnotationId: string;
-  focusAnnotation(id: string): void;
+  getAnnotation(id: AnnotationId): AnnotationData | undefined;
+  getAnnotationGroup(setId: string, groupId: string): AnnotationData[];
+  getAnnotationSet(setId: string): AnnotationSet | undefined;
+  activeAnnotationId: AnnotationId | undefined;
+  setAnnotationActive(id: AnnotationId): void;
+  setAnnotationInactive(id: AnnotationId): void;
+  focusedAnnotationId: AnnotationId | undefined;
+  focusAnnotation(id: AnnotationId): void;
   unfocusAnnotation(): void;
+  setAnnotationSetActive(setId: string): void;
+  setAnnotationSetInactive(setId: string): void;
+  toggleAnnotationSet(setId: string): void;
+  activeAnnotationSetIds: string[];
+  allAnnotationSetIds: string[];
 }
 
 const NoopAnnotationManagerProvider = {
-  getAnnotation: (id: string) => {
-    return {
-      id: '',
-      content: '',
-    };
+  getAnnotation: (id: AnnotationId) => {
+    return undefined;
   },
-  getAnnotationGroup: (groupId: string) => [],
-  activeAnnotationId: '',
-  setAnnotationActive: (id: string) => {},
-  setAnnotationInactive: (id: string) => {},
-  focusedAnnotationId: '',
-  focusAnnotation: (id: string) => {},
+  getAnnotationGroup: (setId: string, groupId: string) => [],
+  getAnnotationSet: (setId: string) => undefined,
+  activeAnnotationId: undefined,
+  setAnnotationActive: (id: AnnotationId) => {},
+  setAnnotationInactive: (id: AnnotationId) => {},
+  focusedAnnotationId: undefined,
+  focusAnnotation: (id: AnnotationId) => {},
   unfocusAnnotation: () => {},
+  setAnnotationSetActive: (setId: string) => {},
+  setAnnotationSetInactive: (setId: string) => {},
+  toggleAnnotationSet: (setId: string) => {},
+  activeAnnotationSetIds: [],
+  allAnnotationSetIds: [],
 };
 
 const AnnotationManagerContext = createContext<AnnotationManagerInterface>(
@@ -73,50 +140,81 @@ export const NoAnnotationManagerProvider: React.FC<PropsWithChildren> = (
 export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   props: PropsWithChildren
 ) => {
-  const [activeAnnotationId, setActiveAnnotationId] = useState('');
-  const [focusedAnnotationId, setFocusedAnnotationId] = useState('');
+  const [activeAnnotationId, setActiveAnnotationId] = useState<
+    AnnotationId | undefined
+  >(undefined);
+  const [focusedAnnotationId, setFocusedAnnotationId] = useState<
+    AnnotationId | undefined
+  >(undefined);
 
-  // Note: This map is populated from an imported object so it should not be modified.
-  // TODO: Refactor YAML data file specific code into a separate data provider.
-  const annotationMap: Map<string, AnnotationData> = useMemo(() => {
-    const map = new Map<string, AnnotationData>();
-    for (const [_, group] of Object.entries(annotations)) {
-      for (const [key, annotationData] of Object.entries(group as object)) {
-        map.set(key, { id: key, ...annotationData });
-      }
-    }
+  // Annotation sets are defined using imported objects.
+  // TODO: Load and manage sets dynamically.
+  const [activeAnnotationSets, setActiveAnnotationSets] = useState<string[]>([
+    'general',
+  ]);
+  const allAnnotationSetIds = ['general', 'spicedb'];
+
+  // Note: This is populated from an imported object so it should not be modified.
+  const annotationSets = useMemo(() => {
+    const map = new Map<string, AnnotationSet>();
+    const general = loadAnnotationData(annotations);
+    const spicedb = loadAnnotationData(annotationsSpiceDb);
+    map.set(general.id, general);
+    map.set(spicedb.id, spicedb);
     return map;
   }, []);
 
-  // Note: This function uses an imported data object for annotations.
-  const getAnnotationGroup = (groupId: string): AnnotationData[] => {
-    const data: { [key: string]: Omit<AnnotationData, 'id'> } | undefined =
-      annotations[groupId];
-    if (!data) return [];
-
-    return Object.entries(data).map(([id, annotation]) => {
-      return { ...annotation, id };
-    });
+  const getAnnotationGroup = (
+    setId: string,
+    groupId: string
+  ): AnnotationData[] => {
+    return annotationSets.get(setId)?.groups.get(groupId) ?? [];
   };
 
   const getAnnotation = useCallback(
-    (id: string) => {
-      return annotationMap.get(id);
+    (id: AnnotationId) => {
+      return annotationSets.get(id.setId)?.annotations.get(id.entryId);
     },
-    [annotationMap]
+    [annotationSets]
   );
+
+  const setAnnotationSetActive = (setId: string) => {
+    const updated = activeAnnotationSets.concat(setId);
+    setActiveAnnotationSets(updated);
+  };
+
+  const setAnnotationSetInactive = (setId: string) => {
+    const updated = activeAnnotationSets.filter((id) => id !== setId);
+    setActiveAnnotationSets(updated);
+  };
 
   return (
     <AnnotationManagerContext.Provider
       value={{
         getAnnotation,
         getAnnotationGroup,
+        getAnnotationSet: (setId: string) => annotationSets.get(setId),
         activeAnnotationId,
-        setAnnotationActive: (id: string) => setActiveAnnotationId(id),
-        setAnnotationInactive: (id: string) => setActiveAnnotationId(''),
+        setAnnotationActive: (id: AnnotationId) => {
+          setActiveAnnotationId(id);
+        },
+        setAnnotationInactive: (id: AnnotationId) => {
+          if (activeAnnotationId?.equalsId(id)) {
+            setActiveAnnotationId(undefined);
+          }
+        },
         focusedAnnotationId,
-        focusAnnotation: (id: string) => setFocusedAnnotationId(id),
-        unfocusAnnotation: () => setFocusedAnnotationId(''),
+        focusAnnotation: (id: AnnotationId) => setFocusedAnnotationId(id),
+        unfocusAnnotation: () => setFocusedAnnotationId(undefined),
+        setAnnotationSetActive,
+        setAnnotationSetInactive,
+        toggleAnnotationSet: (setId: string) => {
+          activeAnnotationSets.includes(setId)
+            ? setAnnotationSetInactive(setId)
+            : setAnnotationSetActive(setId);
+        },
+        activeAnnotationSetIds: activeAnnotationSets,
+        allAnnotationSetIds,
       }}
     >
       {props.children}
@@ -124,31 +222,47 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   );
 };
 
-function useAnnotation() {
+/**
+ * Hook for using annotation data and state.
+ */
+export function useAnnotation() {
   const {
     getAnnotation,
     getAnnotationGroup,
+    getAnnotationSet,
     activeAnnotationId,
     setAnnotationActive,
     setAnnotationInactive,
     focusedAnnotationId,
     focusAnnotation,
     unfocusAnnotation,
+    setAnnotationSetActive,
+    setAnnotationSetInactive,
+    toggleAnnotationSet,
+    activeAnnotationSetIds,
+    allAnnotationSetIds,
   } = useContext(AnnotationManagerContext);
   return {
     getAnnotation,
     getAnnotationGroup,
+    getAnnotationSet,
     activeAnnotationId,
     setAnnotationActive,
     setAnnotationInactive,
     focusedAnnotationId,
     focusAnnotation,
     unfocusAnnotation,
+    setAnnotationSetActive,
+    setAnnotationSetInactive,
+    toggleAnnotationSet,
+    activeAnnotationSetIds,
+    allAnnotationSetIds,
   };
 }
 
 type HighlightProps = {
-  annotationId: string;
+  setId: string;
+  entryId: string;
   bgColorClass?: string;
   popperPlacement?: Placement;
   showAnnotation?: boolean;
@@ -159,8 +273,8 @@ type HighlightProps = {
  */
 export function Highlight(props: PropsWithChildren<HighlightProps>) {
   const {
-    annotationId,
-    bgColorClass = 'bg-sky-100', // TODO: Take in a color class only and handle the relative weights in the component
+    setId,
+    entryId,
     popperPlacement = 'left',
     showAnnotation = false,
   } = props;
@@ -169,11 +283,25 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
   const [portal, setPortal] = useState<HTMLElement | null>(null);
   const {
     activeAnnotationId,
+    getAnnotationSet,
     setAnnotationActive,
+    setAnnotationInactive,
     focusedAnnotationId,
     focusAnnotation,
     unfocusAnnotation,
+    activeAnnotationSetIds,
   } = useAnnotation();
+  const annotationId = useMemo(() => {
+    return new AnnotationId(setId, entryId);
+  }, [setId, entryId]);
+  const bgColorClass = useMemo(() => {
+    if (activeAnnotationSetIds.includes(setId)) {
+      const set = getAnnotationSet(setId);
+      return set?.highlightColor ?? 'sky';
+    }
+
+    return 'clear';
+  }, [getAnnotationSet, setId, activeAnnotationSetIds]);
 
   useEffect(() => {
     const annotationsRoot = document.getElementById(
@@ -183,7 +311,7 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
       return;
     }
 
-    const portalId = `portal-${annotationId}`;
+    const portalId = `portal-${setId}-${entryId}`;
     let el = document.getElementById(portalId);
     if (!el) {
       el = document.createElement('div');
@@ -193,29 +321,37 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
     setPortal(el);
 
     return () => {
-      if (portal) {
+      if (portal && annotationsRoot.contains(portal)) {
         annotationsRoot.removeChild(portal);
       }
     };
-  }, [annotationId, portal, highlightRef]);
+  }, [setId, entryId, portal, highlightRef]);
 
   return (
     <>
       <span
         ref={setHighlightRef}
-        className={`${bgColorClass} p-px cursor-pointer
-        ${popperVisible ? 'bg-sky-400' : ''}
-        ${activeAnnotationId === props.annotationId ? 'bg-sky-400' : ''}
-        ${focusedAnnotationId === props.annotationId ? 'bg-sky-300' : ''}
+        className={`bg-${bgColorClass}-100 p-px cursor-pointer
+        ${popperVisible ? `bg-${bgColorClass}-400` : ''}
+        ${
+          activeAnnotationId?.equals(setId, entryId)
+            ? `bg-${bgColorClass}-400`
+            : ''
+        }
+        ${
+          focusedAnnotationId?.equals(setId, entryId)
+            ? `bg-${bgColorClass}-300`
+            : ''
+        }
         `}
         onClick={() => {
           setPopperVisible(true);
-          activeAnnotationId === props.annotationId
-            ? setAnnotationActive('')
-            : setAnnotationActive(props.annotationId);
+          activeAnnotationId?.equals(setId, entryId)
+            ? setAnnotationInactive(annotationId)
+            : setAnnotationActive(annotationId);
         }}
         onMouseOver={() => {
-          focusAnnotation(props.annotationId);
+          focusAnnotation(annotationId);
         }}
         onMouseOut={() => {
           unfocusAnnotation();
@@ -232,6 +368,7 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
             referenceRef={highlightRef}
             placement={popperPlacement}
             setVisible={setPopperVisible}
+            colorClass={bgColorClass}
           />,
           portal
         )}
@@ -263,10 +400,11 @@ function XIcon(props: { className: string }) {
  * Annotation
  */
 function AnnotationPopper(props: {
-  annotationId: string;
+  annotationId: AnnotationId;
   referenceRef: HTMLElement | null;
   placement: Placement;
   setVisible: (val: boolean) => void;
+  colorClass: string;
 }) {
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const { getAnnotation, setAnnotationInactive } = useAnnotation();
@@ -307,7 +445,7 @@ function AnnotationPopper(props: {
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}
-            className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 block z-10 outline outline-1 outline-slate-400 border-t-4 border-sky-400 lg:hidden`}
+            className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 block z-10 outline outline-1 outline-slate-400 border-t-4 border-${props.colorClass}-400 lg:hidden`}
           >
             <div className="content px-3 pb-3 block text-sm">
               <span className="inline-block">{title}</span>
@@ -326,20 +464,32 @@ function AnnotationPopper(props: {
  * An individual annotation that is displayed inside of an AnnotationGroup.
  */
 function Annotation(props: {
-  annotationId: string;
+  annotationId: AnnotationId;
   orientation: 'left' | 'right';
 }) {
   const {
+    getAnnotationSet,
     activeAnnotationId,
     focusedAnnotationId,
     getAnnotation,
     setAnnotationActive,
     focusAnnotation,
     unfocusAnnotation,
+    activeAnnotationSetIds,
   } = useAnnotation();
   const [visible, setVisible] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
   const [content, setContent] = useState('');
+
+  const bgColorClass = useMemo(() => {
+    const setId = props.annotationId.setId;
+    if (activeAnnotationSetIds.includes(setId)) {
+      const set = getAnnotationSet(setId);
+      return set?.highlightColor ?? 'sky';
+    }
+
+    return 'clear';
+  }, [getAnnotationSet, props.annotationId, activeAnnotationSetIds]);
 
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
@@ -348,24 +498,18 @@ function Annotation(props: {
     }
   }, [props.annotationId, getAnnotation, content]);
 
-  useEffect(() => {
-    if (activeAnnotationId === props.annotationId) {
-      setCollapsed(false);
-    }
-  }, [props.annotationId, activeAnnotationId]);
-
   const activeStyle =
     props.orientation === 'left'
       ? 'translate-x-10 -translate-y-1 shadow-lg'
       : '-translate-x-10 -translate-y-1 shadow-lg';
-  const opacityStyle = [activeAnnotationId, focusedAnnotationId].includes(
-    props.annotationId
-  )
-    ? ''
-    : 'opacity-60';
+  const opacityStyle =
+    activeAnnotationId?.equalsId(props.annotationId) ||
+    focusedAnnotationId?.equalsId(props.annotationId)
+      ? ''
+      : 'opacity-60';
   const cursorStyle =
-    focusedAnnotationId === props.annotationId &&
-    activeAnnotationId !== props.annotationId
+    focusedAnnotationId?.equalsId(props.annotationId) &&
+    !activeAnnotationId?.equalsId(props.annotationId)
       ? 'cursor-pointer'
       : 'cursor-auto';
 
@@ -374,23 +518,26 @@ function Annotation(props: {
       {visible && (
         <div
           className={`annotation mt-4 p-4 z-50
-          bg-white border-t-4 border-sky-400 outline outline-slate-400
+          bg-white border-t-4 border-${bgColorClass}-400 outline outline-slate-400
           transition transition-all
           text-sm
-          ${activeAnnotationId === props.annotationId ? activeStyle : ''}
+          ${activeAnnotationId?.equalsId(props.annotationId) ? activeStyle : ''}
           ${
-            focusedAnnotationId === props.annotationId
+            focusedAnnotationId?.equalsId(props.annotationId)
               ? 'shadow-lg outline-2'
               : 'outline-1'
           }
           ${cursorStyle}
           ${opacityStyle}
           `}
-          onClick={() => setAnnotationActive(props.annotationId)}
+          onClick={() => {
+            setAnnotationActive(props.annotationId);
+            setCollapsed(false);
+          }}
           onMouseOver={() => focusAnnotation(props.annotationId)}
           onMouseOut={() => unfocusAnnotation()}
         >
-          <a id={`annotation-${props.annotationId}`} />
+          <a id={`annotation-${props.annotationId.key()}`} />
           <div className={`content ${collapsed ? 'collapsed' : ''}`}>
             <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
               {content}
@@ -400,7 +547,7 @@ function Annotation(props: {
             {collapsed ? (
               <span
                 className="inline-block mt-2 cursor-pointer text-blue-600"
-                onClick={() => {
+                onClick={(e) => {
                   setCollapsed(false);
                   return false;
                 }}
@@ -410,15 +557,19 @@ function Annotation(props: {
             ) : (
               <span
                 className="inline-block mt-2 cursor-pointer text-blue-600"
-                onClick={() => {
+                onClick={(e) => {
                   setCollapsed(true);
+                  e.stopPropagation();
+                  return false;
                 }}
               >
                 Show less
               </span>
             )}
             <a
-              href={`#annotation-${encodeURIComponent(props.annotationId)}`}
+              href={`#annotation-${encodeURIComponent(
+                props.annotationId.key()
+              )}`}
               className="ml-2 font-bold absolute bottom-0 right-0"
             >
               #
@@ -443,24 +594,36 @@ export function AnnotationGroup(props: {
   groupId: string;
   orientation: 'left' | 'right';
 }) {
-  const { getAnnotationGroup } = useAnnotation();
+  const { getAnnotationGroup, activeAnnotationSetIds } = useAnnotation();
   const [groupData, setGroupData] = useState<AnnotationData[]>([]);
   useEffect(() => {
-    const group = getAnnotationGroup(_groupId(props.pageNumber, props.groupId));
-    if (group.length > 0) {
-      setGroupData(group);
-    }
-  }, [props.groupId, props.pageNumber, getAnnotationGroup]);
+    const annotations: AnnotationData[] = [];
+    const groupId = _groupId(props.pageNumber, props.groupId);
+    activeAnnotationSetIds.forEach((setId) => {
+      const group = getAnnotationGroup(setId, groupId);
+      annotations.push(...group);
+    });
+
+    setGroupData(annotations);
+  }, [
+    props.groupId,
+    props.pageNumber,
+    getAnnotationGroup,
+    activeAnnotationSetIds,
+  ]);
 
   return (
     <div className="sticky top-10">
-      {groupData.map((data) => (
-        <Annotation
-          key={data.id}
-          annotationId={data.id}
-          orientation={props.orientation}
-        />
-      ))}
+      {groupData.map((data) => {
+        const annotationId = new AnnotationId(data.setId, data.entryId);
+        return (
+          <Annotation
+            key={annotationId.key()}
+            annotationId={annotationId}
+            orientation={props.orientation}
+          />
+        );
+      })}
     </div>
   );
 }

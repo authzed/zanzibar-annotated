@@ -1,8 +1,16 @@
 import { useState } from 'react';
+import { useAnnotation } from './annotation';
 
 // Adapted from https://tailwindcomponents.com/component/nestable-dropdown-menu
 export function PaperInfoMenu() {
   const [collapsed, setCollapsed] = useState(true);
+  const {
+    allAnnotationSetIds,
+    activeAnnotationSetIds,
+    setAnnotationSetActive,
+    setAnnotationSetInactive,
+    toggleAnnotationSet,
+  } = useAnnotation();
 
   return (
     <div className="inline-block fixed bottom-10 right-10 z-50">
@@ -39,7 +47,25 @@ export function PaperInfoMenu() {
           .
         </div>
         <ul className="text-black">
-          <li className="rounded px-3 py-2 hover:bg-gray-100">
+          {allAnnotationSetIds.map((setId: string) => {
+            return (
+              <li
+                className="rounded px-3 py-2 hover:bg-gray-100 border-b border-gray-200"
+                key={setId}
+              >
+                <a
+                  onClick={() => {
+                    toggleAnnotationSet(setId);
+                    return false;
+                  }}
+                  className="block text-black hover:text-gray-500"
+                >
+                  Toggle {setId} annotations
+                </a>
+              </li>
+            );
+          })}
+          <li className="rounded px-3 py-2 hover:bg-gray-100 border-b border-gray-200">
             <a
               href="http://github.com/authzed/spicedb"
               className="block text-black hover:text-gray-500"
@@ -47,7 +73,7 @@ export function PaperInfoMenu() {
               SpiceDB on GitHub
             </a>
           </li>
-          <li className="rounded px-3 py-2 hover:bg-gray-100 border-t border-gray-200">
+          <li className="rounded px-3 py-2 hover:bg-gray-100">
             <a
               href="http://authzed.com/discord"
               className="block text-black hover:text-gray-500"
