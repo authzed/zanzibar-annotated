@@ -18,6 +18,7 @@ import annotations from '../content/annotations.yaml';
 import popperStyles from '../styles/Popper.module.css';
 import { gtag } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
+import { ShareButton } from './SelectionShare';
 
 class AnnotationId {
   setId: string;
@@ -488,6 +489,7 @@ function Annotation(props: {
   const [visible, setVisible] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
   const [content, setContent] = useState('');
+  const [shareUrl, setShareUrl] = useState('');
 
   const bgColorClass = useMemo(() => {
     const setId = props.annotationId.setId;
@@ -505,6 +507,16 @@ function Annotation(props: {
       setContent(annotation.content);
     }
   }, [props.annotationId, getAnnotation, content]);
+
+  useEffect(() => {
+    const urlFragment = `#annotation-${encodeURIComponent(
+      props.annotationId.key()
+    )}`;
+    // Handle existing URL fragments present
+    const origin = new URL(document.URL).origin;
+    const url = new URL(`${origin}${urlFragment}`);
+    setShareUrl(url.toString());
+  }, [props.annotationId]);
 
   const activeStyle =
     props.orientation === 'left'
@@ -551,7 +563,7 @@ function Annotation(props: {
               {content}
             </ReactMarkdown>
           </div>
-          <div className="relative text-xs">
+          <div className="relative text-xs mt-4">
             {collapsed ? (
               <span
                 className="inline-block mt-2 cursor-pointer text-blue-600"
@@ -574,14 +586,37 @@ function Annotation(props: {
                 Show less
               </span>
             )}
-            <a
-              href={`#annotation-${encodeURIComponent(
-                props.annotationId.key()
-              )}`}
-              className="ml-2 font-bold absolute bottom-0 right-0"
-            >
-              #
-            </a>
+            <span className="ml-2 absolute bottom-0 right-0">
+              <ShareButton
+                type="link"
+                shareUrl={shareUrl}
+                title="Copy share URL to clipboard"
+                className="text-sm p-1 pb-0"
+                iconClassName="w-4 hover:fill-black fill-gray-300"
+                callback={() => (window.location.href = shareUrl)}
+              />
+              <ShareButton
+                title="Tweet this annotation"
+                type="twitter"
+                shareUrl={shareUrl}
+                className="text-sm p-1 pb-0"
+                iconClassName="w-4 hover:fill-black fill-gray-300"
+              />
+              <ShareButton
+                type="hn"
+                title="Post annotation to Hacker News"
+                shareUrl={shareUrl}
+                className="text-sm p-1 pb-0"
+                iconClassName="w-4 hover:fill-black fill-gray-300"
+              />
+              <ShareButton
+                type="reddit"
+                title="Submit on Reddit"
+                shareUrl={shareUrl}
+                className="text-sm p-1 pb-0"
+                iconClassName="w-4 hover:fill-black fill-gray-300"
+              />
+            </span>
           </div>
         </div>
       )}
