@@ -62,7 +62,7 @@ function loadAnnotationData(data: any): AnnotationSet {
   const setId = data.id;
   const annotationMap = new Map<string, AnnotationData>();
   const annotationGroups = new Map<string, AnnotationData[]>();
-  for (const [groupId, group] of Object.entries(annotations['groups'])) {
+  for (const [groupId, group] of Object.entries(data['groups'])) {
     const groupList = [];
     for (const [key, annotationData] of Object.entries(group as object)) {
       const obj = { setId, entryId: key, ...annotationData };
