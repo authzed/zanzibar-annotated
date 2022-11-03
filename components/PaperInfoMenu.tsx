@@ -4,13 +4,7 @@ import { useAnnotation } from './annotation';
 // Adapted from https://tailwindcomponents.com/component/nestable-dropdown-menu
 export function PaperInfoMenu() {
   const [collapsed, setCollapsed] = useState(true);
-  const {
-    allAnnotationSetIds,
-    activeAnnotationSetIds,
-    setAnnotationSetActive,
-    setAnnotationSetInactive,
-    toggleAnnotationSet,
-  } = useAnnotation();
+  const { allAnnotationSetIds, toggleAnnotationSet } = useAnnotation();
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -40,7 +34,7 @@ export function PaperInfoMenu() {
       </button>
       <div
         className={`bg-white border transform scale-0 absolute
-  transition duration-150 ease-in-out origin-bottom-right min-w-[10rem] bottom-8 right-0 text-sm
+  transition duration-150 ease-in-out origin-bottom-right min-w-[12rem] bottom-8 right-0 text-sm
   ${collapsed ? 'scale-0' : 'scale-100'}`}
       >
         <div className="bg-black text-white p-2">
@@ -65,7 +59,7 @@ export function PaperInfoMenu() {
                     toggleAnnotationSet(setId);
                     return false;
                   }}
-                  className="block text-black hover:text-gray-500"
+                  className="block text-black hover:text-gray-500 cursor-pointer"
                 >
                   Toggle {setId} annotations
                 </a>
@@ -88,7 +82,7 @@ export function PaperInfoMenu() {
               Discuss on Discord
             </a>
           </li>
-          <li className="rounded px-3 py-2 hover:bg-gray-100 border-t border-gray-200">
+          <li className="rounded px-3 py-2 hover:bg-gray-100 border-t border-gray-200 cursor-pointer">
             <span
               onClick={scrollToTop}
               className="block text-black hover:text-gray-500"
