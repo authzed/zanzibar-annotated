@@ -151,9 +151,9 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
 
   // Annotation sets are defined using imported objects.
   // TODO: Load and manage sets dynamically.
-  const [activeAnnotationSets, setActiveAnnotationSets] = useState<string[]>([
-    'general',
-  ]);
+  const [activeAnnotationSets, setActiveAnnotationSets] = useState<string[]>(
+    []
+  );
   const allAnnotationSetIds = ['general', 'spicedb'];
 
   // Note: This is populated from an imported object so it should not be modified.
@@ -180,24 +180,43 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
     [annotationSets]
   );
 
-  const setAnnotationSetActive = (setId: string) => {
+  const setAnnotationSetActive = useCallback((setId: string) => {
     const updated = activeAnnotationSets.concat(setId);
     setActiveAnnotationSets(updated);
-  };
+  }, []);
 
   const setAnnotationSetInactive = (setId: string) => {
     const updated = activeAnnotationSets.filter((id) => id !== setId);
     setActiveAnnotationSets(updated);
   };
 
-  const setAnnotationActive = (id: AnnotationId) => {
+  const setAnnotationActive = useCallback((id: AnnotationId) => {
     setActiveAnnotationId(id);
 
     gtag('event', 'annotation_active', {
       set_id: id.setId,
       entry_id: id.entryId,
     });
-  };
+  }, []);
+
+  // Parse URL fragment on page load to set default set and annotation entry
+  // Format: #annotations/<set-id>/<entry-id>
+  useEffect(() => {
+    if (window.location.hash && window.location.hash.includes('/')) {
+      const parts = window.location.hash.split('/');
+      const [prefix, setId, entryId] = parts;
+      if (prefix !== '#annotations') return;
+      console.log(prefix, setId, entryId);
+
+      if (setId) setAnnotationSetActive(setId);
+      if (entryId) setAnnotationActive(new AnnotationId(setId, entryId));
+
+      return;
+    }
+
+    // Default annotation set
+    setAnnotationSetActive('general');
+  }, [setAnnotationSetActive, setAnnotationActive]);
 
   return (
     <AnnotationManagerContext.Provider
@@ -509,9 +528,9 @@ function Annotation(props: {
   }, [props.annotationId, getAnnotation, content]);
 
   useEffect(() => {
-    const urlFragment = `#annotation-${encodeURIComponent(
-      props.annotationId.key()
-    )}`;
+    const urlFragment = `#annotations/${encodeURIComponent(
+      props.annotationId.setId
+    )}/${encodeURIComponent(props.annotationId.entryId)}`;
     // Handle existing URL fragments present
     const origin = new URL(document.URL).origin;
     const url = new URL(`${origin}${urlFragment}`);
