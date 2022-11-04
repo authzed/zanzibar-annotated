@@ -11,7 +11,8 @@ export function HighlightProvidedSelection(props: {
   const ranges = renderState.ranges;
 
   useEffect(() => {
-    // Only handle selection fragments
+    // Only handle deeplink fragments (identified by the presence of ':')
+    // to allow default behavior for all other fragments such as anchor links
     if (window.location.hash && window.location.hash.includes(':')) {
       const selectionRanges = fragmentToRangeList(
         window.location.hash.substring(1)
@@ -43,7 +44,7 @@ export function HighlightProvidedSelection(props: {
           document.getSelection() as Selection
         );
 
-        // Only replace selection fragments
+        // Only replace selection fragments so all other fragments persist in the URL
         if (fragment && fragment.includes(':')) {
           // replaceState is used instead of setting location.hash to avoid scrolling.
           history.replaceState(null, '', location.pathname + fragment);

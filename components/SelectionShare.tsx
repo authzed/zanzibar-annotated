@@ -20,12 +20,21 @@ type ShareButtonProps = {
   title: string;
   type: 'link' | 'twitter' | 'reddit' | 'hn';
   shareUrl: string;
+  shareTitle?: string;
   className?: string;
   iconClassName?: string;
 };
 
 export function ShareButton(props: ShareButtonProps) {
-  const { callback, title, type, shareUrl, className, iconClassName } = props;
+  const {
+    callback,
+    title,
+    type,
+    shareUrl,
+    shareTitle,
+    className,
+    iconClassName,
+  } = props;
 
   const icons = {
     link: LinkIcon,
@@ -46,7 +55,9 @@ export function ShareButton(props: ShareButtonProps) {
       window.open(
         `https://twitter.com/intent/tweet/?url=${encodeURIComponent(
           shareUrl
-        )}&text=Shared from the Annotated Zanzibar Paper by Authzed`,
+        )}&text=${
+          shareTitle ?? 'Shared from the Annotated Zanzibar Paper by Authzed'
+        }`,
         '_blank'
       );
 
@@ -58,7 +69,9 @@ export function ShareButton(props: ShareButtonProps) {
       window.open(
         `https://reddit.com/submit/?url=${encodeURIComponent(
           shareUrl
-        )}&resubmit=true&title=Selection from the Annotated Zanzibar Paper by Authzed`,
+        )}&resubmit=true&title=${
+          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by Authzed'
+        }`,
         '_blank'
       );
 
@@ -70,7 +83,9 @@ export function ShareButton(props: ShareButtonProps) {
       window.open(
         `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
           shareUrl
-        )}&t=Selection from the Annotated Zanzibar Paper by Authzed`,
+        )}&t=${
+          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by Authzed'
+        }`,
         '_blank'
       );
 
@@ -80,16 +95,14 @@ export function ShareButton(props: ShareButtonProps) {
     },
   };
 
+  const onClick = () => {
+    shareFuncs[type]();
+    callback && callback();
+  };
+
   const Icon = icons[type];
   return (
-    <button
-      className={className}
-      onClick={() => {
-        shareFuncs[type]();
-        callback && callback();
-      }}
-      title={title}
-    >
+    <button className={className} onClick={onClick} title={title}>
       <Icon className={iconClassName} />
     </button>
   );
