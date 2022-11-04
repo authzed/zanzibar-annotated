@@ -16,6 +16,7 @@ import remarkGfm from 'remark-gfm';
 import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
 import annotations from '../content/annotations.yaml';
 import popperStyles from '../styles/Popper.module.css';
+import { gtagWrapper } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 
 class AnnotationId {
@@ -190,9 +191,11 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
 
   const setAnnotationActive = (id: AnnotationId) => {
     setActiveAnnotationId(id);
-    gtag('event', 'annotation_active', {
-      set_id: id.setId,
-      entry_id: id.entryId,
+    gtagWrapper(() => {
+      gtag('event', 'annotation_active', {
+        set_id: id.setId,
+        entry_id: id.entryId,
+      });
     });
   };
 
