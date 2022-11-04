@@ -46,6 +46,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 div.references > p {
   @apply indent-0 mb-4 break-words;
 }

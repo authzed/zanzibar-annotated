@@ -16,20 +16,94 @@ type VirtualElement = {
 };
 
 type ShareButtonProps = {
-  onClick: () => void;
+  callback?: () => void;
   title: string;
+  type: 'link' | 'twitter' | 'reddit' | 'hn';
+  shareUrl: string;
+  shareTitle?: string;
   className?: string;
-  icon: React.FC<{ className: string }>;
+  iconClassName?: string;
 };
 
-function ShareButton(props: ShareButtonProps) {
+export function ShareButton(props: ShareButtonProps) {
+  const {
+    callback,
+    title,
+    type,
+    shareUrl,
+    shareTitle,
+    className,
+    iconClassName,
+  } = props;
+
+  const icons = {
+    link: LinkIcon,
+    twitter: TwitterIcon,
+    reddit: RedditIcon,
+    hn: HNIcon,
+  };
+
+  const shareFuncs = {
+    link: () => {
+      navigator.clipboard.writeText(shareUrl);
+
+      gtag('event', 'selection_share_clipboard', {
+        share_url: shareUrl,
+      });
+    },
+    twitter: () => {
+      window.open(
+        `https://twitter.com/intent/tweet/?url=${encodeURIComponent(
+          shareUrl
+        )}&text=${
+          shareTitle ?? 'Shared from the Annotated Zanzibar Paper by Authzed'
+        }`,
+        '_blank'
+      );
+
+      gtag('event', 'selection_share_twitter', {
+        share_url: shareUrl,
+      });
+    },
+    reddit: () => {
+      window.open(
+        `https://reddit.com/submit/?url=${encodeURIComponent(
+          shareUrl
+        )}&resubmit=true&title=${
+          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by Authzed'
+        }`,
+        '_blank'
+      );
+
+      gtag('event', 'selection_share_reddit', {
+        share_url: shareUrl,
+      });
+    },
+    hn: () => {
+      window.open(
+        `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
+          shareUrl
+        )}&t=${
+          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by Authzed'
+        }`,
+        '_blank'
+      );
+
+      gtag('event', 'selection_share_hn', {
+        share_url: shareUrl,
+      });
+    },
+  };
+
+  const onClick = () => {
+    shareFuncs[type]();
+    callback && callback();
+  };
+
+  const Icon = icons[type];
   return (
-    <button
-      className={`${popperStyles.button} ${props.className}`}
-      onClick={props.onClick}
-      title={props.title}
-    >
-      <props.icon className={popperStyles.icon} />
+    <button className={className} onClick={onClick} title={title}>
+      <Icon className={iconClassName} />
     </button>
   );
 }
@@ -72,54 +146,6 @@ function SelectionShare() {
     []
   );
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setStatusMsg('URL copied to your clipboard!');
-
-    gtag('event', 'selection_share_clipboard', {
-      share_url: shareUrl,
-    });
-  };
-
-  const shareToTwitter = () => {
-    window.open(
-      `https://twitter.com/intent/tweet/?url=${encodeURIComponent(
-        shareUrl
-      )}&text=Shared from the Annotated Zanzibar Paper by Authzed`,
-      '_blank'
-    );
-
-    gtag('event', 'selection_share_twitter', {
-      share_url: shareUrl,
-    });
-  };
-
-  const shareToReddit = () => {
-    window.open(
-      `https://reddit.com/submit/?url=${encodeURIComponent(
-        shareUrl
-      )}&resubmit=true&title=Selection from the Annotated Zanzibar Paper by Authzed`,
-      '_blank'
-    );
-
-    gtag('event', 'selection_share_reddit', {
-      share_url: shareUrl,
-    });
-  };
-
-  const shareToHN = () => {
-    window.open(
-      `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
-        shareUrl
-      )}&t=Selection from the Annotated Zanzibar Paper by Authzed`,
-      '_blank'
-    );
-
-    gtag('event', 'selection_share_hn', {
-      share_url: shareUrl,
-    });
-  };
-
   useEffect(() => {
     document.addEventListener('selectionchange', debouncedSelectionHandler);
     return () => {
@@ -144,25 +170,33 @@ function SelectionShare() {
             {!statusMsg && (
               <>
                 <ShareButton
-                  className="border-l-0"
-                  onClick={copyToClipboard}
+                  type="link"
+                  shareUrl={shareUrl}
+                  className={`${popperStyles.button} border-l-0`}
+                  iconClassName={popperStyles.icon}
+                  callback={() => setStatusMsg('URL copied to your clipboard!')}
                   title="Copy share URL to clipboard"
-                  icon={LinkIcon}
                 />
                 <ShareButton
-                  onClick={shareToTwitter}
+                  type="twitter"
                   title="Tweet your selection"
-                  icon={TwitterIcon}
+                  shareUrl={shareUrl}
+                  className={popperStyles.button}
+                  iconClassName={popperStyles.icon}
                 />
                 <ShareButton
-                  onClick={shareToHN}
+                  type="hn"
                   title="Post to Hacker News"
-                  icon={HNIcon}
+                  shareUrl={shareUrl}
+                  className={popperStyles.button}
+                  iconClassName={popperStyles.icon}
                 />
                 <ShareButton
-                  onClick={shareToReddit}
+                  type="reddit"
                   title="Submit on Reddit"
-                  icon={RedditIcon}
+                  shareUrl={shareUrl}
+                  className={popperStyles.button}
+                  iconClassName={popperStyles.icon}
                 />
                 <div
                   ref={setArrowElement}
