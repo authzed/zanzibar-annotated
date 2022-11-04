@@ -1,5 +1,10 @@
 id: "spicedb"
-title: "SpiceDB comparisions"
+label: "SpiceDB"
+title: "Insights from building SpiceDB"
+subtitle: "Thoughts and lessons learned about the paper while implementing SpiceDB."
+cta: |
+  [SpiceDB on GitHub](https://github.com/authzed/spicedb) &#8599;
+description: ""
 highlightColor: "sky"
 groups:
   page-1-col-2:
@@ -65,7 +70,3 @@ groups:
     tuple-encoding-hint:
       content: |
         This may be a hint that the namespaces and relations are normalized to a smaller representation in the binary encoding.
-    relation-rewrite-interpret-graph:
-      content: |
-        I like to conceptualize this by saying that the individual tuples represent relationships in a directed graph.
-        The userset rewrite rules therefore act as a set of instructions on how to interpret that graph for authorization decisions.

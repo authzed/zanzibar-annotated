@@ -13,8 +13,8 @@ import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
+import annotationsIntro from '../content/annotations-intro.yaml';
 import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
-import annotations from '../content/annotations.yaml';
 import popperStyles from '../styles/Popper.module.css';
 import { gtag } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
@@ -52,6 +52,9 @@ type AnnotationData = {
 type AnnotationSet = {
   id: string;
   title: string;
+  subtitle: string;
+  description: string;
+  cta: string;
   highlightColor?: string;
   groups: Map<string, AnnotationData[]>;
   annotations: Map<string, AnnotationData>;
@@ -77,6 +80,9 @@ function loadAnnotationData(data: any): AnnotationSet {
   return {
     id: data['id'],
     title: data['title'],
+    subtitle: data['subtitle'],
+    description: data['description'],
+    cta: data['cta'],
     highlightColor: data['highlightColor'] ?? 'sky',
     groups: annotationGroups,
     annotations: annotationMap,
@@ -136,6 +142,27 @@ export const NoAnnotationManagerProvider: React.FC<PropsWithChildren> = (
   );
 };
 
+const _availableAnnotationSets = [
+  {
+    value: annotationsIntro.id,
+    label: annotationsIntro.label,
+    color: annotationsIntro.highlightColor,
+  },
+  {
+    value: annotationsSpiceDb.id,
+    label: annotationsSpiceDb.label,
+    color: annotationsSpiceDb.highlightColor,
+  },
+];
+
+export function getAvailableAnnotationSets() {
+  return _availableAnnotationSets;
+}
+
+const allAnnotationSetIds = getAvailableAnnotationSets().map(
+  (item) => item.value
+);
+
 /**
  * Provider that holds global annotation view state and annotation data.
  */
@@ -154,14 +181,13 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   const [activeAnnotationSets, setActiveAnnotationSets] = useState<string[]>(
     []
   );
-  const allAnnotationSetIds = ['general', 'spicedb'];
 
   // Note: This is populated from an imported object so it should not be modified.
   const annotationSets = useMemo(() => {
     const map = new Map<string, AnnotationSet>();
-    const general = loadAnnotationData(annotations);
+    const intro = loadAnnotationData(annotationsIntro);
     const spicedb = loadAnnotationData(annotationsSpiceDb);
-    map.set(general.id, general);
+    map.set(intro.id, intro);
     map.set(spicedb.id, spicedb);
     return map;
   }, []);
@@ -215,7 +241,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
     }
 
     // Default annotation set
-    setAnnotationSetActive('general');
+    setAnnotationSetActive('intro');
   }, [setAnnotationSetActive, setAnnotationActive]);
 
   return (

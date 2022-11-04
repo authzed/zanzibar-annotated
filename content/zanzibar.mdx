@@ -60,9 +60,9 @@ First, it helps establish consistent
 </Column>
 <Column>
 
-semantics and user experience <Highlight setId="general" entryId="across-applications">across applications</Highlight>.
-Second, it makes it easier for applications to interoperate, <Highlight setId="general" entryId="gmail-example">for example, to coordinate access control when an object from one application embeds an object from another application.</Highlight>
-Third, useful common infrastructure can be built on top of a unified access control system, <Highlight setId="general" entryId="search-index-paper-plea">in particular, a search index that respects access control and works across applications.</Highlight>
+semantics and user experience <Highlight setId="intro" entryId="across-applications">across applications</Highlight>.
+Second, it makes it easier for applications to interoperate, <Highlight setId="intro" entryId="gmail-example">for example, to coordinate access control when an object from one application embeds an object from another application.</Highlight>
+Third, useful common infrastructure can be built on top of a unified access control system, <Highlight setId="intro" entryId="search-index-paper-plea">in particular, a search index that respects access control and works across applications.</Highlight>
 Finally, as we show below, authorization poses unique challenges involving data consistency and scalability.
 It saves engineering resources to tackle them once across applications.
 
@@ -77,7 +77,7 @@ We have the following goals for the Zanzibar system:
 Zanzibar achieves these goals through a combination of notable features.
 To provide flexibility, Zanzibar pairs a simple data model with a powerful configuration language.
 The language allows clients to define arbitrary relations between users and objects, such as `owner`, `editor`, `commenter`, and `viewer`.
-It includes set-algebraic operators <Highlight setId="general" entryId="set-operations-list">such as intersection and union</Highlight> for specifying potentially complex access control policies in terms of those user-object relations.
+It includes set-algebraic operators <Highlight setId="intro" entryId="set-operations-list">such as intersection and union</Highlight> for specifying potentially complex access control policies in terms of those user-object relations.
 For example, an application can specify that users granted editing rights on a document are also allowed to comment on the
 
 </Column>
@@ -92,27 +92,27 @@ For example, an application can specify that users granted editing rights on a d
 document, but not all commenters are given editing rights.
 
 At runtime, Zanzibar allows clients to create, modify, and evaluate access control lists (ACLs) through a remote procedure call (RPC) interface.
-A simple ACL takes the form of <Highlight setId="general" entryId="gaia-ids-shortcut">“user _U_ has relation _R_ to object _O_”</Highlight>.
+A simple ACL takes the form of <Highlight setId="intro" entryId="gaia-ids-shortcut">“user _U_ has relation _R_ to object _O_”</Highlight>.
 More complex ACLs take the form of “set of users _S_ has relation _R_ to object _O_”, where _S_ is itself specified in terms of another object-relation pair.
 ACLs can thus refer to other ACLs, for example to specify that the set of users who can comment on a video consists of the users who have been granted viewing rights on that specific video along with those with viewing permissions on the video channel.
 
 Group memberships are an important class of ACL where the object is a group and the relation is semantically equivalent to `member`.
-<Highlight setId="general" entryId="pointer-chasing">Groups can contain other groups, which illustrates one of the challenges facing Zanzibar, namely that evaluating whether a user belongs to a group can entail following a long chain of nested group memberships.</Highlight>
+<Highlight setId="intro" entryId="pointer-chasing">Groups can contain other groups, which illustrates one of the challenges facing Zanzibar, namely that evaluating whether a user belongs to a group can entail following a long chain of nested group memberships.</Highlight>
 
 Authorization checks take the form of “does user _U_ have relation _R_ to object _O_?” and are evaluated by a collection of distributed servers.
-<Highlight setId="general" entryId="dispatch-introduction">When a check request arrives to Zanzibar, the work to evaluate the check may fan out to multiple servers</Highlight>, for example when a group contains both individual members and other groups.
+<Highlight setId="intro" entryId="dispatch-introduction">When a check request arrives to Zanzibar, the work to evaluate the check may fan out to multiple servers</Highlight>, for example when a group contains both individual members and other groups.
 Each of those servers may in turn contact other servers, for example to recursively traverse a hierarchy of group memberships.
 
 Zanzibar operates at a global scale along multiple dimensions.
 It stores more than two trillion ACLs and performs millions of authorization checks per second.
-<Highlight setId="general" entryId="globally-available-requirement">The ACL data does not lend itself to geographic partitioning because authorization checks for any object can come from anywhere in the world</Highlight>.
+<Highlight setId="intro" entryId="globally-available-requirement">The ACL data does not lend itself to geographic partitioning because authorization checks for any object can come from anywhere in the world</Highlight>.
 Therefore, Zanzibar replicates all ACL data in tens of geographically distributed data centers and distributes load across thousands of servers around the world.
 
 Zanzibar supports global consistency of access control decisions through two interrelated features.
 One, it respects the order in which ACL changes are committed to the underlying data store.
 Two, it can ensure that authorization checks are based on ACL data no older than a client-specified change.
 Thus, for example, a client can remove a user from a group and be assured that subsequent membership checks reflect that removal.
-Zanzibar provides these ordering properties by storing ACLs in a <Highlight setId="general" entryId="spanner-wags-the-dog">globally distributed database system with external consistency guarantees</Highlight>. [[15](#references-15), [18](#references-18)]
+Zanzibar provides these ordering properties by storing ACLs in a <Highlight setId="intro" entryId="spanner-wags-the-dog">globally distributed database system with external consistency guarantees</Highlight>. [[15](#references-15), [18](#references-18)]
 
 Zanzibar employs an array of techniques to achieve low latency and high availability in this globally distributed environment.
 Its consistency protocol allows the vast majority of requests to be served with locally replicated data, without requiring cross-region round trips.
@@ -124,7 +124,7 @@ It also applies techniques such as hedging requests and optimizing computations 
 <Column>
 
 ization.
-Zanzibar responds to more than 95% of authorization checks within 10 milliseconds and has <Highlight setId="general" entryId="uptime-fine-print">maintained more than 99.999% availability for the last 3 years</Highlight>.
+Zanzibar responds to more than 95% of authorization checks within 10 milliseconds and has <Highlight setId="intro" entryId="uptime-fine-print">maintained more than 99.999% availability for the last 3 years</Highlight>.
 
 The main contributions of this paper lie in conveying the engineering challenges in building and deploying a consistent, world-scale authorization system.
 While most elements of Zanzibar's design have their roots in previous research, this paper provides a record of the features and techniques Zanzibar brings together to satisfy its stringent requirements for correctness, flexibility, latency, availability, and scalability.
@@ -136,9 +136,9 @@ This section describes Zanzibar's data model, configuration language, and applic
 
 ### 2.1 Relation Tuples
 
-In Zanzibar, ACLs are collections of <Highlight setId="general" entryId="no-user-user">object-user or object-object relations</Highlight> represented as _relation tuples_.
+In Zanzibar, ACLs are collections of <Highlight setId="intro" entryId="no-user-user">object-user or object-object relations</Highlight> represented as _relation tuples_.
 Groups are simply ACLs with membership semantics.
-Relation tuples have <Highlight setId="general" entryId="tuple-encodings">efficient binary encodings</Highlight>, but in this paper we represent them using a convenient text notation:
+Relation tuples have <Highlight setId="intro" entryId="tuple-encodings">efficient binary encodings</Highlight>, but in this paper we represent them using a convenient text notation:
 
 <br/>
 $\lang tuple \rang \coloncolonequals \lang object \rang \text{\textquoteleft} \# \text{\textquoteright} \lang relation \rang \text{\textquoteleft} @ \text{\textquoteright}\lang user \rang \\ \nobreakspace$
@@ -149,13 +149,13 @@ $\lang user \rang \coloncolonequals \lang user\_id \rang \space | \space \lang u
 
 $\lang userset \rang \coloncolonequals \lang object \rang \text{\textquoteleft} \# \text{\textquoteright} \lang relation \rang \\ \nobreakspace$
 
-where <Highlight setId="general" entryId="tuple-encoding-hint">_〈namespace〉_ and _〈relation〉_ are predefined in client configurations</Highlight> [(§2.3)](#2.3-namespace-configuration), _〈object id〉_ is a string, and _〈user id〉_ is an integer.
+where <Highlight setId="intro" entryId="tuple-encoding-hint">_〈namespace〉_ and _〈relation〉_ are predefined in client configurations</Highlight> [(§2.3)](#2.3-namespace-configuration), _〈object id〉_ is a string, and _〈user id〉_ is an integer.
 The primary keys required to identify a relation tuple are _〈namespace〉_, _〈object id〉_, _〈relation〉_, and _〈user〉_.
 One feature worth noting is that a _〈userset〉_ allows ACLs to refer to groups and thus supports representing nested group membership.
 
 <PreviewLink previewComponent={<Table1 />}>[Table 1](#table-1)</PreviewLink> shows some example tuples and corresponding semantics.
 While some relations (e.g. `viewer`) define access control directly, others (e.g. `parent`, pointing to a folder) only define abstract relations between objects.
-<Highlight setId="general" entryId="relation-rewrite-interpret-graph">These abstract relations may indirectly affect access control given userset rewrite rules specified in namespace configs</Highlight> ([§2.3.1](#2.3.1-relation-configs-and-userset-rewrites)).
+<Highlight setId="intro" entryId="relation-rewrite-interpret-graph">These abstract relations may indirectly affect access control given userset rewrite rules specified in namespace configs</Highlight> ([§2.3.1](#2.3.1-relation-configs-and-userset-rewrites)).
 
 Defining our data model around tuples, instead of perobject ACLs, allows us to unify the concepts of ACLs and groups and to support efficient reads and incremental updates, as we will see in [§2.4](#2.4-api).
 
