@@ -24,8 +24,11 @@ export function GTagScript() {
   );
 }
 
-export function gtagWrapper(func: () => void) {
-  if (!!window.gtag) {
-    return func();
+// Wrapper for the global function defined after the script is loaded.
+// args is constrained by the Gtag.Gtag function type
+export const gtag: Gtag.Gtag = function (...args: any) {
+  if (!window.gtag) {
+    return;
   }
-}
+  (window.gtag as Gtag.Gtag).apply(window, args);
+};
