@@ -6,7 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useState
 } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import { createPortal } from 'react-dom';
@@ -16,6 +16,7 @@ import remarkGfm from 'remark-gfm';
 import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
 import annotations from '../content/annotations.yaml';
 import popperStyles from '../styles/Popper.module.css';
+import { gtagWrapper } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 
 class AnnotationId {
@@ -62,7 +63,7 @@ function loadAnnotationData(data: any): AnnotationSet {
   const setId = data.id;
   const annotationMap = new Map<string, AnnotationData>();
   const annotationGroups = new Map<string, AnnotationData[]>();
-  for (const [groupId, group] of Object.entries(annotations['groups'])) {
+  for (const [groupId, group] of Object.entries(data['groups'])) {
     const groupList = [];
     for (const [key, annotationData] of Object.entries(group as object)) {
       const obj = { setId, entryId: key, ...annotationData };
@@ -188,6 +189,16 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
     setActiveAnnotationSets(updated);
   };
 
+  const setAnnotationActive = (id: AnnotationId) => {
+    setActiveAnnotationId(id);
+    gtagWrapper(() => {
+      gtag('event', 'annotation_active', {
+        set_id: id.setId,
+        entry_id: id.entryId,
+      });
+    });
+  };
+
   return (
     <AnnotationManagerContext.Provider
       value={{
@@ -195,9 +206,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
         getAnnotationGroup,
         getAnnotationSet: (setId: string) => annotationSets.get(setId),
         activeAnnotationId,
-        setAnnotationActive: (id: AnnotationId) => {
-          setActiveAnnotationId(id);
-        },
+        setAnnotationActive,
         setAnnotationInactive: (id: AnnotationId) => {
           if (activeAnnotationId?.equalsId(id)) {
             setActiveAnnotationId(undefined);

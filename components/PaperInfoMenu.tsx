@@ -12,6 +12,13 @@ export function PaperInfoMenu() {
     toggleAnnotationSet,
   } = useAnnotation();
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <div className="inline-block fixed bottom-10 right-10 z-50">
       <button
@@ -80,6 +87,14 @@ export function PaperInfoMenu() {
             >
               Discuss on Discord
             </a>
+          </li>
+          <li className="rounded px-3 py-2 hover:bg-gray-100 border-t border-gray-200">
+            <span
+              onClick={scrollToTop}
+              className="block text-black hover:text-gray-500"
+            >
+              Scroll to top
+            </span>
           </li>
         </ul>
       </div>

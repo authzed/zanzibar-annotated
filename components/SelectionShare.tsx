@@ -8,6 +8,7 @@ import HNIcon from '../content/HNIcon.svg';
 import RedditIcon from '../content/RedditIcon.svg';
 import TwitterIcon from '../content/TwitterIcon.svg';
 import popperStyles from '../styles/Popper.module.css';
+import { gtagWrapper } from './GTag';
 
 type VirtualElement = {
   getBoundingClientRect: () => DOMRect;
@@ -59,6 +60,12 @@ function SelectionShare() {
           setVisible(true);
           setShareUrl(document.URL);
           setStatusMsg('');
+          gtagWrapper(() => {
+            gtag('event', 'selection_share_viewed', {
+              share_url: document.URL,
+            });
+          });
+
           return;
         }
       }, 200),
@@ -68,6 +75,11 @@ function SelectionShare() {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareUrl);
     setStatusMsg('URL copied to your clipboard!');
+    gtagWrapper(() => {
+      gtag('event', 'selection_share_clipboard', {
+        share_url: shareUrl,
+      });
+    });
   };
 
   const shareToTwitter = () => {
@@ -77,6 +89,11 @@ function SelectionShare() {
       )}&text=Shared from the Annotated Zanzibar Paper by Authzed`,
       '_blank'
     );
+    gtagWrapper(() => {
+      gtag('event', 'selection_share_twitter', {
+        share_url: shareUrl,
+      });
+    });
   };
 
   const shareToReddit = () => {
@@ -86,6 +103,11 @@ function SelectionShare() {
       )}&resubmit=true&title=Selection from the Annotated Zanzibar Paper by Authzed`,
       '_blank'
     );
+    gtagWrapper(() => {
+      gtag('event', 'selection_share_reddit', {
+        share_url: shareUrl,
+      });
+    });
   };
 
   const shareToHN = () => {
@@ -95,6 +117,11 @@ function SelectionShare() {
       )}&t=Selection from the Annotated Zanzibar Paper by Authzed`,
       '_blank'
     );
+    gtagWrapper(() => {
+      gtag('event', 'selection_share_hn', {
+        share_url: shareUrl,
+      });
+    });
   };
 
   useEffect(() => {
