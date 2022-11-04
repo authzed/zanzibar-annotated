@@ -1,5 +1,4 @@
-const puppeteer = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');
+const chromium = require('chrome-aws-lambda');
 
 export default function Test(props) {
   console.log(props);
@@ -25,7 +24,12 @@ export async function getServerSideProps(context) {
           headless: true,
         };
 
-  const browser = await puppeteer.launch(options);
+  // const browser = await chromium.puppeteer.launch(options);
+  const browser = await chromium.puppeteer.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath,
+    headless: true,
+  });
 
   const page = await browser.newPage();
   await page.goto('https://authzed.com');
