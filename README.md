@@ -38,6 +38,41 @@ The paper content is stored as markdown but with markup that provides layout ins
 
 ### Annotations
 
-The paper layout expects an annotations context. The [default annotation provider] implementation uses a YAML file to store all annotations and provides a function for components to get an annotation by an annotation id.
+The paper layout expects an annotations context. The [default annotation provider] implementation uses YAML files to store all annotations and provides hooks for components to get annotations and annotation related state.
+
+A collection of annotations can be organized into sets. Each set can be toggled on and off and can contain additional metadata to be displayed along side the paper.
 
 [default annotation provider]: https://github.com/authzed/zanzibar-annotated/blob/main/components/annotation.tsx
+
+#### YAML format
+
+One YAML file per annotation set.
+
+```
+id: <An identifier unique across annotation sets>
+label: The short, human readable version of the id
+title: The descriptive name for the set
+subtitle: Additional description of the set
+cta: Short Markdown string for a call to action or link to additional info.
+description: Markdown string for additional information. Can be used
+highlightColor: A tailwind color class name used to color code the annotations and highlights for this set. See https://tailwindcss.com/docs/customizing-colors
+
+
+(Annotations are organized into groups. Each group has an id such as "page-1-col-2" and each annotation has an id such as "across-applications".)
+groups:
+  page-1-col-2:
+    across-applications:
+    ...
+  page-2-col-1:
+    ...
+```
+
+#### Linking
+
+An annotation set can be directly linked using a URL fragment in the format:
+
+`#annotations/<annotation set id>`
+
+An individual annotation can be directly linked using:
+
+`#annotations/<annotation set id>/<annotation entry id>`
