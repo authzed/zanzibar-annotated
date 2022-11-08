@@ -86,7 +86,7 @@ export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
 
   return (
     <div className="relative z-0">
-      <div className="hidden xl:block absolute h-full w-80 -left-[20rem] top-0 z-10">
+      <div className="hidden lg:block absolute h-full w-80 -left-[20rem] top-0 z-10">
         <AnnotationGroup
           pageNumber={props.pageNumber}
           groupId="col-1"
@@ -96,7 +96,7 @@ export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
       <div className="md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow z-0">
         {props.children}
       </div>
-      <div className="hidden xl:block absolute h-full w-80 -right-[20rem] top-0 z-10">
+      <div className="hidden lg:block absolute h-full w-80 -right-[20rem] top-0 z-10">
         <AnnotationGroup
           pageNumber={props.pageNumber}
           groupId="col-2"
