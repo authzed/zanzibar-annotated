@@ -22,8 +22,7 @@ type SelectProps = {
 export default function AnnotationSetSelect(props: SelectProps) {
   const defaultItem = props.items.find((item) => item.value === props.default);
   const [selected, setSelected] = useState<SelectItem | undefined>(defaultItem);
-  const { activeAnnotationSetIds, getAnnotationSet, toggleAnnotationSet } =
-    useAnnotation();
+  const { activeAnnotationSetIds, toggleAnnotationSet } = useAnnotation();
 
   useEffect(() => {
     if (activeAnnotationSetIds.length === 1) {
@@ -44,11 +43,11 @@ export default function AnnotationSetSelect(props: SelectProps) {
       {({ open }) => (
         <>
           <div className="relative text-black">
-            <Listbox.Button className="relative cursor-default rounded border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-00">
+            <Listbox.Button className="relative cursor-default rounded border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-0">
               <span
                 className={classNames(
                   selected?.color ? `bg-${selected?.color}-300` : '',
-                  'inline-block w-2 mr-2'
+                  'hidden lg:inline-block w-2 mr-2'
                 )}
               >
                 &nbsp;

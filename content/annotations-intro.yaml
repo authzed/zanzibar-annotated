@@ -4,7 +4,7 @@ title: "Introduction to Zanzibar"
 subtitle: "Highlights and commentary on notable portions of the paper."
 cta: |
   Annotated by [Authzed](https://authzed.com)
-description: "Authzed, creator of the open source, Zanzibar inspired, fine-grained permissions database SpiceDB."
+description: "This paper is hosted by Authzed, the creator of the open source, Zanzibar inspired, fine-grained permissions database [SpiceDB](https://github.com/authzed/spicedb)."
 highlightColor: "amber"
 groups:
   page-1-col-2:

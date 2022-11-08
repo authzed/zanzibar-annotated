@@ -1,10 +1,25 @@
-import { useState } from 'react';
+import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid';
+import { useMemo, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useAnnotation } from './annotation';
 
-// Adapted from https://tailwindcomponents.com/component/nestable-dropdown-menu
+/**
+ * Sticky menu for the paper reader.
+ * Assumes that only one annotation set is active at a time.
+ * Adapted from https://tailwindcomponents.com/component/nestable-dropdown-menu
+ */
 export function PaperInfoMenu() {
   const [collapsed, setCollapsed] = useState(true);
-  const { allAnnotationSetIds, toggleAnnotationSet } = useAnnotation();
+  const { activeAnnotationSetIds, getAnnotationSet } = useAnnotation();
+
+  const annotationSet = useMemo(() => {
+    if (activeAnnotationSetIds.length === 1) {
+      return getAnnotationSet(activeAnnotationSetIds[0]);
+    }
+
+    return undefined;
+  }, [getAnnotationSet, activeAnnotationSetIds]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -19,67 +34,56 @@ export function PaperInfoMenu() {
         onClick={() => {
           setCollapsed(!collapsed);
         }}
-        className="outline-none focus:outline-none border hover:shadow-lg px-4 py-2 bg-white rounded-sm flex items-center"
+        className="outline-none focus:outline-none flex items-center"
       >
         <span>
-          <svg
-            className={`fill-current h-4 w-4 transform transition duration-150 ease-in-out
-          ${collapsed ? 'rotate-180' : 'rotate-0'}`}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-          >
-            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-          </svg>
+          <QuestionMarkCircleIcon
+            className={`${
+              collapsed ? 'fill-current' : 'fill-gray-300'
+            } h-12 w-12 transform transition duration-150 ease-in-out`}
+          />
         </span>
       </button>
       <div
         className={`bg-white border transform scale-0 absolute
-  transition duration-150 ease-in-out origin-bottom-right min-w-[12rem] bottom-8 right-0 text-sm
+  transition duration-150 ease-in-out origin-bottom-right min-w-[16rem] bottom-12 right-1 text-sm shadow-md rounded
   ${collapsed ? 'scale-0' : 'scale-100'}`}
       >
-        <div className="bg-black text-white p-2">
-          The Annotated Zanzibar Paper is hosted by{' '}
-          <a
-            href="https://authzed.com"
-            className="text-white underline hover:text-gray-200"
-          >
-            Authzed
-          </a>
-          .
-        </div>
-        <ul className="text-black">
-          {allAnnotationSetIds.map((setId: string) => {
-            return (
-              <li
-                className="rounded px-3 py-2 hover:bg-gray-100 border-b border-gray-200"
-                key={setId}
-              >
+        <div className="bg-black text-white p-2 rounded-t">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: (props) => <p className="indent-0">{props.children}</p>,
+              a: (props) => (
                 <a
-                  onClick={() => {
-                    toggleAnnotationSet(setId);
-                    return false;
-                  }}
-                  className="block text-black hover:text-gray-500 cursor-pointer"
+                  href={props.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-white hover:text-indigo-200 underline"
                 >
-                  Toggle {setId} annotations
+                  {props.children}
                 </a>
-              </li>
-            );
-          })}
+              ),
+            }}
+          >
+            {annotationSet?.description ?? ''}
+          </ReactMarkdown>
+        </div>
+        <ul className="text-black text-right">
           <li className="rounded px-3 py-2 hover:bg-gray-100 border-b border-gray-200">
             <a
               href="http://github.com/authzed/spicedb"
-              className="block text-black hover:text-gray-500"
+              className="block text-black hover:text-indigo-500"
             >
-              SpiceDB on GitHub
+              SpiceDB on GitHub &#8599;
             </a>
           </li>
           <li className="rounded px-3 py-2 hover:bg-gray-100">
             <a
               href="http://authzed.com/discord"
-              className="block text-black hover:text-gray-500"
+              className="block text-black hover:text-indigo-500"
             >
-              Discuss on Discord
+              Discuss on Discord &#8599;
             </a>
           </li>
           <li className="rounded px-3 py-2 hover:bg-gray-100 border-t border-gray-200 cursor-pointer">
@@ -87,7 +91,7 @@ export function PaperInfoMenu() {
               onClick={scrollToTop}
               className="block text-black hover:text-gray-500"
             >
-              Scroll to top
+              Scroll to top &#8593;
             </span>
           </li>
         </ul>
