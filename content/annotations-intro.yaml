@@ -195,3 +195,99 @@ groups:
         Because it doesn't recursively expand through usersets (e.g. group:123#member), you can't directly use it to answer "Who has access to this resource?".
         According to [§4](#4-experience) it gets almost 20% as many API requests as the Check API, so engineers there have found utility.
         Our own experience with trying to use it to drive a UI panel proved challenging; users wanted to see the full transitive closure of all users that had access.
+
+    one-database-per-namespace:
+      content: |
+        It's unclear why Zanzibar uses one database per namespace.
+        The object ID encoding configuration in [§2.3](#2.3-namespace-configuration) is a good justification for using separate _tables_ per namespace.
+        The most plausible justifications are scale and geographic distribution.
+        The choice makes it very hard to do some operations, such as a reverse query for all tuples with a specific subject.
+        If anyone knows for sure, please reach out and we will update this annotation.
+
+    backup:
+      content: |
+        Backup.
+
+  page-6-col-1:
+    why-garbage-collection:
+      content: |
+        This implies that Zanzibar is doing some sort of manual [Multiversion Concurrency Control](https://fixme.com).
+        It's unclear why this would be needed considering Spanner supports snapshot queries.
+
+    user-configurable-sharding:
+      content: |
+        This is interesting.
+        Normally Spanner will automatically assign data to replicas to scale automatically.
+        This user-configurable sharding strategy that doesn't use the primary-key components in order seems to be a response to shard hot-spots on the `group` namespace.
+
+    change-streams-or-changelog:
+      content: |
+        I wonder if Google still uses a changelog table now that Spanner has [change streams](https://fixme.com).
+  
+  page-6-col-2:
+    spanner-transaction-coordinator:
+      content: |
+        This 2-phase commit capability does not appear to be possible in GCP's Cloud Spanner offering.
+
+    namespace-new-enemy:
+      content: |
+        Here it looks like each `aclserver` is updating and caching versions of the namespace configuration individually by watching a change feed.
+        Interesting to note that this could theoretically lead to a "new-enemy problem" where older versions of a namespace are incorrectly interpreting tuples that were written at a later time.
+
+    voting-replica-write-latency-abroad:
+      content: |
+        I believe this is a Spanner limitation where "global" clusters [always have their voting members in North America](https://fixme.com).
+        How large is the impact on write latencies for permissions operations occurring abroad?
+        Does it necessarily take longer to add a reader to a document in Europe?
+  
+  page-7-col-1:
+    replication-lag-computation:
+      content: |
+        This seems like a really complicated way to automatically measure and adjust for replication lag.
+
+    latency-impact-namespace-load:
+      content: |
+        Presumably this is done to avoid the latency impact of loading and parsing namespace config at request time.
+        One can't help wonder what happens as Zanzibar grows and the number of namespace versions exceeds what's reasonable to keep in memory on every node.
+
+    rewrite-boolean-translation:
+      content: |
+        It's an open question how formal this translation is.
+        Is Google using something like Prolog or Datalog to evaluate these expressions?
+        Or is it being evaluated by code in a more general-purpose programming language?
+
+  page-7-col-2:
+    cross-namespace-leopard:
+      content: |
+        Presumably google is doing this for namespaces like `group`, and maybe `role`.
+        There are certain use cases where it might be really interesting to cross the namespace boundary.
+        For example, many business are structured into teams, roles, organizational units, and ultimately an organization.
+        Without being able to cross namespace boundaries you are still limited to recursive pointer chasing on the order of the number of namespaces involved.
+        It is unclear if Leopard could handle this use case.
+
+  page-8-col-1:
+    hotspot-latency:
+      content: |
+        This is a very bold statement, and the solution that they chose turns Zanzibar into a distributed system.
+
+  page-8-col-2:
+    slicer-resiliency:
+      content: |
+        It's hard to imagine one object ID being so hot that it overloads a server all by itself.
+        Presumably spreading that out over multiple servers is done in some part for the sake of resiliency.
+
+    future-snapshot-timestamps:
+      content: |
+        The talk about using future timestamps here is interesting considering the focus on tail latencies.
+        It seems like you would need a very good reason to sit around accomplishing nothing and waiting for the clock to tick.
+
+    over-read-heuristic:
+      content: |
+        This is such a simple and seemingly effective heuristic for when to over-read data, it's rather beautiful.
+
+  page-9-col-1:
+    nth-percentile-hedging:
+     content: |
+       It's interesting to note that when you do this you end up in a steady-state hedging scenario.
+       For example, if you pick 90th percentile is considered slow, then that means that 10% of all calls will be hedged regardless of the actual median and outlier response times.
+       If Spanner were always returning within 10±2 milliseconds, your 12 millisecond requests would get hedged despite being _very_ fast.
