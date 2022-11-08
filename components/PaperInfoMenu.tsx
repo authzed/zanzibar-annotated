@@ -49,11 +49,11 @@ export function PaperInfoMenu() {
   transition duration-150 ease-in-out origin-bottom-right min-w-[16rem] bottom-12 right-1 text-sm shadow-md rounded
   ${collapsed ? 'scale-0' : 'scale-100'}`}
       >
-        <div className="bg-black text-white p-2 rounded-t">
+        <div className="p-3 bg-black text-white rounded-t">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              p: (props) => <p className="indent-0">{props.children}</p>,
+              p: (props) => <p className="indent-0 mb-2">{props.children}</p>,
               a: (props) => (
                 <a
                   href={props.href}

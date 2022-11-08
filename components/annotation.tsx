@@ -142,18 +142,15 @@ export const NoAnnotationManagerProvider: React.FC<PropsWithChildren> = (
   );
 };
 
-const _availableAnnotationSets = [
-  {
-    value: annotationsIntro.id,
-    label: annotationsIntro.label,
-    color: annotationsIntro.highlightColor,
-  },
-  {
-    value: annotationsSpiceDb.id,
-    label: annotationsSpiceDb.label,
-    color: annotationsSpiceDb.highlightColor,
-  },
-];
+const _availableAnnotationSets = [annotationsIntro, annotationsSpiceDb].map(
+  (set) => {
+    return {
+      value: set.id,
+      label: set.label,
+      color: set.highlightColor,
+    };
+  }
+);
 
 export function getAvailableAnnotationSets() {
   return _availableAnnotationSets;

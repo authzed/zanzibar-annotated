@@ -32,6 +32,7 @@ export function Banner() {
       </div>
       <div className="w-full sticky top-0 p-3 mt-20 -mb-20 z-10 bg-[#494B6A] text-white font-sans text-sm grid grid-cols-6 gap-0">
         <div className="col-span-1 my-auto">
+          <span className="mb-1 inline-block">Choose annotations:</span>
           <AnnotationSetSelect
             items={availableAnnotationSets}
             default="intro"

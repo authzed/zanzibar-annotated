@@ -20,7 +20,8 @@ type SelectProps = {
 
 // Adapted from https://tailwindui.com/components/application-ui/forms/select-menus
 export default function AnnotationSetSelect(props: SelectProps) {
-  const defaultItem = props.items.find((item) => item.value === props.default);
+  const defaultItem = () =>
+    props.items.find((item) => item.value === props.default);
   const [selected, setSelected] = useState<SelectItem | undefined>(defaultItem);
   const { activeAnnotationSetIds, toggleAnnotationSet } = useAnnotation();
 
@@ -33,7 +34,10 @@ export default function AnnotationSetSelect(props: SelectProps) {
   }, [props.items, activeAnnotationSetIds]);
 
   const onChangeHandler = (value: SelectItem) => {
-    selected && toggleAnnotationSet(selected.value);
+    if (selected) {
+      if (value.value === selected.value) return;
+      toggleAnnotationSet(selected.value);
+    }
     toggleAnnotationSet(value.value);
     setSelected(value);
   };

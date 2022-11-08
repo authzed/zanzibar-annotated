@@ -4,7 +4,10 @@ title: "Insights from building SpiceDB"
 subtitle: "Thoughts and lessons learned about the paper while implementing SpiceDB."
 cta: |
   [SpiceDB on GitHub](https://github.com/authzed/spicedb) &#8599;
-description: ""
+description: |
+  SpiceDB was designed to be the most accurate, open source implementation of Zanzibar.
+
+  Learn more about [SpiceDB](https://authzed.com/spicedb?utm_source=za&utm_medium=menu).
 highlightColor: "sky"
 groups:
   page-1-col-2:
