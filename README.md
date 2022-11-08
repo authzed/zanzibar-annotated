@@ -38,6 +38,10 @@ The paper content is stored as markdown but with markup that provides layout ins
 
 ### Annotations
 
-The paper layout expects an annotations context. The [default annotation provider] implementation uses a YAML file to store all annotations and provides a function for components to get an annotation by an annotation id.
+The paper layout expects an annotations context. The [default annotation provider] implementation uses YAML files to store all annotations and provides hooks for components to get annotations and annotation related state.
+
+A collection of annotations can be organized into sets. Each set can be toggled on and off and can contain additional metadata to be displayed along side the paper.
 
 [default annotation provider]: https://github.com/authzed/zanzibar-annotated/blob/main/components/annotation.tsx
+
+#### YAML format
