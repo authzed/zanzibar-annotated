@@ -1,4 +1,4 @@
-// From: https://github.com/WesleyAC/deeplinks/blob/main/src/versions/2.ts
+// Original From: https://github.com/WesleyAC/deeplinks/blob/main/src/versions/2.ts
 // Original License Below:
 // Copyright © 2021 Wesley Aptekar-Cassels
 //
@@ -30,7 +30,7 @@ function countLeadingWhitespace(node: Text): number {
 
 // Take a range, and return a new range containing the same text, but ensuring
 // that the start and end are both non-whitespace-only text nodes.
-function normalizeRange(range: Range) {
+function normalizeRange(doc: Document, range: Range) {
   // We start off by picking start and end nodes. If the start node is a text
   // node, we can just use it as is. If it's a element node, though, we need to
   // use the offset to figure out which child node is the one that's actually
@@ -80,8 +80,8 @@ function normalizeRange(range: Range) {
     range.endOffset
   );
 
-  const newRange = new Range();
-  const treeWalker = document.createTreeWalker(range.commonAncestorContainer);
+  const newRange = doc.createRange();
+  const treeWalker = doc.createTreeWalker(range.commonAncestorContainer);
   // stages:
   // 0 = Looking for startNode.
   // 1 = startNode found, but it wasn't a non-empty text node — looking for a
@@ -126,12 +126,15 @@ function normalizeRange(range: Range) {
   return null;
 }
 
-export function selectionToFragment(selection: Selection): string {
+export function selectionToFragment(
+  doc: Document,
+  selection: Selection
+): string {
   type HashNodeOffset = [string, Text, string];
   type DupeData = [boolean[], number, number];
   const ranges: [HashNodeOffset, HashNodeOffset, DupeData][] = [];
   for (let i = 0; i < selection.rangeCount; i++) {
-    const range = normalizeRange(selection.getRangeAt(i));
+    const range = normalizeRange(doc, selection.getRangeAt(i));
     if (range && !range.collapsed) {
       const [startNode, endNode] = [range.startContainer, range.endContainer];
       if (startNode.nodeType == TEXT_NODE && endNode.nodeType == TEXT_NODE) {
@@ -169,7 +172,7 @@ export function selectionToFragment(selection: Selection): string {
     return '';
   }
 
-  const walk = document.createTreeWalker(document.body, NODEFILTER_SHOW_TEXT);
+  const walk = doc.createTreeWalker(doc.body, NODEFILTER_SHOW_TEXT);
   let node;
   while ((node = walk.nextNode() as Text)) {
     // eslint-disable-line no-cond-assign
@@ -214,7 +217,7 @@ export function selectionToFragment(selection: Selection): string {
   return `#2${fragmentParts.join()}`;
 }
 
-function getRangeFromFragmentPart(fragmentPart: string): Range {
+function getRangeFromFragmentPart(doc: Document, fragmentPart: string): Range {
   const [hashOffsetFragmentPart, dupeString, dupeStartOffset, dupeEndOffset] =
     fragmentPart.split('~');
   const split = hashOffsetFragmentPart.split('.').map((x) => x.split(':'));
@@ -230,11 +233,7 @@ function getRangeFromFragmentPart(fragmentPart: string): Range {
   // the boolean represents whether it's a start node (true) or end node (false)
   const nodes: [Text, boolean][] = [];
 
-  const walk = document.createTreeWalker(
-    document.body,
-    NODEFILTER_SHOW_TEXT,
-    null
-  );
+  const walk = doc.createTreeWalker(doc.body, NODEFILTER_SHOW_TEXT, null);
   let node,
     numEndNodes = 0;
   while ((node = walk.nextNode() as Text)) {
@@ -273,7 +272,7 @@ function getRangeFromFragmentPart(fragmentPart: string): Range {
     }
   }
 
-  const range = new Range();
+  const range = doc.createRange();
   if (startNode && endNode) {
     range.setStart(
       startNode[0],
@@ -293,6 +292,9 @@ function getRangeFromFragmentPart(fragmentPart: string): Range {
   return range;
 }
 
-export function fragmentToRangeList(fragment: string): Range[] {
-  return fragment.substring(1).split(',').map(getRangeFromFragmentPart);
+export function fragmentToRangeList(doc: Document, fragment: string): Range[] {
+  return fragment
+    .substring(1)
+    .split(',')
+    .map((part) => getRangeFromFragmentPart(doc, part));
 }

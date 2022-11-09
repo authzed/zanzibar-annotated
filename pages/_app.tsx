@@ -1,7 +1,7 @@
 import { MDXProvider } from '@mdx-js/react';
 import 'katex/dist/katex.min.css';
 import type { AppProps } from 'next/app';
-import { Layout } from '../components/layout';
+import { Layout, LayoutProps } from '../components/layout';
 import {
   H2,
   H3,
@@ -13,7 +13,7 @@ import {
 } from '../components/markdown';
 import '../styles/globals.css';
 
-function ZanzibarPaper({ Component, pageProps }: AppProps) {
+function ZanzibarPaper({ Component, pageProps }: AppProps<LayoutProps>) {
   return (
     <MDXProvider
       components={{
@@ -27,7 +27,7 @@ function ZanzibarPaper({ Component, pageProps }: AppProps) {
         h4: H4,
       }}
     >
-      <Layout>
+      <Layout {...pageProps}>
         <Component {...pageProps} />
       </Layout>
     </MDXProvider>
