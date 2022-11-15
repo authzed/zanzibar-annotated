@@ -6,7 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState
+  useState,
 } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import { createPortal } from 'react-dom';
@@ -698,7 +698,7 @@ export function AnnotationGroup(props: {
   ]);
 
   return (
-    <div className="sticky top-10">
+    <div className="sticky top-10 annotation">
       {groupData.map((data) => {
         const annotationId = new AnnotationId(data.setId, data.entryId);
         return (

@@ -1,15 +1,15 @@
 import Head from 'next/head';
-import { PropsWithChildren, UIEvent, useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import {
   AnnotationGroup,
   AnnotationManagerProvider,
   NoAnnotationManagerProvider,
 } from './annotation';
 import { Banner } from './Banner';
+import { Container, ContentContainer } from './Container';
 import { Footer } from './Footer';
 import { GTagScript } from './GTag';
 import { HighlightProvidedSelection } from './HighlightProvidedSelection';
-import { PaperInfoMenu } from './PaperInfoMenu';
 import { useRenderState } from './renderstate';
 import SelectionShare from './SelectionShare';
 
@@ -63,7 +63,6 @@ export function Layout(props: PropsWithChildren) {
       </Head>
       <GTagScript />
       <AnnotationManagerProvider>
-        <PaperInfoMenu />
         <Container onScrolled={setIsTopOfContent}>
           <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
             <SelectionShare />
@@ -76,38 +75,6 @@ export function Layout(props: PropsWithChildren) {
       <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
       <HighlightProvidedSelection />
     </>
-  );
-}
-
-function Container(
-  props: PropsWithChildren<{
-    onScrolled: (isTopOfContent: boolean) => void;
-  }>
-) {
-  const [isTopOfContent, setIsTopOfContent] = useState(false);
-
-  const handleScrolled = (e: UIEvent<HTMLDivElement>) => {
-    props.onScrolled(e.currentTarget.scrollTop === 0);
-    setIsTopOfContent(e.currentTarget.scrollTop === 0);
-  };
-
-  return (
-    <div
-      onScroll={handleScrolled}
-      className="transition-all"
-      style={{
-        position: 'absolute',
-        height: isTopOfContent ? 'calc(100vh - 55px)' : 'calc(100vh - 44px)',
-        top: isTopOfContent ? '55px' : '44px',
-        left: '0px',
-        right: '0px',
-        bottom: '0px',
-        overflow: 'auto',
-        zIndex: '-1',
-      }}
-    >
-      {props.children}
-    </div>
   );
 }
 
@@ -129,9 +96,11 @@ export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
           orientation="left"
         />
       </div>
-      <div className="md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow z-10">
-        {props.children}
-      </div>
+      <ContentContainer>
+        <div className="md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow z-10">
+          {props.children}
+        </div>
+      </ContentContainer>
       <div className="hidden lg:block absolute h-full w-80 -right-[20rem] top-0 z-10">
         <AnnotationGroup
           pageNumber={props.pageNumber}

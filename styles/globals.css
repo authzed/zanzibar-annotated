@@ -81,10 +81,6 @@ a[id] {
   border-bottom: 0px;
 }
 
-div.annotation-markdown {
-  display: inline-block;
-}
-
 div.annotation-markdown p {
   display: inline-block;
   font-weight: normal;

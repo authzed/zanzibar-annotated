@@ -8,6 +8,7 @@ import HNIcon from '../content/HNIcon.svg';
 import RedditIcon from '../content/RedditIcon.svg';
 import TwitterIcon from '../content/TwitterIcon.svg';
 import popperStyles from '../styles/Popper.module.css';
+import { isUnderContentContainer } from './Container';
 import { gtag } from './GTag';
 
 type VirtualElement = {
@@ -130,6 +131,10 @@ function SelectionShare() {
         const selection = document.getSelection();
         if (selection && selection.rangeCount > 0 && !selection?.isCollapsed) {
           const range = selection.getRangeAt(0);
+          if (!isUnderContentContainer(range.startContainer)) {
+            return;
+          }
+
           setVirtualRef(range);
           setVisible(true);
           setShareUrl(document.URL);
