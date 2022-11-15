@@ -68,3 +68,28 @@ div.annotation div.collapsed *:not(:first-child) {
 }
 
 .katex { font-size: 1em; }
+
+a[id] {
+  display: block;
+  position: relative;
+  top: -50px;
+  visibility: hidden;
+}
+
+.scrolled {
+  @apply shadow-xl;
+  border-bottom: 0px;
+}
+
+div.annotation-markdown {
+  display: inline-block;
+}
+
+div.annotation-markdown p {
+  display: inline-block;
+  font-weight: normal;
+}
+
+div.annotation-markdown a {
+  color: black;
+}

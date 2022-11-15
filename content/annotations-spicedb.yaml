@@ -1,14 +1,14 @@
-id: "spicedb"
-label: "SpiceDB"
-title: "Insights from building SpiceDB"
-subtitle: "Thoughts and lessons learned about the paper while implementing SpiceDB."
+id: 'spicedb'
+label: 'SpiceDB vs Zanzibar'
+title: 'Insights from building SpiceDB'
+subtitle: 'Thoughts and lessons learned about the paper while implementing SpiceDB.'
 cta: |
-  [SpiceDB on GitHub](https://github.com/authzed/spicedb) &#8599;
+  Thoughts and lessons learned about the paper while implementing [SpiceDB](https://github.com/authzed/spicedb)
 description: |
   SpiceDB was designed to be the most accurate, open source implementation of Zanzibar.
 
   Learn more about [SpiceDB](https://authzed.com/spicedb?utm_source=za&utm_medium=menu).
-highlightColor: "sky"
+highlightColor: 'sky'
 groups:
   page-1-col-2:
     across-applications:
