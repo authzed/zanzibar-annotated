@@ -1,5 +1,10 @@
-id: "general"
-title: "General technical commentary"
+id: "intro"
+label: "Introduction"
+title: "Introduction to Zanzibar"
+subtitle: "Highlights and commentary on notable portions of the paper."
+cta: |
+  Annotated by [Authzed](https://authzed.com?utm_source=za&utm_medium=toolbar)
+description: "This paper is hosted by [Authzed](https://authzed.com?utm_source=za&utm_medium=menu), the creator of the open source, Zanzibar inspired, fine-grained permissions database [SpiceDB](https://github.com/authzed/spicedb)."
 highlightColor: "amber"
 groups:
   page-1-col-2:
