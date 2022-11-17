@@ -6,6 +6,7 @@ const chromium = require('chrome-aws-lambda');
 
 const sharedOptions = {};
 
+// Orignally from https://mediajams.dev/post/automate-social-images-next-puppeteer
 const devOptions = {
   args: [],
   executablePath:

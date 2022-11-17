@@ -18,7 +18,7 @@ First, run the development server:
 
 ```bash
 yarn install
-yarn run dev
+PREVIEW_ENDPOINT=http://localhost:3000 yarn run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the paper.
@@ -76,3 +76,7 @@ An annotation set can be directly linked using a URL fragment in the format:
 An individual annotation can be directly linked using:
 
 `#annotations/<annotation set id>/<annotation entry id>`
+
+#### Open Graph support
+
+Chromium and Puppeteer are used to dynamically generate a description and screenshot preview for selections. In the dev environment, set the PREVIEW_ENDPOINT env variable to your local instance (usually localhost:3000).
