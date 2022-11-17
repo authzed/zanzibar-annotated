@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { isUnderContentContainer } from './Container';
 import { fragmentToRangeList, selectionToFragment } from './lib/deeplinks';
 import { selectRanges, SelectRangesOptions } from './lib/selectranges';
 import { useRenderState } from './renderstate';
@@ -40,9 +41,19 @@ export function HighlightProvidedSelection(props: {
     // Based on the fragment in the original deeplinks.ts library.
     const timeoutHandle = setTimeout(() => {
       document.addEventListener('selectionchange', () => {
-        const fragment = selectionToFragment(
-          document.getSelection() as Selection
-        );
+        const selection = document.getSelection() as Selection;
+        if (!selection || selection.rangeCount === 0) {
+          history.replaceState(null, '', location.pathname);
+          return;
+        }
+
+        const range = selection.getRangeAt(0);
+        if (!isUnderContentContainer(range.startContainer)) {
+          history.replaceState(null, '', location.pathname);
+          return;
+        }
+
+        const fragment = selectionToFragment(selection);
 
         // Only replace selection fragments so all other fragments persist in the URL
         if (fragment && fragment.includes(':')) {

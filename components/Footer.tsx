@@ -4,20 +4,38 @@
 export function Footer() {
   return (
     <>
-      <div className="w-full p-3 bg-black text-white font-sans text-center text-sm">
-        <div className="w-3/4 mx-auto">
-          <p className="">
-            Join the discussion on{' '}
-            <a
-              href="https://authzed.com/discord"
-              className="text-white hover:text-gray-300 underline"
-            >
-              Discord
-            </a>
-          </p>
-          <p className="">Annotations &copy; 2022 Authzed, Inc</p>
-          <p className="">Zanzibar Paper &copy; USENIX and original authors.</p>
+      <div className="w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
+        <div>
+          Annotations &copy; 2022{' '}
+          <a
+            href="https://authzed.com"
+            target="_blank"
+            rel="noopener"
+            className="text-white hover:text-indigo-200 underline"
+          >
+            Authzed, Inc
+          </a>
+          . Zanzibar Paper &copy; USENIX and original authors.
         </div>
+        <div className="text-right">
+          <span className="hidden md:inline-block">
+            Join the discussion on&nbsp;
+          </span>
+          <a
+            href="https://authzed.com/discord"
+            className="text-white hover:text-gray-300 underline"
+          >
+            Discord
+          </a>
+        </div>
+        <a
+          href="https://authzed.com"
+          target="_blank"
+          rel="noopener"
+          className="text-white hover:text-indigo-200 underline"
+        >
+          <img src="/authzed-logo.svg"></img>
+        </a>
       </div>
     </>
   );

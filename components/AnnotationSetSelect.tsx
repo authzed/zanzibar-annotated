@@ -46,7 +46,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
     <Listbox value={selected} onChange={onChangeHandler}>
       {({ open }) => (
         <>
-          <div className="relative text-black">
+          <div className="relative inline-block">
             <Listbox.Button className="relative cursor-default rounded border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-0">
               <span
                 className={classNames(
@@ -69,7 +69,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute w-fit z-10 mt-1 max-h-56 overflow-auto rounded bg-white py-1 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <Listbox.Options className="absolute w-fit z-10 mt-1 max-h-56 overflow-auto rounded bg-white py-1 right-0 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {props.items.map((item) => (
                   <Listbox.Option
                     key={item.value}
