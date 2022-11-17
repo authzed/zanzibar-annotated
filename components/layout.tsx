@@ -10,7 +10,7 @@ import { Container, ContentContainer } from './Container';
 import { Footer } from './Footer';
 import { GTagScript } from './GTag';
 import { HighlightProvidedSelection } from './HighlightProvidedSelection';
-import { useRenderState } from './renderstate';
+import { RenderingState, useRenderState } from './renderstate';
 import SelectionShare from './SelectionShare';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
@@ -19,63 +19,159 @@ const SOCIAL_CARD_COLUMN_WIDTH = 412; // pixels
 const SOCIAL_CARD_COLUMN_PADDING = 8; // pixels
 
 /**
+ * SelectionContext is the context associated with the current selection, if any.
+ */
+export type SelectionContext = {
+  /**
+   * previewImageUrl is the URL at which the preview image for this selection can be retrieved.
+   */
+  previewImageUrl: string | null;
+
+  /**
+   * previewText is the text of the selection, if any.
+   */
+  previewText: string | null;
+
+  /**
+   * previewSection is the section of the selection, if any.
+   */
+  previewSection: string | null;
+};
+
+/**
+ * LayoutProps are props passed from the page to the layout.
+ */
+export type LayoutProps = { selectionContext?: SelectionContext | undefined };
+
+/**
  * Paper layout
  */
-export function Layout(props: PropsWithChildren) {
+export function Layout(props: PropsWithChildren<LayoutProps>) {
   const [isTopOfContent, setIsTopOfContent] = useState(true);
 
   const renderState = useRenderState();
-  if (renderState.isForSocialCardRendering) {
-    return (
-      <>
-        <div
-          className="font-serif"
-          style={{
-            width: `${
-              SOCIAL_CARD_COLUMN_WIDTH + SOCIAL_CARD_COLUMN_PADDING * 2
-            }px`,
-            padding: `${SOCIAL_CARD_COLUMN_PADDING}px`,
-            backgroundColor: 'white',
-          }}
-        >
-          <NoAnnotationManagerProvider>
-            {props.children}
-          </NoAnnotationManagerProvider>
-          <HighlightProvidedSelection
-            options={{ block: 'center' }}
-            skipSelectionMonitoring
-          />
-        </div>
-      </>
-    );
-  }
+  switch (renderState.state) {
+    case RenderingState.FOR_SELECTION:
+      return (
+        <NoAnnotationManagerProvider>
+          {props.children}
+        </NoAnnotationManagerProvider>
+      );
 
-  return (
-    <>
-      <Head>
-        <title>The Zanzibar Paper, annotated by Authzed</title>
-        <meta
-          name="description"
-          content="Zanzibar: Google’s Consistent, Global Authorization System. This is an annotated copy of the original paper submitted to USENIX 2019."
-        />
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
-      <GTagScript />
-      <AnnotationManagerProvider>
-        <Container onScrolled={setIsTopOfContent}>
-          <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
-            <SelectionShare />
-            {props.children}
+    case RenderingState.FOR_RENDERING:
+      return (
+        <>
+          <div
+            className="font-serif"
+            style={{
+              width: `${
+                SOCIAL_CARD_COLUMN_WIDTH + SOCIAL_CARD_COLUMN_PADDING * 2
+              }px`,
+              padding: `${SOCIAL_CARD_COLUMN_PADDING}px`,
+              backgroundColor: 'white',
+            }}
+          >
+            <NoAnnotationManagerProvider>
+              {props.children}
+            </NoAnnotationManagerProvider>
+            <HighlightProvidedSelection
+              options={{ block: 'center', behavior: 'auto' }}
+              skipSelectionMonitoring
+              pathPrefix="_render/"
+            />
           </div>
-          <Footer />
-        </Container>
-        <Banner isTopOfContent={isTopOfContent} />
-      </AnnotationManagerProvider>
-      <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
-      <HighlightProvidedSelection />
-    </>
-  );
+        </>
+      );
+
+    default:
+      let previewText: string | undefined = undefined;
+      if (props.selectionContext?.previewText) {
+        previewText = props.selectionContext.previewText
+          .split('\n')
+          .map((l) => `> ${l}`)
+          .join('\n')
+          .substring(0, 200);
+      }
+      return (
+        <>
+          <Head>
+            <title>The Zanzibar Paper, annotated by Authzed</title>
+            <link rel="icon" href="/favicon.ico" />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1.0"
+            />
+            <meta
+              name="description"
+              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
+            />
+            <meta property="og:type" content="website" />
+            <meta
+              property="og:title"
+              content="The Zanzibar Paper, annotated by Authzed"
+            />
+            <meta property="twitter:card" content="summary_large_image" />
+            <meta property="twitter:site" content="@authzed" />
+            <meta
+              property="twitter:description"
+              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
+            />
+            <meta
+              property="og:description"
+              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
+            />
+            <meta
+              property="twitter:title"
+              content="The Zanzibar Paper, annotated by Authzed"
+            />
+            {!!props.selectionContext?.previewImageUrl && (
+              <meta
+                property="og:image"
+                content={props.selectionContext.previewImageUrl}
+              />
+            )}
+
+            {!!previewText && (
+              <meta property="og:image:alt" content={previewText} />
+            )}
+            {!!props.selectionContext?.previewImageUrl && (
+              <meta
+                property="twitter:image"
+                content={props.selectionContext.previewImageUrl}
+              />
+            )}
+            {!!previewText && (
+              <meta property="twitter:image:alt" content={previewText} />
+            )}
+            {!!props.selectionContext?.previewSection && (
+              <>
+                <meta name="twitter:label1" content="Section" />
+                <meta
+                  name="twitter:data1"
+                  content={props.selectionContext.previewSection}
+                />
+              </>
+            )}
+          </Head>
+          <GTagScript />
+          <AnnotationManagerProvider>
+            <Container onScrolled={setIsTopOfContent}>
+              <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
+                <SelectionShare />
+                {props.children}
+              </div>
+              <Footer />
+            </Container>
+            <Banner isTopOfContent={isTopOfContent} />
+          </AnnotationManagerProvider>
+          <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
+          <HighlightProvidedSelection
+            options={{ block: 'center', behavior: 'smooth' }}
+            pathPrefix="/"
+          />
+        </>
+      );
+  }
 }
 
 /**
@@ -128,4 +224,19 @@ export function Header(props: PropsWithChildren) {
  */
 export function Column(props: PropsWithChildren) {
   return <div className="page-column">{props.children}</div>;
+}
+
+/**
+ * Section metadata.
+ */
+export function Section(
+  props: PropsWithChildren<{
+    titles: string[];
+  }>
+) {
+  return (
+    <div data-section-title={props.titles[props.titles.length - 1]}>
+      {props.children}
+    </div>
+  );
 }

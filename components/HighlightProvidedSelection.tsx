@@ -7,16 +7,23 @@ import { useRenderState } from './renderstate';
 export function HighlightProvidedSelection(props: {
   options?: SelectRangesOptions | undefined;
   skipSelectionMonitoring?: boolean;
+  pathPrefix: string;
+  onSelectionChanged?: (fragement: string) => void;
 }) {
   const renderState = useRenderState();
   const ranges = renderState.ranges;
 
   useEffect(() => {
-    // Only handle deeplink fragments (identified by the presence of ':')
+    // Only handle deeplink paths (identified by the presence of ':')
     // to allow default behavior for all other fragments such as anchor links
-    if (window.location.hash && window.location.hash.includes(':')) {
+    if (
+      window.location.pathname &&
+      window.location.pathname.includes(':') &&
+      window.location.pathname.startsWith(props.pathPrefix)
+    ) {
       const selectionRanges = fragmentToRangeList(
-        window.location.hash.substring(1)
+        document,
+        window.location.pathname.substring(props.pathPrefix.length)
       );
       selectRanges(selectionRanges, props.options);
       return;
@@ -24,14 +31,15 @@ export function HighlightProvidedSelection(props: {
 
     if (ranges !== undefined && ranges.length > 0) {
       try {
-        const selectionRanges = fragmentToRangeList(ranges[0]);
+        const selectionRanges = fragmentToRangeList(document, ranges[0]);
         selectRanges(selectionRanges, props.options);
+        (window as any)._scrolled = true;
       } catch (e) {
         // Ignore.
       }
       return;
     }
-  }, [ranges, props.options]);
+  }, [ranges, props.pathPrefix, props.options]);
 
   useEffect(() => {
     if (props.skipSelectionMonitoring) {
@@ -53,12 +61,19 @@ export function HighlightProvidedSelection(props: {
           return;
         }
 
-        const fragment = selectionToFragment(selection);
+        const fragment = selectionToFragment(document, selection);
 
         // Only replace selection fragments so all other fragments persist in the URL
-        if (fragment && fragment.includes(':')) {
+        if (fragment && fragment.includes(':') && fragment.startsWith('#')) {
           // replaceState is used instead of setting location.hash to avoid scrolling.
-          history.replaceState(null, '', location.pathname + fragment);
+          history.replaceState(
+            null,
+            '',
+            `${location.origin}/${fragment.substring(1)}`
+          );
+          if (props.onSelectionChanged) {
+            props.onSelectionChanged(fragment.substring(1));
+          }
         }
       });
 
@@ -66,7 +81,7 @@ export function HighlightProvidedSelection(props: {
         clearTimeout(timeoutHandle);
       };
     }, 0);
-  }, [props.skipSelectionMonitoring]);
+  }, [props.skipSelectionMonitoring, props.onSelectionChanged, props]);
 
   return <></>;
 }

@@ -1,7 +1,7 @@
 # Zanzibar Annotated
 
-[![Discord Server](https://img.shields.io/discord/844600078504951838?color=7289da&logo=discord "Discord Server")](https://authzed.com/discord)
-[![Twitter](https://img.shields.io/twitter/follow/authzed?color=%23179CF0&logo=twitter&style=flat-square&label=@authzed "@authzed on Twitter")](https://twitter.com/authzed)
+[![Discord Server](https://img.shields.io/discord/844600078504951838?color=7289da&logo=discord 'Discord Server')](https://authzed.com/discord)
+[![Twitter](https://img.shields.io/twitter/follow/authzed?color=%23179CF0&logo=twitter&style=flat-square&label=@authzed '@authzed on Twitter')](https://twitter.com/authzed)
 
 Zanzibar Annotated is a hosted copy of the [paper presented at USENIX ATC 2019](https://www.usenix.org/conference/atc19/presentation/pang) describing the Zanzibar authorization system. It includes annotations that provide commentary on notable portions of the paper.
 
@@ -9,8 +9,8 @@ Looking for further discussion of the paper? Join our [Discord].
 
 Looking to contribute? See [CONTRIBUTING.md].
 
-[Discord]: https://authzed.com/discord
-[CONTRIBUTING.md]: https://github.com/authzed/zanzibar-annotated/blob/main/CONTRIBUTING.md
+[discord]: https://authzed.com/discord
+[contributing.md]: https://github.com/authzed/zanzibar-annotated/blob/main/CONTRIBUTING.md
 
 ## Getting Started
 
@@ -18,7 +18,7 @@ First, run the development server:
 
 ```bash
 yarn install
-yarn run dev
+PREVIEW_ENDPOINT=http://localhost:3000 yarn run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the paper.
@@ -27,9 +27,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 This is a NextJS project that uses [Tailwind CSS] for styling and [MDX] for markdown integration in React. The markdown support also includes math typesetting using [Katex] and GitHub flavored features with [remark-gfm].
 
-[Tailwind CSS]: https://tailwindcss.com/
-[MDX]: https://mdxjs.com/
-[Katex]: https://katex.org/
+[tailwind css]: https://tailwindcss.com/
+[mdx]: https://mdxjs.com/
+[katex]: https://katex.org/
 [remark-gfm]: https://github.com/remarkjs/remark-gfm
 
 ### Paper Layout
@@ -76,3 +76,7 @@ An annotation set can be directly linked using a URL fragment in the format:
 An individual annotation can be directly linked using:
 
 `#annotations/<annotation set id>/<annotation entry id>`
+
+#### Open Graph support
+
+Chromium and Puppeteer are used to dynamically generate a description and screenshot preview for selections. In the dev environment, set the PREVIEW_ENDPOINT env variable to your local instance (usually localhost:3000).

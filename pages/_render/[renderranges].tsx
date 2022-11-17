@@ -1,16 +1,15 @@
 import Zanzibar from '../../content/zanzibar.mdx';
 
 export default function Default() {
-    return (
+  return (
     <>
-      <Zanzibar/>
+      <Zanzibar />
     </>
   );
 }
 
-
 export async function getServerSideProps() {
   return {
     props: {},
-  }
+  };
 }
