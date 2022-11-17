@@ -20,6 +20,8 @@ const devOptions = {
 
 const isProd = process.env.NODE_ENV === 'production';
 
+const MAX_AGE = 31536000;
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ranges } = req.query;
   if (!ranges?.includes(':')) {
@@ -73,6 +75,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await browser.close();
 
   res.setHeader('Content-Type', 'image/png');
+  res.setHeader('Cache-Control', `max-age=${MAX_AGE}, public`);
+  res.setHeader('Cache-Control', `s-maxage=${MAX_AGE}`);
   res.send(result);
 };
 
