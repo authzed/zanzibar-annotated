@@ -53,9 +53,11 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
   switch (renderState.state) {
     case RenderingState.FOR_SELECTION:
       return (
-        <NoAnnotationManagerProvider>
-          {props.children}
-        </NoAnnotationManagerProvider>
+        <div className="font-serif">
+          <NoAnnotationManagerProvider>
+            {props.children}
+          </NoAnnotationManagerProvider>
+        </div>
       );
 
     case RenderingState.FOR_RENDERING:
