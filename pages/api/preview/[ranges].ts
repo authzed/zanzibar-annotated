@@ -33,7 +33,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res;
   }
 
-  await chromium.font('/Times%20New%20Roman.ttf');
+  await chromium.font('/LinLibertine_R.ttf');
   const browser = await chromium.puppeteer.launch(
     isProd
       ? {

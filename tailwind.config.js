@@ -7,7 +7,7 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      serif: ['Times New Roman', 'serif'],
+      serif: ['Times New Roman', 'Linux Libertine', 'serif'],
       sans: ['ui-sans-serif', 'system-ui'],
     },
     extend: {},
