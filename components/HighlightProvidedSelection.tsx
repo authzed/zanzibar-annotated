@@ -1,4 +1,6 @@
+import debounce from 'lodash.debounce';
 import { useEffect } from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 import { isUnderContentContainer } from './Container';
 import { fragmentToRangeList, selectionToFragment } from './lib/deeplinks';
 import { selectRanges, SelectRangesOptions } from './lib/selectranges';
@@ -13,7 +15,7 @@ export function HighlightProvidedSelection(props: {
   const renderState = useRenderState();
   const ranges = renderState.ranges;
 
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     // Only handle deeplink paths (identified by the presence of ':')
     // to allow default behavior for all other fragments such as anchor links
     if (
@@ -48,34 +50,40 @@ export function HighlightProvidedSelection(props: {
 
     // Based on the fragment in the original deeplinks.ts library.
     const timeoutHandle = setTimeout(() => {
-      document.addEventListener('selectionchange', () => {
-        const selection = document.getSelection() as Selection;
-        if (!selection || selection.rangeCount === 0) {
-          history.replaceState(null, '', location.pathname);
-          return;
-        }
-
-        const range = selection.getRangeAt(0);
-        if (!isUnderContentContainer(range.startContainer)) {
-          history.replaceState(null, '', location.pathname);
-          return;
-        }
-
-        const fragment = selectionToFragment(document, selection);
-
-        // Only replace selection fragments so all other fragments persist in the URL
-        if (fragment && fragment.includes(':') && fragment.startsWith('#')) {
-          // replaceState is used instead of setting location.hash to avoid scrolling.
-          history.replaceState(
-            null,
-            '',
-            `${location.origin}/${fragment.substring(1)}`
-          );
-          if (props.onSelectionChanged) {
-            props.onSelectionChanged(fragment.substring(1));
+      document.addEventListener(
+        'selectionchange',
+        debounce(() => {
+          const selection = document.getSelection() as Selection;
+          if (!selection || selection.rangeCount === 0) {
+            history.replaceState(null, '', '/');
+            return;
           }
-        }
-      });
+
+          const range = selection.getRangeAt(0);
+          if (
+            range.collapsed ||
+            !isUnderContentContainer(range.startContainer)
+          ) {
+            history.replaceState(null, '', '/');
+            return;
+          }
+
+          const fragment = selectionToFragment(document, selection);
+
+          // Only replace selection fragments so all other fragments persist in the URL
+          if (fragment && fragment.includes(':') && fragment.startsWith('#')) {
+            // replaceState is used instead of setting location.hash to avoid scrolling.
+            history.replaceState(
+              null,
+              '',
+              `${location.origin}/${fragment.substring(1)}`
+            );
+            if (props.onSelectionChanged) {
+              props.onSelectionChanged(fragment.substring(1));
+            }
+          }
+        }, 50)
+      );
 
       return () => {
         clearTimeout(timeoutHandle);
