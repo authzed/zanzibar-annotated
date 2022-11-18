@@ -33,7 +33,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res;
   }
 
-  await chromium.font('/LinLibertine_R.ttf');
+  // Using an open source Times New Roman alternative
+  // Linking to a hosted version to avoid adding to the serverless function build size
+  // TODO: Switch to a file hosted in the zanzibar-annotated repo when the repo is public
+  const fontPath =
+    'https://cdn.jsdelivr.net/gh/samkim/Linux-Libertine/LinLibertine_R.ttf';
+  await chromium.font(fontPath);
   const browser = await chromium.puppeteer.launch(
     isProd
       ? {
