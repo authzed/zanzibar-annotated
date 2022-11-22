@@ -1,0 +1,60 @@
+id: "rebac"
+label: "ReBAC vs Zanzibar"
+title: "ReBAC vs Zanzibar"
+subtitle: "Comparing and contrasting ReBAC and Zanzibar."
+cta: |
+  Comparing and contrasting ReBAC and Zanzibar
+description: "This paper is hosted by [Authzed](https://authzed.com?utm_source=za&utm_medium=menu), the creator of the open source, Zanzibar inspired, fine-grained permissions database [SpiceDB](https://github.com/authzed/spicedb)."
+highlightColor: "violet"
+groups:
+  page-1-col-1:
+    what-is-rebac:
+      content: |
+        What is ReBAC? Relationship-based access control. The term was first coined in 2006 by Dr. Carrie E. Gates in her paper: [Access Control Requirements for Web 2.0 Security and Privacy](https://www.researchgate.net/publication/240787391_Access_Control_Requirements_for_Web_20_Security_and_Privacy)
+
+        She observed an increasing trend of user data on the web and a corresponding increase in ways to interact with that data.
+    relationship-graph:
+      content: |
+        In response to inflexible and not expressive enough ACL models, she proposed controlling data access based on literal relationships between the data owner and receiver.
+
+        _“the data owner can control the release of their personal information in the same manner he would control it in the analog world— based on their relationship with the data receiver rather than the receiver’s role.”_
+
+        She Introduced the idea of using a graph (in this case a social graph) to answer authorization  questions.
+
+    zanzibar-system:
+      content: |
+        ReBAC is just a framework for modeling authorization. Zanzibar is an opinionated design that incorporates ReBAC concepts with concrete implementations of systems that make authorization available and scalable for a wide set of applications.
+  page-1-col-2:
+    zanzibar-goals:
+      content: |
+        These high level goals describe how Zanzibar makes a ReBAC system usable and this paper serves as an engineering blueprint for achieving the goals.
+  page-2-col-1:
+    nested-groups:
+      content: |
+        Authorization services that infer a relationship graph from an existing database schema or map a graph to database tables run into issues with nested groups. Directly storing relation tuples is a key decision that supports nested groups.
+    scaling:
+      content: |
+        Not all applications that use Zanzibar may have Google’s traffic and not all Zanzibar implementations will be scaled to the size of Google’s internal implementation. However, the techniques used in Google’s implementation are still applicable to accomplish the same goals: Correctness, Flexibility, Low latency, HA, and Large scale.
+  page-2-col-2:
+    engineering-blueprint:
+      content: |
+        This paper serves as an engineering blueprint. While the authorization model supported by Zanzibar (which incorporates concepts from ReBAC) is useful, the architecture designs and lessons learned presented are what make this paper so unique.
+    consistency-model:
+      content: |
+        Zanzibar’s consistency model is what allows the relationship graph to evolve with user data and interactions while still providing correct ACLs.
+  page-4-col-1:
+    config-language:
+      content: |
+        This configuration language allows for reasoning about and implementing authorization models independent of application data and schema.
+  page-5-col-2:
+    zanzibar-annotations:
+      content: |
+        The following section dives into the internals of the system. See the [Introduction to Zanzibar](#annotations/intro) annotations for commentary.
+  page-11-col-2:
+    lessons-learned:
+      content: |
+        Engineering notes: Any implementation of Zanzibar the service (not just ReBAC concepts) must incorporate these lessons from Google.
+  page-12-col-1:
+    finer-grained-rbac:
+      content: |
+        To this point, ReBAC is sometimes referred to as _finer-grained_ RBAC.

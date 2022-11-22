@@ -1,4 +1,4 @@
-# Zanzibar Annotated
+# Zanzibar Annotated - Testing
 
 [![Discord Server](https://img.shields.io/discord/844600078504951838?color=7289da&logo=discord 'Discord Server')](https://authzed.com/discord)
 [![Twitter](https://img.shields.io/twitter/follow/authzed?color=%23179CF0&logo=twitter&style=flat-square&label=@authzed '@authzed on Twitter')](https://twitter.com/authzed)

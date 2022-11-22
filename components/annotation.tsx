@@ -14,6 +14,7 @@ import ReactMarkdown from 'react-markdown';
 import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
 import annotationsIntro from '../content/annotations-intro.yaml';
+import annotationsRebac from '../content/annotations-rebac.yaml';
 import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
 import popperStyles from '../styles/Popper.module.css';
 import { gtag } from './GTag';
@@ -142,15 +143,17 @@ export const NoAnnotationManagerProvider: React.FC<PropsWithChildren> = (
   );
 };
 
-const _availableAnnotationSets = [annotationsIntro, annotationsSpiceDb].map(
-  (set) => {
-    return {
-      value: set.id,
-      label: set.label,
-      color: set.highlightColor,
-    };
-  }
-);
+const _availableAnnotationSets = [
+  annotationsIntro,
+  annotationsRebac,
+  annotationsSpiceDb,
+].map((set) => {
+  return {
+    value: set.id,
+    label: set.label,
+    color: set.highlightColor,
+  };
+});
 
 export function getAvailableAnnotationSets() {
   return _availableAnnotationSets;
@@ -183,8 +186,10 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   const annotationSets = useMemo(() => {
     const map = new Map<string, AnnotationSet>();
     const intro = loadAnnotationData(annotationsIntro);
+    const rebac = loadAnnotationData(annotationsRebac);
     const spicedb = loadAnnotationData(annotationsSpiceDb);
     map.set(intro.id, intro);
+    map.set(rebac.id, rebac);
     map.set(spicedb.id, spicedb);
     return map;
   }, []);
