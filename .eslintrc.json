@@ -1,6 +1,8 @@
 {
   "extends": "next/core-web-vitals",
-  "react/jsx-no-target-blank": [true, {
-    "allowReferrer": true
-  }]
+  "rules": {
+    "react/jsx-no-target-blank": ["warn", {
+      "allowReferrer": true
+    }]
+  }
 }

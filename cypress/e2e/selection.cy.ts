@@ -1,3 +1,5 @@
+export {};
+
 describe('selection view', () => {
   beforeEach(() => {
     cy.visit('/228mrk3xXL:0:7'); // Section 2.4 API
@@ -10,7 +12,7 @@ describe('selection view', () => {
     // Selection is highlighted
     cy.window().then((w) => {
       const selection = w.getSelection();
-      expect(selection.toString()).to.equal('2.4 API');
+      expect(selection?.toString()).to.equal('2.4 API');
     });
   });
 

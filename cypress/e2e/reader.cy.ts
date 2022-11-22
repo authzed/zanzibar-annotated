@@ -1,3 +1,5 @@
+export {};
+
 const viewports: Cypress.ViewportPreset[] = [
   'macbook-13',
   'iphone-x',
