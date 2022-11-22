@@ -215,7 +215,7 @@ export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
  */
 export function Header(props: PropsWithChildren) {
   return (
-    <div className="w-3/4 my-10 mx-auto md:col-span-2 text-center">
+    <div className="header w-3/4 my-10 mx-auto md:col-span-2 text-center">
       {props.children}
     </div>
   );
