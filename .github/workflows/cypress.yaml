@@ -1,0 +1,39 @@
+name: cypress
+"on":
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - edited
+      - reopened
+    branches:
+      - '*'
+jobs:
+  cypress:
+    name: Cypress Tests
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node14.17.6-chrome100-ff98
+    steps:
+      - uses: actions/checkout@v3
+      - uses: bahmutov/npm-install@v1.8.15
+        with:
+          useRollingCache: true
+      - uses: cypress-io/github-action@v4
+        with:
+          install: "false"
+          browser: chrome
+          start: npm run dev
+          wait-on: http://localhost:3000
+          config-file: cypress.config.ts
+        env:
+          PREVIEW_ENDPOINT: "http://localhost:3000"
+      - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: cypress-screenshots
+          path: ./cypress/screenshots
+      - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: cypress-videos
+          path: ./cypress/videos

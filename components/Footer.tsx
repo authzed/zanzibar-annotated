@@ -4,7 +4,7 @@
 export function Footer() {
   return (
     <>
-      <div className="w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
+      <div className="footer w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
         <div>
           Annotations &copy; 2022{' '}
           <a
