@@ -1,9 +1,10 @@
 export {};
 
 const viewports: Cypress.ViewportPreset[] = [
-  'macbook-13',
-  'iphone-x',
-  'ipad-2',
+  'macbook-16', // 2xl
+  'macbook-13', // xl
+  'ipad-2', // md
+  'iphone-x', // sm
 ];
 
 describe('reader view', () => {
