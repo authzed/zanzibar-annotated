@@ -562,8 +562,8 @@ function Annotation(props: {
 
   const activeStyle =
     props.orientation === 'left'
-      ? 'translate-x-10 -translate-y-1 shadow-lg'
-      : '-translate-x-10 -translate-y-1 shadow-lg';
+      ? 'lg:translate-x-72 2xl:translate-x-16 -translate-y-1 shadow-lg'
+      : 'lg:-translate-x-72 2xl:-translate-x-16 -translate-y-1 shadow-lg';
   const opacityStyle =
     activeAnnotationId?.equalsId(props.annotationId) ||
     focusedAnnotationId?.equalsId(props.annotationId)
@@ -581,7 +581,7 @@ function Annotation(props: {
         <div
           className={`annotation mt-4 p-4 z-50
           bg-white border-t-4 border-${bgColorClass}-400 outline outline-slate-400
-          transition transition-all
+          transition transition-transform ease-in-out duration-[250ms]
           text-sm
           ${activeAnnotationId?.equalsId(props.annotationId) ? activeStyle : ''}
           ${
