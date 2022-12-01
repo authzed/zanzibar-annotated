@@ -44,16 +44,16 @@ It has maintained 95th-percentile latency of less than 10 milliseconds and avail
 ## 1 Introduction
 
 <Section titles={["1 Introduction"]}>
-<Highlight setId="spicedb" entryId="across-applications">Many online interactions</Highlight> require authorization checks to confirm that a user has permission to carry out an operation on a digital object.
+<Highlight setId="rebac" entryId="what-is-rebac"><Highlight setId="spicedb" entryId="across-applications">Many online interactions</Highlight> require authorization checks to confirm that a user has permission to carry out an operation on a digital object.</Highlight>
 For example, web-based photo storage services typically allow photo owners to share some photos with friends while keeping other photos private.
-Such a service must check whether a photo has been shared with a user before allowing that user to view the photo.
+<Highlight setId="rebac" entryId="relationship-graph">Such a service must check whether a photo has been shared with a user before allowing that user to view the photo.</Highlight>
 Robust authorization checks are central to preserving online privacy.
 
 This paper presents Zanzibar, a system for storing permissions and performing authorization checks based on the stored permissions.
 It is used by a wide array of services offered by Google, including Calendar, Cloud, Drive, Maps, Photos, and YouTube.
 Several of these services manage billions of objects on behalf of more than a billion users.
 
-A unified authorization system offers important advantages over maintaining separate access control mechanisms for individual applications.
+<Highlight setId="rebac" entryId="zanzibar-system">A unified authorization system offers important advantages over maintaining separate access control mechanisms for individual applications.</Highlight>
 First, it helps establish consistent
 
 <span className="block text-sm mt-4 pt-1 border-t border-black indent-1">
@@ -71,13 +71,13 @@ Third, useful common infrastructure can be built on top of a unified access cont
 Finally, as we show below, authorization poses unique challenges involving data consistency and scalability.
 It saves engineering resources to tackle them once across applications.
 
-We have the following goals for the Zanzibar system:
+<Highlight setId="rebac" entryId="zanzibar-goals">We have the following goals for the Zanzibar system:</Highlight>
 
-* _Correctness_: It must ensure consistency of access control decisions to respect user intentions.
-* _Flexibility_: It must support a rich set of access control policies as required by both consumer and enterprise applications.
-* _Low latency_: It must respond quickly because authorization checks are often in the critical path of user interactions. Low latency at the tail is particularly important for serving search results, which often require tens to hundreds of checks.
-* _High availability_: It must reliably respond to requests because, in the absence of explicit authorizations, client services would be forced to deny their users access.
-* _Large scale_: It needs to protect billions of objects shared by billions of users. It must be deployed around the globe to be near its clients and their end users.
+* <Highlight setId="rebac" entryId="zanzibar-goals">_Correctness_</Highlight>: It must ensure consistency of access control decisions to respect user intentions.
+* <Highlight setId="rebac" entryId="zanzibar-goals">_Flexibility_</Highlight>: It must support a rich set of access control policies as required by both consumer and enterprise applications.
+* <Highlight setId="rebac" entryId="zanzibar-goals">_Low latency_</Highlight>: It must respond quickly because authorization checks are often in the critical path of user interactions. Low latency at the tail is particularly important for serving search results, which often require tens to hundreds of checks.
+* <Highlight setId="rebac" entryId="zanzibar-goals">_High availability_</Highlight>: It must reliably respond to requests because, in the absence of explicit authorizations, client services would be forced to deny their users access.
+* <Highlight setId="rebac" entryId="zanzibar-goals">_Large scale_</Highlight>: It needs to protect billions of objects shared by billions of users. It must be deployed around the globe to be near its clients and their end users.
 
 Zanzibar achieves these goals through a combination of notable features.
 To provide flexibility, Zanzibar pairs a simple data model with a powerful configuration language.
@@ -103,15 +103,15 @@ A simple ACL takes the form of <Highlight setId="intro" entryId="gaia-ids-shortc
 More complex ACLs take the form of “set of users _S_ has relation _R_ to object _O_”, where _S_ is itself specified in terms of another object-relation pair.
 ACLs can thus refer to other ACLs, for example to specify that the set of users who can comment on a video consists of the users who have been granted viewing rights on that specific video along with those with viewing permissions on the video channel.
 
-Group memberships are an important class of ACL where the object is a group and the relation is semantically equivalent to `member`.
-<Highlight setId="intro" entryId="pointer-chasing">Groups can contain other groups, which illustrates one of the challenges facing Zanzibar, namely that evaluating whether a user belongs to a group can entail following a long chain of nested group memberships.</Highlight>
+<Highlight setId="rebac" entryId="nested-groups">Group memberships are an important class of ACL where the object is a group and the relation is semantically equivalent to `member`.
+<Highlight setId="intro" entryId="pointer-chasing">Groups can contain other groups, which illustrates one of the challenges facing Zanzibar, namely that evaluating whether a user belongs to a group can entail following a long chain of nested group memberships.</Highlight></Highlight>
 
 Authorization checks take the form of “does user _U_ have relation _R_ to object _O_?” and are evaluated by a collection of distributed servers.
 <Highlight setId="intro" entryId="dispatch-introduction">When a check request arrives to Zanzibar, the work to evaluate the check may fan out to multiple servers</Highlight>, for example when a group contains both individual members and other groups.
 Each of those servers may in turn contact other servers, for example to recursively traverse a hierarchy of group memberships.
 
-Zanzibar operates at a global scale along multiple dimensions.
-It stores more than two trillion ACLs and performs millions of authorization checks per second.
+<Highlight setId="rebac" entryId="scaling">Zanzibar operates at a global scale along multiple dimensions.
+It stores more than two trillion ACLs and performs millions of authorization checks per second.</Highlight>
 <Highlight setId="intro" entryId="globally-available-requirement">The ACL data does not lend itself to geographic partitioning because authorization checks for any object can come from anywhere in the world</Highlight>.
 Therefore, Zanzibar replicates all ACL data in tens of geographically distributed data centers and distributes load across thousands of servers around the world.
 
@@ -135,9 +135,9 @@ It also applies techniques such as hedging requests and optimizing computations 
 ization.
 Zanzibar responds to more than 95% of authorization checks within 10 milliseconds and has <Highlight setId="intro" entryId="uptime-fine-print">maintained more than 99.999% availability for the last 3 years</Highlight>.
 
-The main contributions of this paper lie in conveying the engineering challenges in building and deploying a consistent, world-scale authorization system.
+<Highlight setId="rebac" entryId="engineering-blueprint">The main contributions of this paper lie in conveying the engineering challenges in building and deploying a consistent, world-scale authorization system.
 While most elements of Zanzibar's design have their roots in previous research, this paper provides a record of the features and techniques Zanzibar brings together to satisfy its stringent requirements for correctness, flexibility, latency, availability, and scalability.
-The paper also highlights lessons learned from operating Zanzibar in service of a diverse set of demanding clients.
+The paper also highlights lessons learned from operating Zanzibar in service of a diverse set of demanding clients.</Highlight>
 
 </Section>
 
@@ -176,7 +176,7 @@ Defining our data model around tuples, instead of perobject ACLs, allows us to u
 ### 2.2 Consistency Model
 <Section titles={["2 Model, Language, and API", "2.2 Consistency Model"]}>
 
-ACL checks must respect the order in which users modify ACLs and object contents to avoid unexpected sharing behaviors.
+<Highlight setId="rebac" entryId="consistency-model">ACL checks must respect the order in which users modify ACLs and object contents to avoid unexpected sharing behaviors.</Highlight>
 Specifically, our clients care about preventing the
 
 </Section>
@@ -296,10 +296,10 @@ Storage parameters include sharding settings and an encoding for object IDs that
 <Section titles={["2 Model, Language, and API", "2.3 Namespace Configuration", "2.3.1 Relation Configs and Userset Rewrites"]}>
 #### 2.3.1 Relation Configs and Userset Rewrites
 
-While relation tuples reflect relationships between objects and users, they do not completely define the effective ACLs.
+<Highlight setId="rebac" entryId="config-language">While relation tuples reflect relationships between objects and users, they do not completely define the effective ACLs.
 For example, some clients specify that users with `editor` permissions on each object should have `viewer` permission on the same object.
 While such relationships between relations can be represented by a relation tuple per object, storing a tuple for each object in a namespace would be wasteful and make it hard to make modifications across all objects.
-Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs.
+Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs.</Highlight>
 <PreviewLink previewComponent={<Figure1 />}>[Figure 1](#figure-1)</PreviewLink> demonstrates a simple namespace configuration with concentric relations, where `viewer` contains `editor`, and `editor` contains `owner`.
 
 Userset rewrite rules are defined per relation in a namespace.
@@ -414,7 +414,7 @@ Expand is crucial for our clients to reason about the complete set of users and 
 <Section titles={["3 Architecture and Implementation"]}>
 ## 3 Architecture and Implementation
 
-<PreviewLink previewComponent={<Figure2 />}>[Figure 2](#figure-2)</PreviewLink> shows the architecture of the Zanzibar system.
+<Highlight setId="rebac" entryId="zanzibar-annotations"><PreviewLink previewComponent={<Figure2 />}>[Figure 2](#figure-2)</PreviewLink> shows the architecture of the Zanzibar system.</Highlight>
 `aclservers` are the main server type.
 They are organized in clusters and respond to Check, Read, Expand, and Write requests.
 Requests arrive at any server in a cluster and that server fans out the work to other servers in the cluster as necessary.
@@ -877,7 +877,7 @@ This section highlights lessons learned from this experience.
 One common theme has been the importance of flexibility to accommodate differences between clients.
 For example:
 
-* _Access control patterns vary widely:_ Over time we have added features to support specific clients.
+* <Highlight setId="rebac" entryId="lessons-learned">_Access control patterns vary widely_</Highlight>: Over time we have added features to support specific clients.
 For instance,
 
 </Section>
@@ -889,7 +889,7 @@ we added `computed_userset` to allow inferring an object’s owner ID from the o
 Similarly, we added `tuple_to_userset` to represent object hierarchy with only one relation tuple per hop.
 The benefits are both space reduction and flexibility—-it allows clients such as Cloud both to express ACL inheritance compactly and to change ACL inheritance rules without having to update large numbers of tuples.
 See [§2.3.1](#2.3.1-relation-configs-and-userset-rewrites).
-* _Freshness requirements are often but not always loose_: Clients often allow unspecified, moderate staleness during ACL evaluation, but sometimes require more precisely specified freshness.
+* <Highlight setId="rebac" entryId="lessons-learned">_Freshness requirements are often but not always loose_</Highlight>: Clients often allow unspecified, moderate staleness during ACL evaluation, but sometimes require more precisely specified freshness.
 We designed our zookie protocol around this property so that we can serve most requests from a default, already replicated snapshot, while allowing clients to bound the staleness when needed.
 We also tuned the granularity of our snapshot timestamps to match clients’ freshness requirements.
 The resulting coarse timestamp quanta allow us to perform the majority of authorization checks on a small number of snapshots, thus greatly reducing the frequency of database reads.
@@ -898,17 +898,17 @@ See [§3.2.1](#3.2.1-evaluation-timestamp).
 Another theme has been the need to add performance optimizations to support client behaviors observed in production.
 For example:
 
-* _Request hedging is key to reducing tail latency_: Clients that offer search capabilities to their users, such as Drive, often issue tens to hundreds of authorization checks to serve a single set of search results.
+* <Highlight setId="rebac" entryId="lessons-learned">_Request hedging is key to reducing tail latency_</Highlight>: Clients that offer search capabilities to their users, such as Drive, often issue tens to hundreds of authorization checks to serve a single set of search results.
 We introduced hedging of Spanner and Leopard requests to prevent an occasional slow operation from slowing the overall user interaction.
 See [§3.2.7](#3.2.7-tail-latency-mitigation).
-* _Hot-spot mitigation is critical for high availability_: Some workloads create hot spots in ACL data that can overwhelm the underlying database servers.
+* <Highlight setId="rebac" entryId="lessons-learned">_Hot-spot mitigation is critical for high availability_</Highlight>: Some workloads create hot spots in ACL data that can overwhelm the underlying database servers.
 A common pattern is a burst of ACL checks for an object that is indirectly referenced by the ACLs for many different objects.
 Specific instances arise from the search use case mentioned above, where the documents in the search indirectly share ACLs for a large social or work group, and Cloud use cases where many objects indirectly share ACLs for the same object high in a hierarchy.
 Zanzibar handles most hot spots with general mechanisms such as its distributed cache and lock table, but we have found the need to optimize specific uses cases.
 For example, we added cache prefetching of all relation tuples for a hot object.
 We also delayed cancellation of secondary ACL checks when there are concurrent requests for the same ACL data.
 See [§3.2.5](#3.2.5-handling-hot-spots).
-* _Performance isolation is indispensable to protect against misbehaving clients_: Even with hot-spot mitigation measures, unexpected and sometimes unin-
+* <Highlight setId="rebac" entryId="lessons-learned">_Performance isolation is indispensable to protect against misbehaving clients_</Highlight>: Even with hot-spot mitigation measures, unexpected and sometimes unin-
 </Section>
 
 </Column>
@@ -951,7 +951,7 @@ However, Zanzibar adopts a unified representation for ACLs and groups using user
 
 Role-based access control (RBAC), first proposed in [[17]](#references-17), introduced the notion of roles, which are similar to Zanzibar relations.
 Roles can inherit from each other and imply permissions.
-A number of Zanzibar clients have implemented RBAC policies on top of Zanzibar’s namespace configuration language.
+<Highlight setId="rebac" entryId="finer-grained-rbac">A number of Zanzibar clients have implemented RBAC policies on top of Zanzibar’s namespace configuration language.</Highlight>
 
 A discussion of ACL stores in 2019 would be remiss without mentioning the Identity and Access Management (IAM) systems offered commercially by Amazon [[1]](#references-1), Google [[5]](#references-5), Microsoft [[2]](#references-2), and others.
 These systems allow customers of those companies’ cloud products to configure flexible access controls based on various features such as: assigning users to
