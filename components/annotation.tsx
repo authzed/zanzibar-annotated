@@ -560,6 +560,11 @@ function Annotation(props: {
     setShareUrl(url.toString());
   }, [props.annotationId]);
 
+  useEffect(() => {
+    // Auto expand/collapse
+    setCollapsed(!activeAnnotationId?.equalsId(props.annotationId));
+  }, [props.annotationId, activeAnnotationId]);
+
   const activeStyle =
     props.orientation === 'left'
       ? 'lg:translate-x-72 2xl:translate-x-16 -translate-y-1 shadow-lg'
