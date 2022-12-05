@@ -291,3 +291,60 @@ groups:
        It's interesting to note that when you do this you end up in a steady-state hedging scenario.
        For example, if you pick 90th percentile is considered slow, then that means that 10% of all calls will be hedged regardless of the actual median and outlier response times.
        If Spanner were always returning within 10±2 milliseconds, your 12 millisecond requests would get hedged despite being _very_ fast.
+
+  page-9-col-2:
+    surprising-reads-qps:
+      content: |
+        It's surprising that there are nearly twice as many reads per second as checks.
+        It suggests that services are using Zanzibar storage for more than just permissions computations.
+
+  page-10-col-1:
+    combined-latency-percentiles:
+      content: |
+        It is interesting that Google chooses to report these metrics separated rather than combined.
+        Is there some human-factors reason why a user waiting for a permissions check would care about whether the content was changed recently?
+        Or was this decision made to help guide the improvements to these numbers independently?
+    
+  page-10-col-2:
+    client-observed-availability-delta:
+      content: |
+        I wonder how large the delta is between the advertised 99.999% availability and the client-observed availability with all of these conditionals and exclusions.
+        I am particularly concerned with the idea of excluding outliers, although maybe that's more innocent than it sounds.
+
+  page-11-col-1:
+    spanner-vs-cloud-spanner:
+      content: |
+        Are they calling out the difference between Cloud Spanner and internally deployed Spanner to avoid client comparisons with the numbers published here?
+        In general, half of a millisecond is very fast for a database response.
+
+  page-11-col-2:
+    owner-id-from-object-id:
+      content: |
+        This particular transformation breaks the graph traversal paradigm because it is essentially injecting synthetic edges.
+        Other transformations are seem to simply be interpreting edges that exist.
+        This will prevent some interesting techniques that might involve traversing the graph backward from users toward their respective resources.
+
+  page-12-col-1:
+    zanzibar-as-an-engineering-project:
+      content: |
+        There seems to be a lot of confusion about Zanzibar.
+        Some people think all relationship-based access control is "Zanzibar".
+        This section really brings to light that the ReBAC concepts have already been explored in depth, and that Zanzibar is really the scaling achievement of bringing those concepts to Google's scale needs.
+  
+    rbac-on-zanzibar:
+      content: |
+        RBAC is just one of the many models that ReBAC can host.
+        It's interesting to note that often Zanzibar is presented as an alternative to RBAC, or sometimes even as _just_ a way to implement RBAC at scale.
+
+  page-12-col-2:
+    himeji-is-tao-not-zanzibar:
+      content: |
+        Airbnb's [Himeji](https://medium.com/airbnb-engineering/himeji-a-scalable-centralized-system-for-authorization-at-airbnb-341664924574) claims to be based on Zanzibar, and even includes one of the Zanzibar authors among its creators.
+        The use of cache invalidation and eventual consistency makes it sounds like Himeji is more based on TAO than on Zanzibar.
+
+  page-13-col-1:
+    zanzibar-implementations-without-zookies:
+      content: |
+        Zookies are very clearly important to Google.
+        They get a significant amount of attention in the paper and are called out as a critical component in the conclusion.
+        Why then do so many of the Zanzibar-likes that are cropping up give them essentially no thought?
