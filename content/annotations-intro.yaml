@@ -81,11 +81,11 @@ groups:
         I believe this term is coined by this very paper, as I was unable to find any other literature on the subject.
         Zanzibar spends a lot of time and effort solving this challenge.
         Some other Zanzibar implementations such as [Airbnb's Himeji](https://medium.com/airbnb-engineering/himeji-a-scalable-centralized-system-for-authorization-at-airbnb-341664924574) do not take such a strict stance on causal ordering, preferring to use fast cache-invalidation to minimize the time that stale responses will be returned.
-        I believe this stance was taken by Google mostly because Spanner allows them to.
+        I believe this stance was taken by Google mostly because Spanner is uniquely suited to such a strong consistency guarantee.
 
     timestamps-from-checks:
       content: |
-        In order to get a causal ordering token, the user must request one from Zanzibar even if they aren't modifying any data stored in Zanzibar.
+        In order to get a causal ordering token, the user must request one from Zanzibar, even if they aren't modifying any data stored in Zanzibar.
         You're essentially asking Zanzibar: "Hey, what time you got?"
         Some users can find this "extra" communication requirement surprising, until they realize they were _already_ going to be talking to Zanzibar anyway to determine whether the user is allowed to make the mutation.
 
@@ -100,8 +100,8 @@ groups:
       content: |
         TrueTime is a network service at Google that uses atomic clocks and GPS (flying atomic clocks) time to keep very accurate time on each synchronized server.
         The difference between TrueTime and NTP is that TrueTime also provides a confidence interval for how far off the local clock might be.
-        Armed with this information, Spanner can derive an externally observable ordering of events in a distributed system by waiting for other servers to report no changes locally for times that could be overlapping within the confidence interval.
-        When you don't have the guarantees of TrueTime, you have to take other approaches to derive a causal ordering in a distributed system.
+        Armed with this information, Spanner can derive an externally observable ordering of events in a distributed system by waiting for other servers to report no changes occurred for times that could be overlapping within the confidence interval.
+        Without the guarantees of TrueTime, other approaches are required to derive a causal ordering in a distributed system.
         CockroachDB's CEO Spencer Kimball writes about working around this in his seminal blog post [Living Without Atomic Clocks](https://www.cockroachlabs.com/blog/living-without-atomic-clocks/).
 
     presumed-immediately-consistent:
@@ -111,14 +111,14 @@ groups:
 
     zookie-with-content-replication:
       content: |
-        It is important that the Zookie be stored _with the content_ because it is used to prevent the "new enemy" problem for _that particular revision of the content_.
+        It is important that the Zookie be stored _with the content being modified_ because it is used to prevent the "new enemy" problem for _that particular revision of the content_.
         If the content is being stored in a distributed system that itself has flexible consistency, by storing it atomically with the content we ensure that the Zookie is replicated consistently with that particular version of the content.
 
   page-4-col-1:
     relaxed-consistency-for-performance:
       content: |
         This idea that we start from a globally consistent datastore and then _relax_ consistency for performance is key to understanding Zanzibar.
-        A lot of distributed systems (e.g. those based on [Dynamo](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)) are inherently eventually consistent and allow the user to trade-off higher consistency for more availability by layering on things like quorum reads.
+        A lot of distributed systems (e.g. those based on [Dynamo](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)) are intentionally eventually consistent and allow the user to trade-off higher consistency for more availability by layering on things like quorum reads.
         Spanner starts from the default position of immediate consistency with snapshot reads, and Zanzibar as a client leverages this for higher performance and uptime by selectively relaxing consistency.
 
     more-tuple-encoding-hints:
@@ -130,7 +130,7 @@ groups:
       content: |
         There are currently some Zanzibar-like permissions systems out in the wild that operate exactly on this principle.
         The data is stored denormalized and the denormalizations need to be computed and written by the client itself.
-        They are likely very performant systems, however the author of the paper highlights the migration challenges that are inherent in such a system.
+        They are likely very performant _for read_, however the author of the paper highlights the migration challenges that are inherent in such a system.
 
         Userset rewrites, to me, are critical for ease of use of any Zanzibar-inspired system.
 
@@ -165,7 +165,7 @@ groups:
       content: |
         The usage of the word "key" here is different from the "primary key" in a relational database.
         These are [Spanner keys](https://cloud.google.com/spanner/docs/reference/rest/v1/KeySet), which represent the exact values that will be found in the Spanner table primary key, or a secondary index key.
-        The paper explicitly states the Spanner primary key components in section [§2.1](#2.1-relation-tuples)
+        The paper explicitly states the Spanner primary key components in [§2.1](#2.1-relation-tuples)
 
     tuple-versioning-implication:
       content: |
@@ -211,18 +211,18 @@ groups:
   page-6-col-1:
     why-garbage-collection:
       content: |
-        This implies that Zanzibar is doing some sort of manual [Multiversion Concurrency Control](https://fixme.com).
+        This implies that Zanzibar is doing some sort of manual [Multiversion Concurrency Control](https://en.wikipedia.org/wiki/Multiversion_concurrency_control).
         It's unclear why this would be needed considering Spanner supports snapshot queries.
 
     user-configurable-sharding:
       content: |
         This is interesting.
         Normally Spanner will automatically assign data to replicas to scale automatically.
-        This user-configurable sharding strategy that doesn't use the primary-key components in order seems to be a response to shard hot-spots on the `group` namespace.
+        This user-configurable sharding strategy (which doesn't use the primary-key components in order) seems to be a response to shard hot-spots on the `group` namespace.
 
     change-streams-or-changelog:
       content: |
-        I wonder if Google still uses a changelog table now that Spanner has [change streams](https://fixme.com).
+        I wonder if Google still uses a changelog table now that Spanner has [change streams](https://cloud.google.com/spanner/docs/change-streams).
   
   page-6-col-2:
     spanner-transaction-coordinator:
@@ -236,7 +236,7 @@ groups:
 
     voting-replica-write-latency-abroad:
       content: |
-        I believe this is a Spanner limitation where "global" clusters [always have their voting members in North America](https://fixme.com).
+        I believe this is a Spanner limitation where "global" clusters [always have their voting members in North America](https://cloud.google.com/spanner/docs/instance-configurations#three_continents).
         How large is the impact on write latencies for permissions operations occurring abroad?
         Does it necessarily take longer to add a reader to a document in Europe?
   
@@ -252,14 +252,14 @@ groups:
 
     rewrite-boolean-translation:
       content: |
-        It's an open question how formal this translation is.
+        An open question: how formal is this translation?
         Is Google using something like Prolog or Datalog to evaluate these expressions?
         Or is it being evaluated by code in a more general-purpose programming language?
 
   page-7-col-2:
     cross-namespace-leopard:
       content: |
-        Presumably google is doing this for namespaces like `group`, and maybe `role`.
+        Presumably Google is doing this for namespaces like `group`, and maybe `role`.
         There are certain use cases where it might be really interesting to cross the namespace boundary.
         For example, many business are structured into teams, roles, organizational units, and ultimately an organization.
         Without being able to cross namespace boundaries you are still limited to recursive pointer chasing on the order of the number of namespaces involved.
@@ -288,8 +288,8 @@ groups:
   page-9-col-1:
     nth-percentile-hedging:
      content: |
-       It's interesting to note that when you do this you end up in a steady-state hedging scenario.
-       For example, if you pick 90th percentile is considered slow, then that means that 10% of all calls will be hedged regardless of the actual median and outlier response times.
+       It's interesting to note that when you do fixed percentile hedging, you can end up in a steady-state hedging scenario.
+       For example, if you pick "90th percentile" as your slow response cutoff, then that means that 10% of all calls will be hedged regardless of the actual median and outlier response times.
        If Spanner were always returning within 10±2 milliseconds, your 12 millisecond requests would get hedged despite being _very_ fast.
 
   page-9-col-2:
@@ -297,6 +297,7 @@ groups:
       content: |
         It's surprising that there are nearly twice as many reads per second as checks.
         It suggests that services are using Zanzibar storage for more than just permissions computations.
+        Google mentions that some services are storing their entire social graph in Zanzibar in [§5](#5-related-work). 
 
   page-10-col-1:
     combined-latency-percentiles:
@@ -340,11 +341,11 @@ groups:
     himeji-is-tao-not-zanzibar:
       content: |
         Airbnb's [Himeji](https://medium.com/airbnb-engineering/himeji-a-scalable-centralized-system-for-authorization-at-airbnb-341664924574) claims to be based on Zanzibar, and even includes one of the Zanzibar authors among its creators.
-        The use of cache invalidation and eventual consistency makes it sounds like Himeji is more based on TAO than on Zanzibar.
+        The use of cache invalidation and eventual consistency makes it sounds like Himeji is more based on [TAO](https://engineering.fb.com/2013/06/25/core-data/tao-the-power-of-the-graph/) than on Zanzibar.
 
   page-13-col-1:
     zanzibar-implementations-without-zookies:
       content: |
         Zookies are very clearly important to Google.
         They get a significant amount of attention in the paper and are called out as a critical component in the conclusion.
-        Why then do so many of the Zanzibar-likes that are cropping up give them essentially no thought?
+        Why then do so many of the Zanzibar-like solutions that are cropping up give them essentially no thought?
