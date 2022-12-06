@@ -74,3 +74,278 @@ groups:
       content: |
         I like to conceptualize this by saying that the individual tuples represent relationships in a directed graph.
         The userset rewrite rules therefore act as a set of instructions on how to interpret that graph for authorization decisions.
+
+  page-3-col-1:
+    new-enemy-intro:
+      content: |
+        I believe this term is coined by this very paper, as I was unable to find any other literature on the subject.
+        Zanzibar spends a lot of time and effort solving this challenge.
+        Some other Zanzibar implementations such as [Airbnb's Himeji](https://medium.com/airbnb-engineering/himeji-a-scalable-centralized-system-for-authorization-at-airbnb-341664924574) do not take such a strict stance on causal ordering, preferring to use fast cache-invalidation to minimize the time that stale responses will be returned.
+        I believe this stance was taken by Google mostly because Spanner is uniquely suited to such a strong consistency guarantee.
+
+    timestamps-from-checks:
+      content: |
+        In order to get a causal ordering token, the user must request one from Zanzibar, even if they aren't modifying any data stored in Zanzibar.
+        You're essentially asking Zanzibar: "Hey, what time you got?"
+        Some users can find this "extra" communication requirement surprising, until they realize they were _already_ going to be talking to Zanzibar anyway to determine whether the user is allowed to make the mutation.
+
+    causal-ordering-schemes:
+      content: |
+        It's important to note that these "timestamps" don't actually have to represent time at all.
+        Some systems may offer opaque causal ordering tokens as a first class feature.
+        In a sufficiently clever system they don't even have to be strictly orderable.
+
+  page-3-col-2:
+    truetime-spanner-requirement:
+      content: |
+        TrueTime is a network service at Google that uses atomic clocks and GPS (flying atomic clocks) time to keep very accurate time on each synchronized server.
+        The difference between TrueTime and NTP is that TrueTime also provides a confidence interval for how far off the local clock might be.
+        Armed with this information, Spanner can derive an externally observable ordering of events in a distributed system by waiting for other servers to report no changes occurred for times that could be overlapping within the confidence interval.
+        Without the guarantees of TrueTime, other approaches are required to derive a causal ordering in a distributed system.
+        CockroachDB's CEO Spencer Kimball writes about working around this in his seminal blog post [Living Without Atomic Clocks](https://www.cockroachlabs.com/blog/living-without-atomic-clocks/).
+
+    presumed-immediately-consistent:
+      content: |
+        This is how most users who are coming from a traditional relational database assume that Zanzibar works.
+        There is a learning curve required to understand why minimum freshness is an acceptable consistency model for permissions.
+
+    zookie-with-content-replication:
+      content: |
+        It is important that the Zookie be stored _with the content being modified_ because it is used to prevent the "new enemy" problem for _that particular revision of the content_.
+        If the content is being stored in a distributed system that itself has flexible consistency, by storing it atomically with the content we ensure that the Zookie is replicated consistently with that particular version of the content.
+
+  page-4-col-1:
+    relaxed-consistency-for-performance:
+      content: |
+        This idea that we start from a globally consistent datastore and then _relax_ consistency for performance is key to understanding Zanzibar.
+        A lot of distributed systems (e.g. those based on [Dynamo](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)) are intentionally eventually consistent and allow the user to trade-off higher consistency for more availability by layering on things like quorum reads.
+        Spanner starts from the default position of immediate consistency with snapshot reads, and Zanzibar as a client leverages this for higher performance and uptime by selectively relaxing consistency.
+
+    more-tuple-encoding-hints:
+      content: |
+        Here is another hint about how Zanzibar efficiently encodes tuples.
+        Letting the user pick how object IDs get stored would be a big win for storage, but might result in horrible user-managed migrations without the proper tooling if that assumption needs to change.
+
+    systems-without-rewrites:
+      content: |
+        There are currently some Zanzibar-like permissions systems out in the wild that operate exactly on this principle.
+        The data is stored denormalized and the denormalizations need to be computed and written by the client itself.
+        They are likely very performant _for read_, however the author of the paper highlights the migration challenges that are inherent in such a system.
+
+        Userset rewrites, to me, are critical for ease of use of any Zanzibar-inspired system.
+
+    dont-write-proto:
+      content: |
+        This appears to be the serialized text format of the namespace configuration protocol buffer.
+        No human should ever have to write this by hand.
+        Most Zanzibar-inspired systems in the wild have adopted a higher-level language for defining these definitions.
+
+    rewrites-are-important:
+      content: |
+        This is the most important part of the model for actually computing authorization.
+        I don't think the paper gives this enough attention.
+        We've helped hundreds of companies model their very complex, very bespoke permissions systems using these primitives.
+        The process of transforming your thinking from RBAC and direct ACLs to using a graph of tuples will teach you a lot about your business domain as well.
+
+  page-4-col-2:
+    negations-are-hard:
+      content: |
+        It's somewhat surprising to see intersections and exclusions on this list, given that a number of Google services forgo permission exclusions for performance reasons.
+        When you compute permissions using only additive conditions such as union, it is easy to eagerly return a decision when you find just one matching positive case from anywhere in the tree.
+        When you have intersections and exclusions in play, the intersections and exclusions must be fully resolved before any positive decision can be returned.
+
+    how-opaque-are-zookies:
+      content: |
+        It would be interesting to know if Google is obfuscating their Zookies at all.
+        Googlers are clever, and if there is any utility to be had by decoding/comparing Zookies, and they're not otherwise obfuscated, I'm sure somebody is doing it.
+        As soon as one person does it, it becomes a feature that [will be depended on](https://xkcd.com/1172/), breaking the ability to do future extensions.
+
+  page-5-col-1:
+    spanner-keys-for-queries:
+      content: |
+        The usage of the word "key" here is different from the "primary key" in a relational database.
+        These are [Spanner keys](https://cloud.google.com/spanner/docs/reference/rest/v1/KeySet), which represent the exact values that will be found in the Spanner table primary key, or a secondary index key.
+        The paper explicitly states the Spanner primary key components in [§2.1](#2.1-relation-tuples)
+
+    tuple-versioning-implication:
+      content: |
+        This implies that there is some way to distinguish a lock tuple pre-touch from a lock tuple post-touch.
+        I have not found anything else in the paper which makes it clear how that works given the key components specified in [§2.1](#2.1-relation-tuples).
+
+  page-5-col-2:
+    putative-user-implication:
+      content: |
+        The use of authentication tokens here implies some deeper integration between Zanzibar and Gaia.
+        If the user has not been pre-decoded to a unique ID, then Zanzibar must be able to exchange the authentication token for a Gaia ID to use when reading and processing tuples.
+
+    content-change-check:
+      content: |
+        Content-change checks are an important part of Zanzibar, but they have a steep learning curve for integrators.
+        You always want to do a content-change check before modifying content, because you want to make sure you're considering every possible ACL change that could have occurred before giving the user permission to change the content.
+        
+        One open question that the paper leaves, is how often to check this.
+        Do you only do a content-change check when the user expresses their intent to write (e.g. when a doc is opened for editing)?
+        Whenever the user saves?
+        For concurrent editing software like Google Docs, do you do it on every character press?
+        After some timeout?
+
+    expand-usefulness:
+      content: |
+        It seems like Expand was created for some specific reason at Google.
+        Because it doesn't recursively expand through usersets (e.g. group:123#member), you can't directly use it to answer "Who has access to this resource?".
+        According to [§4](#4-experience) it gets almost 20% as many API requests as the Check API, so engineers there have found utility.
+        Our own experience with trying to use it to drive a UI panel proved challenging; users wanted to see the full transitive closure of all users that had access.
+
+    one-database-per-namespace:
+      content: |
+        It's unclear why Zanzibar uses one database per namespace.
+        The object ID encoding configuration in [§2.3](#2.3-namespace-configuration) is a good justification for using separate _tables_ per namespace.
+        The most plausible justifications are scale and geographic distribution.
+        The choice makes it very hard to do some operations, such as a reverse query for all tuples with a specific subject.
+        If anyone knows for sure, please reach out and we will update this annotation.
+
+    backup:
+      content: |
+        Backup.
+
+  page-6-col-1:
+    why-garbage-collection:
+      content: |
+        This implies that Zanzibar is doing some sort of manual [Multiversion Concurrency Control](https://en.wikipedia.org/wiki/Multiversion_concurrency_control).
+        It's unclear why this would be needed considering Spanner supports snapshot queries.
+
+    user-configurable-sharding:
+      content: |
+        This is interesting.
+        Normally Spanner will automatically assign data to replicas to scale automatically.
+        This user-configurable sharding strategy (which doesn't use the primary-key components in order) seems to be a response to shard hot-spots on the `group` namespace.
+
+    change-streams-or-changelog:
+      content: |
+        I wonder if Google still uses a changelog table now that Spanner has [change streams](https://cloud.google.com/spanner/docs/change-streams).
+  
+  page-6-col-2:
+    spanner-transaction-coordinator:
+      content: |
+        This 2-phase commit capability does not appear to be possible in GCP's Cloud Spanner offering.
+
+    namespace-new-enemy:
+      content: |
+        Here it looks like each `aclserver` is updating and caching versions of the namespace configuration individually by watching a change feed.
+        Interesting to note that this could theoretically lead to a "new-enemy problem" where older versions of a namespace are incorrectly interpreting tuples that were written at a later time.
+
+    voting-replica-write-latency-abroad:
+      content: |
+        I believe this is a Spanner limitation where "global" clusters [always have their voting members in North America](https://cloud.google.com/spanner/docs/instance-configurations#three_continents).
+        How large is the impact on write latencies for permissions operations occurring abroad?
+        Does it necessarily take longer to add a reader to a document in Europe?
+  
+  page-7-col-1:
+    replication-lag-computation:
+      content: |
+        This seems like a really complicated way to automatically measure and adjust for replication lag.
+
+    latency-impact-namespace-load:
+      content: |
+        Presumably this is done to avoid the latency impact of loading and parsing namespace config at request time.
+        One can't help wonder what happens as Zanzibar grows and the number of namespace versions exceeds what's reasonable to keep in memory on every node.
+
+    rewrite-boolean-translation:
+      content: |
+        An open question: how formal is this translation?
+        Is Google using something like Prolog or Datalog to evaluate these expressions?
+        Or is it being evaluated by code in a more general-purpose programming language?
+
+  page-7-col-2:
+    cross-namespace-leopard:
+      content: |
+        Presumably Google is doing this for namespaces like `group`, and maybe `role`.
+        There are certain use cases where it might be really interesting to cross the namespace boundary.
+        For example, many business are structured into teams, roles, organizational units, and ultimately an organization.
+        Without being able to cross namespace boundaries you are still limited to recursive pointer chasing on the order of the number of namespaces involved.
+        It is unclear if Leopard could handle this use case.
+
+  page-8-col-1:
+    hotspot-latency:
+      content: |
+        This is a very bold statement, and the solution that they chose turns Zanzibar into a distributed system.
+
+  page-8-col-2:
+    slicer-resiliency:
+      content: |
+        It's hard to imagine one object ID being so hot that it overloads a server all by itself.
+        Presumably spreading that out over multiple servers is done in some part for the sake of resiliency.
+
+    future-snapshot-timestamps:
+      content: |
+        The talk about using future timestamps here is interesting considering the focus on tail latencies.
+        It seems like you would need a very good reason to sit around accomplishing nothing and waiting for the clock to tick.
+
+    over-read-heuristic:
+      content: |
+        This is such a simple and seemingly effective heuristic for when to over-read data, it's rather beautiful.
+
+  page-9-col-1:
+    nth-percentile-hedging:
+     content: |
+       It's interesting to note that when you do fixed percentile hedging, you can end up in a steady-state hedging scenario.
+       For example, if you pick "90th percentile" as your slow response cutoff, then that means that 10% of all calls will be hedged regardless of the actual median and outlier response times.
+       If Spanner were always returning within 10±2 milliseconds, your 12 millisecond requests would get hedged despite being _very_ fast.
+
+  page-9-col-2:
+    surprising-reads-qps:
+      content: |
+        It's surprising that there are nearly twice as many reads per second as checks.
+        It suggests that services are using Zanzibar storage for more than just permissions computations.
+        Google mentions that some services are storing their entire social graph in Zanzibar in [§5](#5-related-work). 
+
+  page-10-col-1:
+    combined-latency-percentiles:
+      content: |
+        It is interesting that Google chooses to report these metrics separated rather than combined.
+        Is there some human-factors reason why a user waiting for a permissions check would care about whether the content was changed recently?
+        Or was this decision made to help guide the improvements to these numbers independently?
+    
+  page-10-col-2:
+    client-observed-availability-delta:
+      content: |
+        I wonder how large the delta is between the advertised 99.999% availability and the client-observed availability with all of these conditionals and exclusions.
+        I am particularly concerned with the idea of excluding outliers, although maybe that's more innocent than it sounds.
+
+  page-11-col-1:
+    spanner-vs-cloud-spanner:
+      content: |
+        Are they calling out the difference between Cloud Spanner and internally deployed Spanner to avoid client comparisons with the numbers published here?
+        In general, half of a millisecond is very fast for a database response.
+
+  page-11-col-2:
+    owner-id-from-object-id:
+      content: |
+        This particular transformation breaks the graph traversal paradigm because it is essentially injecting synthetic edges.
+        Other transformations are seem to simply be interpreting edges that exist.
+        This will prevent some interesting techniques that might involve traversing the graph backward from users toward their respective resources.
+
+  page-12-col-1:
+    zanzibar-as-an-engineering-project:
+      content: |
+        There seems to be a lot of confusion about Zanzibar.
+        Some people think all relationship-based access control is "Zanzibar".
+        This section really brings to light that the ReBAC concepts have already been explored in depth, and that Zanzibar is really the scaling achievement of bringing those concepts to Google's scale needs.
+  
+    rbac-on-zanzibar:
+      content: |
+        RBAC is just one of the many models that ReBAC can host.
+        It's interesting to note that often Zanzibar is presented as an alternative to RBAC, or sometimes even as _just_ a way to implement RBAC at scale.
+
+  page-12-col-2:
+    himeji-is-tao-not-zanzibar:
+      content: |
+        Airbnb's [Himeji](https://medium.com/airbnb-engineering/himeji-a-scalable-centralized-system-for-authorization-at-airbnb-341664924574) claims to be based on Zanzibar, and even includes one of the Zanzibar authors among its creators.
+        The use of cache invalidation and eventual consistency makes it sounds like Himeji is more based on [TAO](https://engineering.fb.com/2013/06/25/core-data/tao-the-power-of-the-graph/) than on Zanzibar.
+
+  page-13-col-1:
+    zanzibar-implementations-without-zookies:
+      content: |
+        Zookies are very clearly important to Google.
+        They get a significant amount of attention in the paper and are called out as a critical component in the conclusion.
+        Why then do so many of the Zanzibar-like solutions that are cropping up give them essentially no thought?
