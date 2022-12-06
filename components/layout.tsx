@@ -41,7 +41,9 @@ export type SelectionContext = {
 /**
  * LayoutProps are props passed from the page to the layout.
  */
-export type LayoutProps = { selectionContext?: SelectionContext | undefined };
+export type LayoutProps = {
+  selectionContext?: SelectionContext | undefined | null;
+};
 
 /**
  * Paper layout

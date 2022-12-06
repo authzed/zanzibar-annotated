@@ -1,8 +1,8 @@
-import { JSDOM } from 'jsdom';
 import { GetServerSideProps } from 'next';
 import { LayoutProps } from '../components/layout';
 import { fragmentToRangeList } from '../components/lib/deeplinks';
 import Zanzibar from '../content/zanzibar.mdx';
+import { getParsedPaperDOM } from '../util/parseddom';
 
 export default function Default(props: LayoutProps) {
   return (
@@ -25,31 +25,46 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
     fragment = req.url.substring(1);
   }
 
+  // NOTE: This can happen during debugging.
+  if (fragment?.startsWith('_next')) {
+    return {
+      props: {
+        selectionContext: null,
+      },
+    };
+  }
+
   // Create the preview text for the selection by retrieving the rendered selection DOM and then
   // grabbing the ranges and their text.
-  const previewEndpointHTML = await (
-    await fetch(`${endpoint}/_selection/${fragment}`)
-  ).text();
+  const dom = await getParsedPaperDOM(endpoint);
 
-  const dom = new JSDOM(previewEndpointHTML);
-  const selectionRanges = fragmentToRangeList(dom.window.document, fragment!);
+  // Make sure to not raise errors if there is a selection parse error.
+  let selectionRanges: Range[] | undefined = undefined;
+  try {
+    selectionRanges = fragmentToRangeList(dom.window.document, fragment!);
+  } catch (e) {
+    console.log(e);
+  }
+
   const selectionText = selectionRanges
-    .map((range) => range.toString())
-    .join('\n');
+    ?.map((range) => range.toString())
+    ?.join('\n');
 
-  const sections = selectionRanges.map((sr) => {
+  const sections = selectionRanges?.map((sr) => {
     return findSection(sr.startContainer);
   });
 
   return {
     props: {
-      selectionContext: {
-        previewImageUrl: fragment
-          ? `${endpoint}/api/preview/${fragment}`
-          : null,
-        previewText: selectionText,
-        previewSection: sections.length ? sections[0] : null,
-      },
+      selectionContext: selectionRanges
+        ? {
+            previewImageUrl: fragment
+              ? `${endpoint}/api/preview/${fragment}`
+              : null,
+            previewText: selectionText ?? null,
+            previewSection: sections?.length ? sections[0] : null,
+          }
+        : null,
     },
   };
 };
