@@ -41,7 +41,7 @@
   h4 + p {
     @apply indent-0;
   }
-  div.page-column > p:first-child {
+  div.page-column > p:first-child, div[data-section-title] > p:first-child {
     @apply indent-0;
   }
 }
