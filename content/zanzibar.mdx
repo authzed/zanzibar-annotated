@@ -10,8 +10,6 @@ import Figure3 from './Figure3.svg';
 import Figure4 from './Figure4.svg';
 import Figure5 from './Figure5.svg';
 
---for annotating--
-
 <Page pageNumber={1}>
 
 <Header>
@@ -37,7 +35,7 @@ import Figure5 from './Figure5.svg';
 <Section titles={["Abstract"]}>
 Determining whether online users are authorized to access digital objects is central to preserving privacy.
 This paper presents the design, implementation, and deployment of Zanzibar, a global system for storing and evaluating access control lists.
-Zanzibar provides a uniform data model and configuration language for expressing a wide range of access control policies from hundreds of client services at Google, including Calendar, Cloud, Drive, Maps, Photos, and YouTube.
+Zanzibar provides a uniform data model and <Highlight setId="spicedb" entryId="config-language">configuration language</Highlight> for expressing a wide range of access control policies from hundreds of client services at Google, including Calendar, Cloud, Drive, Maps, Photos, and YouTube.
 Its authorization decisions respect causal ordering of user actions and thus provide external consistency amid changes to access control lists and object contents.
 Zanzibar scales to trillions of access control lists and millions of authorization requests per second to support services used by billions of people.
 It has maintained 95th-percentile latency of less than 10 milliseconds and availability of greater than 99.999% over 3 years of production use.
@@ -46,7 +44,7 @@ It has maintained 95th-percentile latency of less than 10 milliseconds and avail
 ## 1 Introduction
 
 <Section titles={["1 Introduction"]}>
-<Highlight setId="spicedb" entryId="across-applications">Many online interactions</Highlight> require authorization checks to confirm that a user has permission to carry out an operation on a digital object.
+Many online interactions require authorization checks to confirm that a user has permission to carry out an operation on a digital object.
 For example, web-based photo storage services typically allow photo owners to share some photos with friends while keeping other photos private.
 Such a service must check whether a photo has been shared with a user before allowing that user to view the photo.
 Robust authorization checks are central to preserving online privacy.
@@ -102,7 +100,7 @@ document, but not all commenters are given editing rights.
 
 At runtime, Zanzibar allows clients to create, modify, and evaluate access control lists (ACLs) through a remote procedure call (RPC) interface.
 A simple ACL takes the form of <Highlight setId="intro" entryId="gaia-ids-shortcut">“user _U_ has relation _R_ to object _O_”</Highlight>.
-More complex ACLs take the form of “set of users _S_ has relation _R_ to object _O_”, where _S_ is itself specified in terms of another object-relation pair.
+<Highlight setId="spicedb" entryId="user-set-acl">More complex ACLs take the form of “set of users _S_ has relation _R_ to object _O_”, where _S_ is itself specified in terms of another object-relation pair.</Highlight>
 ACLs can thus refer to other ACLs, for example to specify that the set of users who can comment on a video consists of the users who have been granted viewing rights on that specific video along with those with viewing permissions on the video channel.
 
 Group memberships are an important class of ACL where the object is a group and the relation is semantically equivalent to `member`.
@@ -119,7 +117,7 @@ Therefore, Zanzibar replicates all ACL data in tens of geographically distribute
 
 Zanzibar supports global consistency of access control decisions through two interrelated features.
 One, it respects the order in which ACL changes are committed to the underlying data store.
-Two, it can ensure that authorization checks are based on ACL data no older than a client-specified change.
+Two, <Highlight setId="spicedb" entryId="client-specified-consistency">it can ensure that authorization checks are based on ACL data no older than a client-specified change.</Highlight>
 Thus, for example, a client can remove a user from a group and be assured that subsequent membership checks reflect that removal.
 Zanzibar provides these ordering properties by storing ACLs in a <Highlight setId="intro" entryId="spanner-wags-the-dog">globally distributed database system with external consistency guarantees</Highlight>. [[15](#references-15), [18](#references-18)]
 
@@ -151,12 +149,12 @@ This section describes Zanzibar's data model, configuration language, and applic
 ### 2.1 Relation Tuples
 <Section titles={["2 Model, Language, and API", "2.1 Relation Tuples"]}>
 
-In Zanzibar, ACLs are collections of <Highlight setId="intro" entryId="no-user-user">object-user or object-object relations</Highlight> represented as _relation tuples_.
+In Zanzibar, ACLs are collections of <Highlight setId="intro" entryId="no-user-user">object-user or object-object relations</Highlight> represented as <Highlight setId="spicedb" entryId="relation-tuples">_relation tuples_</Highlight>.
 Groups are simply ACLs with membership semantics.
 Relation tuples have <Highlight setId="intro" entryId="tuple-encodings">efficient binary encodings</Highlight>, but in this paper we represent them using a convenient text notation:
 
 <br/>
-$\lang tuple \rang \coloncolonequals \lang object \rang \text{\textquoteleft} \# \text{\textquoteright} \lang relation \rang \text{\textquoteleft} @ \text{\textquoteright}\lang user \rang \\ \nobreakspace$
+<Highlight setId="spicedb" entryId="relation-tuple-syntax" type="paragraph">$\lang tuple \rang \coloncolonequals \lang object \rang \text{\textquoteleft} \# \text{\textquoteright} \lang relation \rang \text{\textquoteleft} @ \text{\textquoteright}\lang user \rang \\ \nobreakspace$</Highlight>
 
 $\lang object \rang \coloncolonequals \lang namespace \rang \text{\textquoteleft} : \text{\textquoteright} \lang object id \rang \\ \nobreakspace$
 
@@ -166,10 +164,10 @@ $\lang userset \rang \coloncolonequals \lang object \rang \text{\textquoteleft} 
 
 where <Highlight setId="intro" entryId="tuple-encoding-hint">〈_namespace_〉 and 〈_relation_〉 are predefined in client configurations</Highlight> [(§2.3)](#2.3-namespace-configuration), 〈_object id_〉 is a string, and 〈_user id_〉 is an integer.
 The primary keys required to identify a relation tuple are 〈_namespace_〉, 〈_object id_〉, 〈_relation_〉, and 〈_user_〉.
-One feature worth noting is that a 〈_userset_〉 allows ACLs to refer to groups and thus supports representing nested group membership.
+One feature worth noting is that a <Highlight setId="spicedb" entryId="userset-support">〈_userset_〉</Highlight> allows ACLs to refer to groups and thus supports representing nested group membership.
 
 <PreviewLink previewComponent={<Table1 />}>[Table 1](#table-1)</PreviewLink> shows some example tuples and corresponding semantics.
-While some relations (e.g. `viewer`) define access control directly, others (e.g. `parent`, pointing to a folder) only define abstract relations between objects.
+<Highlight setId="spicedb" entryId="relations-vs-permissions">While some relations (e.g. `viewer`) define access control directly, others (e.g. `parent`, pointing to a folder) only define abstract relations between objects.</Highlight>
 <Highlight setId="intro" entryId="relation-rewrite-interpret-graph">These abstract relations may indirectly affect access control given userset rewrite rules specified in namespace configs</Highlight> ([§2.3.1](#2.3.1-relation-configs-and-userset-rewrites)).
 
 Defining our data model around tuples, instead of per-object ACLs, allows us to unify the concepts of ACLs and groups and to support efficient reads and incremental updates, as we will see in [§2.4](#2.4-api).
@@ -201,7 +199,7 @@ Specifically, our clients care about preventing the
 <Column>
 <Section titles={["2 Model, Language, and API", "2.2 Consistency Model"]}>
 
-<Highlight setId="intro" entryId="new-enemy-intro">“new enemy” problem, which can arise when we fail to respect the ordering between ACL updates or when we apply old ACLs to new content</Highlight>.
+<Highlight setId="intro" entryId="new-enemy-intro"><Highlight setId="spicedb" entryId="new-enemy">“new enemy” problem</Highlight>, which can arise when we fail to respect the ordering between ACL updates or when we apply old ACLs to new content</Highlight>.
 Consider these two examples:
 
 <a name="example-a"></a>
@@ -252,11 +250,11 @@ To avoid evaluating checks for new contents using stale ACLs, <Highlight setId="
 However, such evaluation would require global data synchronization with high-latency round trips and limited availability.
 Instead, we design the following protocol to allow most checks to be evaluated on already replicated data with cooperation from Zanzibar clients:
 
-1. A Zanzibar client requests an opaque consistency token called a _zookie_ for each content version, via a _content-change_ ACL check ([§2.4.4](#2.4.4-check)) when the content modification is about to be saved.
+1. A Zanzibar client requests an opaque consistency token called a <Highlight setId="spicedb" entryId="zedtoken">_zookie_</Highlight> for each content version, via a _content-change_ ACL check ([§2.4.4](#2.4.4-check)) when the content modification is about to be saved.
 Zanzibar encodes a current global timestamp in the zookie and ensures that all prior ACL writes have lower timestamps.
 The client <Highlight setId="intro" entryId="zookie-with-content-replication">stores the zookie with the content change in an atomic write to the client storage</Highlight>.
 Note that the content-change check does _not_ need to be evaluated in the same transaction as the application content modification, but only has to be triggered when the user modifies the contents.
-2. The client sends this zookie in subsequent ACL check requests to ensure that the check snapshot is at least as fresh as the timestamp for the content version.
+2. <Highlight setId="spicedb" entryId="level-of-consistency">The client sends this zookie in subsequent ACL check requests to ensure that the check snapshot is at least as fresh as the timestamp for the content version.</Highlight>
 
 External consistency and snapshot reads with staleness bounded by zookie prevent the “new enemy” problem.
 In [Example A](#example-a), ACL updates _A1_ and _A2_ will be assigned timestamps $T_{A1} \leq T_{A2}$, respectively.
@@ -289,7 +287,7 @@ Such freedom in turn allows Zanzibar to serve most checks at a default staleness
 ### 2.3 Namespace Configuration
 <Section titles={["2 Model, Language, and API", "2.3 Namespace Configuration"]}>
 
-Before clients can store relation tuples in Zanzibar, they must configure their namespaces.
+Before clients can store relation tuples in Zanzibar, they must configure their <Highlight setId="spicedb" entryId="object-definitions">namespaces</Highlight>.
 A namespace configuration specifies its relations as well as its storage parameters.
 Each relation has a name, which is a client-defined string such as `viewer` or `editor`, and a relation config.
 Storage parameters include sharding settings and an <Highlight setId="intro" entryId="more-tuple-encoding-hints">encoding for object IDs that helps Zanzibar optimize storage of integer, string, and other object ID formats.</Highlight>
@@ -304,13 +302,13 @@ While such relationships between relations can be represented by a relation tupl
 Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs.</Highlight>
 <PreviewLink previewComponent={<Figure1 />}>[Figure 1](#figure-1)</PreviewLink> demonstrates a <Highlight setId="intro" entryId="dont-write-proto">simple namespace configuration</Highlight> with concentric relations, where `viewer` contains `editor`, and `editor` contains `owner`.
 
-Userset rewrite rules are defined per relation in a namespace.
+<Highlight setId="spicedb" entryId="userset-rewrite-rules">Userset rewrite rules</Highlight> are defined per relation in a namespace.
 <Highlight setId="intro" entryId="rewrites-are-important">Each rule specifies a function that takes an object ID as input and outputs a userset expression tree.</Highlight>
 Each leaf node of the tree can be any of the following:
 
-* `_this`: Returns all users from stored relation tuples for the ⟨_object#relation_⟩ pair, including indirect ACLs referenced by usersets from the tuples.
-This is the default behavior when no rewrite rule is specified.
-* `computed_userset`: Computes, for the input object, a new userset.
+* <Highlight setId="spicedb" entryId="this-rule">`_this`: Returns all users from stored relation tuples for the ⟨_object#relation_⟩ pair, including indirect ACLs referenced by usersets from the tuples.
+This is the default behavior when no rewrite rule is specified.</Highlight>
+* <Highlight setId="spicedb" entryId="computed-userset">`computed_userset`</Highlight>: Computes, for the input object, a new userset.
 For example, this allows the userset expression for a `viewer` relation to refer to the `editor` userset on the same object, thus offering an ACL inheritance capability between relations.
 
 </Section>
@@ -321,11 +319,11 @@ For example, this allows the userset expression for a `viewer` relation to refer
 <a id="figure-1" />
 <Figure1 className="mb-10 w-full mt-10 md:mt-0" />
 
-* `tuple_to_userset`: Computes a tupleset ([§2.4.1](#2.4.1-read))
+* <Highlight setId="spicedb" entryId="tuple-to-userset">`tuple_to_userset`</Highlight>: Computes a tupleset ([§2.4.1](#2.4.1-read))
 from the input object, fetches relation tuples matching the tupleset, and computes a userset from every fetched relation tuple.
 This flexible primitive allows our clients to express complex policies such as “look up the parent folder of the document and inherit its viewers”.
 
-A userset expression can also be composed of multiple sub-expressions, combined by operations such as union, <Highlight setId="intro" entryId="negations-are-hard">intersection, and exclusion</Highlight>.
+A userset expression can also be composed of multiple sub-expressions, <Highlight setId="spicedb" entryId="subexpressions">combined by operations such as union, <Highlight setId="intro" entryId="negations-are-hard">intersection, and exclusion</Highlight></Highlight>.
 </Section>
 
 ### 2.4 API
@@ -336,7 +334,7 @@ In addition to supporting ACL checks, Zanzibar also provides APIs for clients to
 A concept used throughout these API methods is that of a _zookie_.
 A zookie is an opaque byte sequence encoding a globally meaningful timestamp that reflects an ACL write, a client content version, or a read snapshot.
 Zookies in ACL read and check requests specify staleness bounds for snapshot reads, thus providing one of Zanzibar’s core consistency properties.
-We <Highlight setId="intro" entryId="how-opaque-are-zookies">choose to use an opaque cookie</Highlight> instead of the actual timestamp to discourage our clients from choosing arbitrary timestamps and to allow future extensions.
+<Highlight setId="spicedb" entryId="opaque-tokens">We <Highlight setId="intro" entryId="how-opaque-are-zookies">choose to use an opaque cookie</Highlight> instead of the actual timestamp to discourage our clients from choosing arbitrary timestamps and to allow future extensions.</Highlight>
 
 </Section>
 </Column>
@@ -351,7 +349,7 @@ We <Highlight setId="intro" entryId="how-opaque-are-zookies">choose to use an op
 #### 2.4.1 Read
 
 Our clients read relation tuples to display ACLs or group membership to users, or to prepare for a subsequent write.
-A read request specifies one or multiple _tuplesets_ and an optional zookie.
+A read request specifies one or multiple _tuplesets_ and an <Highlight setId="spicedb" entryId="zedtoken-consistency-performance">optional zookie</Highlight>.
 
 Each _tupleset_ specifies <Highlight setId="intro" entryId="spanner-keys-for-queries">keys of a set of relation tuples.</Highlight>
 The set can include a single tuple key, or all tuples with a given object ID or userset in a namespace, optionally constrained by a relation name.
@@ -377,7 +375,7 @@ They may also modify all tuples related to an object via a read-modify-write pro
 2. Generate the tuples to write or delete. Send the writes, along with a touch on the lock tuple, to Zanzibar, with the condition that the writes will be committed <Highlight setId="intro" entryId="tuple-versioning-implication">only if the lock tuple has not been modified since the read</Highlight>.
 3. If the write condition is not met, go back to step 1.
 
-The lock tuple is just a regular relation tuple used by clients to detect write races.
+<Highlight setId="spicedb" entryId="lock-tuple">The lock tuple is just a regular relation tuple used by clients to detect write races.</Highlight>
 </Section>
 
 <Section titles={["2 Model, Language, and API", "2.4 API", "2.4.3 Watch"]}>
@@ -395,11 +393,11 @@ The client can use the heartbeat zookie to resume watching where the previous wa
 <Section titles={["2 Model, Language, and API", "2.4 API", "2.4.4 Check"]}>
 #### 2.4.4 Check
 
-A check request specifies a userset, represented by ⟨_object#relation_⟩, <Highlight setId="intro" entryId="putative-user-implication">a putative user, often represented by an authentication token</Highlight>, and a zookie corresponding to the desired object version.
+A check request specifies a userset, represented by ⟨_object#relation_⟩, <Highlight setId="intro" entryId="putative-user-implication">a putative user, often represented by an <Highlight setId="spicedb" entryId="auth-token">authentication token</Highlight></Highlight>, and a zookie corresponding to the desired object version.
 Like reads, a check is always evaluated at a consistent snapshot no earlier than the given zookie.
 
 To authorize application content modifications, our clients send a special type of check request, a _content-change_ check.
-<Highlight setId="intro" entryId="content-change-check">A content-change check request does not carry a zookie and is evaluated at the latest snapshot.</Highlight>
+<Highlight setId="intro" entryId="content-change-check"><Highlight setId="spicedb" entryId="content-change-check">A content-change check request does not carry a zookie and is evaluated at the latest snapshot.</Highlight></Highlight>
 If a content change is authorized, the check response includes a zookie for clients to store along with object contents and use for subsequent checks of the content version.
 The zookie encodes the evaluation snapshot and captures any possible causality from ACL changes to content changes, because the zookie’s timestamp will be greater than that of the ACL updates that protect the new content ([§2.2](#2.2-consistency-model)).
 </Section>
@@ -409,7 +407,7 @@ The zookie encodes the evaluation snapshot and captures any possible causality f
 
 <Highlight setId="intro" entryId="expand-usefulness">The Expand API returns the effective userset given an ⟨_object#relation_⟩ pair and an optional zookie.</Highlight>
 Unlike the Read API, Expand follows indirect references expressed through userset rewrite rules.
-The result is represented by a _userset tree_ whose leaf nodes are user IDs or usersets pointing to other ⟨_object#relation_⟩ pairs, and intermediate nodes represent union, intersection, or exclusion operators.
+The result is represented by a _userset tree_ whose leaf nodes are user IDs or <Highlight setId="spicedb" entryId="lookup-subjects">usersets pointing to other ⟨_object#relation_⟩ pairs</Highlight>, and intermediate nodes represent union, intersection, or exclusion operators.
 Expand is crucial for our clients to reason about the complete set of users and groups that have access to their objects, which allows them to build efficient search indices for access-controlled content.
 </Section>
 
@@ -493,7 +491,7 @@ age and the changelog shard in a single transaction.
 
 Namespace configs are stored in a database with two tables.
 One table contains the configs and is keyed by namespace IDs.
-The other is a changelog of config updates and is keyed by commit timestamps.
+The other is a <Highlight setId="spicedb" entryId="config-changelog">changelog of config updates</Highlight> and is keyed by commit timestamps.
 This structure <Highlight setId="intro" entryId="namespace-new-enemy">allows a Zanzibar server to load all configs upon startup and monitor the changelog to refresh configs continuously.</Highlight>
 </Section>
 
@@ -531,7 +529,7 @@ Each server tracks the frequency of such out-of-zone reads for data at a default
 and staler data, and uses these frequencies to compute a binomial proportion confidence interval of the probability that any given piece of data is available locally at each staleness.
 
 Upon collecting enough data, the server checks to see if each staleness value has a sufficiently low probability of incurring an out-of-zone read, and thus will be low-latency.
-If so, it updates the default staleness bound to the lowest “safe” value.
+<Highlight setId="spicedb" entryId="staleness">If so, it updates the default staleness bound to the lowest “safe” value.</Highlight>
 <Highlight setId="intro" entryId="replication-lag-computation">If no known staleness values are safe, we use a two-proportion $z$-test to see if increasing the default will be a statistically significant amount safer.
 In that case, we increase the default value in the hopes of improving latency.</Highlight>
 This default staleness mechanism is purely a performance optimization.
@@ -591,7 +589,7 @@ We apply a pooling mechanism to group reads for the same ACL check to minimize t
 Recursive pointer chasing during check evaluation has difficulty maintaining low latency with groups that are deeply nested or have a large number of child groups.
 <Highlight setId="intro" entryId="cross-namespace-leopard">For selected namespaces that exhibit such structure, Zanzibar handles checks using Leopard, a specialized index that supports efficient set computation.</Highlight>
 
-A Leopard index represents a collection of named sets using $(T,s,e)$ tuples, where $T$ is an enum representing the set type and $s$ and $e$ are 64-bit integers representing the set ID and the element ID, respectively.
+A <Highlight setId="spicedb" entryId="leopard-index">Leopard index</Highlight> represents a collection of named sets using $(T,s,e)$ tuples, where $T$ is an enum representing the set type and $s$ and $e$ are 64-bit integers representing the set ID and the element ID, respectively.
 A query evaluates an expression of union, intersection, or exclusion of named sets and returns the result set ordered by the element ID up to a specified number of results.
 
 To index and evaluate group membership, Zanzibar represents group membership with two set types, `GROUP2GROUP` and `MEMBER2GROUP`, which we show here as functions mapping from a set ID to element IDs:
@@ -652,7 +650,7 @@ With normalized data, hot spots on common ACLs (e.g., popular groups) may overlo
 <Highlight setId="intro" entryId="hotspot-latency">We found the handling of hot spots to be the most critical frontier in our pursuit of low latency and high availability.</Highlight>
 
 Zanzibar servers in each cluster form a distributed cache for both reads and check evaluations, including intermediate check results evaluated during pointer chasing.
-Cache entries are distributed across Zanzibar servers with consistent hashing [[20]](#references-20).
+Cache entries are distributed across Zanzibar servers with <Highlight setId="spicedb" entryId="consisten-hashing">consistent hashing</Highlight> [[20]](#references-20).
 To process checks or reads, we fan out re-
 </Section>
 
@@ -668,7 +666,7 @@ To handle hot forwarding keys, we cache results at both the caller and the calle
 
 We avoid reusing results evaluated from a different snapshot by encoding snapshot timestamps in cache keys.
 We choose evaluation timestamps rounded up to a coarse granularity, such as one or ten seconds, while respecting staleness constraints from request zookies.
-This timestamp quantization allows the vast majority of recent checks and reads to be evaluated at the same timestamps and to share cache results, despite having microsecond-resolution timestamps in cache keys.
+<Highlight setId="spicedb" entryId="timestamp-quantization">This timestamp quantization allows the vast majority of recent checks and reads to be evaluated at the same timestamps and to share cache results, despite having microsecond-resolution timestamps in cache keys.</Highlight>
 It is worth noting that rounding up timestamps does not affect Zanzibar’s consistency properties, since Spanner ensures that a snapshot read at timestamp $T$ will observe all writes up to $T$ <Highlight setId="intro" entryId="future-snapshot-timestamps">—-this holds even if $T$ is in the future, in which case the read will wait until TrueTime has moved past $T$.</Highlight>
 
 To handle the “cache stampede” problem [[3]](#references-3), where concurrent requests create flash hot spots before the cache is populated with results, we maintain a _lock table_ on each server to track outstanding reads and checks.
@@ -764,7 +762,7 @@ Clusters are sized in proportion to load in their geographic regions.
 ### 4.1 Requests
 
 We divide requests into two categories according to the required data freshness, which can have a large impact on latency and availability of the requests.
-Specifically, Check, Read, and Expand requests carry zookies to specify lower bounds on evaluation timestamps.
+<Highlight setId="spicedb" entryId="configurable-consistency">Specifically, Check, Read, and Expand requests carry zookies to specify lower bounds on evaluation timestamps.</Highlight>
 When a zookie timestamp is higher than that of the most recent data replicated to the region, the storage reads require cross-region round trips to the leader replica to retrieve fresher data.
 As our storage
 

@@ -10,66 +10,179 @@ description: |
   Learn more about [SpiceDB](https://authzed.com/spicedb?utm_source=za&utm_medium=menu).
 highlightColor: 'sky'
 groups:
-  page-1-col-2:
-    across-applications:
+  page-1-col-1:
+    "id?":
       content: |
-        This can also come into play when you have multiple micro-services trying to access authorization data.
-    gmail-example:
+        Note that this means namespaces ("schema" in SpiceDB) is also versioned, allowing for older versions to be used for evaluation while their queries are still running.
+    config-language:
       content: |
-        Concrete example that I use in talks: sending an email through Gmail that includes a link to a document in Google Drive, can warn you that the recipient doesn't have access, _and allow you to grant it right from within Gmail_.
-    search-index-paper-plea:
-      content: |
-        Google, if you're listening, please write a paper about this too!
-    set-operations-list:
-      content: |
-        At no point in the paper is the full list of operators outlined. This is one of the reasons why when people throw around the term "Zanzibar spec" it's not necessarily concrete enough to consider.
+        The callout of a configuration language could indicate a DSL for configuring Zanzibar, like the schema language in SpiceDB.
+
+        However, there appears to be no further mention or example of the configuration *language* itself within the paper, suggesting this feature was not described.
 
   page-2-col-1:
-    gaia-ids-shortcut:
+    user-set-acl:
       content: |
-        This is one of the interesting Google-isms inherent in Zanzibar.
-        Google uses a system internally called [Gaia](https://developers.google.com/issue-tracker/concepts/access-control#users) to assign every entity a very long integer identifier.
-        Most are natural persons, but occasionally they represent role accounts, robots, and the like.
-        Because the subject of these relationships are overwhelmingly end-users, Zanzibar takes a shortcut and has a specialization for Gaia IDs specifically.
+        Defining an ACL based on a *set* of users can be non-obvious in its usefulness at first.
 
-        Outside of Google, one can't make such strong claims about users and how one should refer to them.
-        For example, some users have identities being assigned by more than one identity provider, without a reconciliation layer.
-        Others are building products and platforms which have no natural persons as users at all!
-    pointer-chasing:
+        However, it is quite powerful: for example, rather than granting a role to a team as a whole, a role could be granted to the *members* of a team, or to the *owners* of an organization, allowing for intent to be specified when the role itself is defined.
+    client-specified-consistency:
       content: |
-        Outside of Google, this problem is not just for group membership.
-        It can occur any time you have recursive nesting, e.g. folders in folders, or sub-projects in projects.
-        We refer to this problem as it relates to Zanzibar resolution generically as "recursive pointer chasing."
+        This is an extremely important, but often overlooked feature of Zanzibar: by allowing *clients* to specify their consistency requirements, including based on other changes made, it can achieve an excellent balance between *safety* and *performance*.
 
-        The Leopard cache solution to this problem is specialized for group membership, but the approach can likely be extended to any recursive pointer chasing problem generically.
-    dispatch-introduction:
-      content: |
-        We refer to this concept colloquially as "dispatch."
-        Often users load testing such a system will find that isolated performance tests run faster with this option off, without realizing that it is a parallelization optimization, which are often slower at smaller scales but unlock higher throughputs at higher scales than would be possible without.
-        Particularly, if you think of the memory of every node in the cluster as a pool of resources, you can get better utilization of those resources by reducing contention of that memory through specialization.
-    globally-available-requirement:
-      content: |
-        This is another Google-ism.
-        Many real-world users don't have this exact requirement, having found ways to geographically partition their user-base and backing infrastructure.
-    spanner-wags-the-dog:
-      content: |
-        This is the first time that [Spanner](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf) comes up directly in the paper.
-        While it is true that Spanner has some very unique properties that allow for solving these types of ordering problems with perfect consistency, it is likely that Google would have built a Zanzibar-like system even without access to Spanner.
-        To an external observer, it appears that Spanner capabilities have directly influenced the way that Zanzibar was created in a multitude of ways.
+        SpiceDB follows this requirement by supporting Zookies/ZedTokens.
 
   page-2-col-2:
-    uptime-fine-print:
+    relation-tuples:
       content: |
-        Make sure to read the fine-print in [§4.3](#4.3-availability), which has an algorithm for defining if a request is "qualified" and therefore admissible for calculating uptime.
-    no-user-user:
+        "relationships" in SpiceDB parlance. To disambiguate things, we've chosen to use some slightly different terms for SpiceDB.
+    relation-tuple-syntax:
       content: |
-        Notice how there are no user-user relations in Zanzibar, this is a follow-on effect of using Gaia IDs as terminals always.
-    tuple-encodings:
+        This relationship (relation tuple) syntax can be hard to grok at first, especially because it is *inverted* from the expectation of subject-role-object.
+    userset-support:
       content: |
-        The paper doesn't talk about _what_ the efficient binary encoding is anywhere.
-        Because Google loves [protocol buffers](https://en.wikipedia.org/wiki/Protocol_Buffers) we might assume that they are just binary protos, but that would potentially lead to indexing challenges.
-        They could also have some amount of compression, deduplication, and/or normalization.
-        It's an interesting area to explore.
-    tuple-encoding-hint:
+        Note that in SpiceDB, only a "userset" is supported (called a "Subject"), as there is no predefined set of users IDs ala Google's GAIA.
+    relations-vs-permissions:
       content: |
-        This may be a hint that the namespaces and relations are normalized to a smaller representation in the binary encoding.
+        In SpiceDB, we've chosen to separate the idea of "permissions" (access control which is abstract) from "relations" (the way objects can relate to one another). This is simply a type checking convention, with all becoming "relations" within the core Zanzibar-like engine.
+
+  page-3-col-1:
+    new-enemy:
+      content: |
+        This [blog post](https://authzed.com/blog/new-enemies/) for more details about the New Enemy problem.
+    "?":
+      content: |
+        In SpiceDB, we use the terms "resource", "permission" and "subject", to be both more descriptive and more generic.
+
+  page-3-col-2:
+    zedtoken:
+      content: |
+        SpiceDB uses the term "Zedtoken" to differentiate slightly from Zookie, which can be an overloaded term.
+    level-of-consistency:
+      content: |
+        In SpiceDB, the client can choose what level of consistency they require: full consistency, at least as fresh as a particular update, etc.
+
+  page-4-col-1:
+    object-definitions:
+      content: |
+        Called "object definitions" in SpiceDB, as the term "namespace" is quite overloaded.
+    userset-rewrite-rules:
+      content: |
+        A `permission` in SpiceDB.
+    this-rule:
+      content: |
+        When we originally designed SpiceDB, the usage of `_this` proved to be a point of major misunderstanding, as it makes a `relation` into *both* a store of relationships and a computed result.
+
+        We therefore chose to remove `_this` and instead break relations into the two categories of `relation` and `permission`, with only `permission` holding computed or abstract results.
+    computed-userset:
+      content: |
+        In SpiceDB: a reference to another relation, ala:
+
+        ```
+        // computed_userset
+        permission view = viewer
+        ```
+
+  page-4-col-2:
+    tuple-to-userset:
+      content: |
+        In SpiceDB, an arrow:
+
+        ```
+        // tuple_to_userset
+        permission view = parent->view
+        ```
+    subexpressions:
+      content: |
+        In SpiceDB parlance:
+
+        ```
+        permission view = viewer & editor - banned
+        ```
+
+        We choose to use an opaque cookie instead of the actual timestamp to discourage our clients from choosing arbitrary timestamps and to allow future extensions.
+        SpiceDB's ZedToken's are also opaque, for the same reason.
+    opaque-tokens:
+      content: |
+        SpiceDB's ZedToken's are also opaque, for the same reason.
+
+  page-5-col-1:
+    zedtoken-consistency-performance:
+      content: |
+        Zookies/Zedtokens allow for consistency while not sacrificing performance; without them, any implementation has to compromise on one or the other.
+    "??":
+      content: |
+        Some simpler implementations of Zanzibar do in fact store a relationship for each object, which can result in improved performance for checks, but adversely affect cache latency and other operations.
+    lock-tuple:
+      content: |
+        We've extended this capability slightly in SpiceDB via the use of preconditions.
+
+  page-5-col-2:
+    auth-token:
+      content: |
+        This is a key difference in SpiceDB: SpiceDB does not restrict checks to simply users, but any *subject type* defined.
+    content-change-check:
+      content: |
+        This was originally present in V0 of SpiceDB's API, but was removed in favor of being able to specify a consistency level of "full consistency" on the normal CheckPermission call in V1.
+    "???":
+      content: |
+        SpiceDB takes this one step further, and allows for client-provided consistency options, to allow for specifying the exact nature of staleness that is considered okay for the request.
+    lookup-subjects:
+      content: |
+        Note here that Expand does *not* automatically recurse through other subjects, which can make it hard to use for UIs that need to display all reachable subjects.
+
+        SpiceDB has added the LookupSubjects API to provide this capability.
+
+  page-6-col-1:
+    "????":
+      content: |
+        This is accomplished in SpiceDB via the use of a fully consistent Check.
+    "?????":
+      content: |
+        This is often a non-obvious discovery to those using a Read-like API.
+
+  page-6-col-2:
+    config-changelog:
+      content: |
+        Note that this means namespaces ("schema" in SpiceDB) is also versioned, allowing for older versions to be used for evaluation while their queries are still running.
+
+  page-7-col-1:
+    staleness:
+      content: |
+        This is often surprising to people new to the Zanzibar model: staleness is tolerated, so long as it is "safe" to do so, either via specifying MInimizeLatency or giving a ZedToken with an explicit lower bound.
+
+  page-7-col-2:
+    leopard-index:
+      content: |
+        While not given a great detail, Leopard is known to be specialized only to nested group membership, which is often deep and also easy to compute, having no computation besides membership.
+
+        In SpiceDB we are planning to generalize this index as the Tiger cache, for any configured relation(s) or permission(s).
+    "??????":
+      content: |
+        By default 24 hours in most datastores in SpiceDB.
+
+  page-8-col-2:
+    timestamp-quantization:
+      content: |
+        In SpiceDB, this quantization rounding is configurable and defaults to 5s: this means that caches will be reused for approximately 5s before the next quantization window is chosen.
+    consistent-hashing:
+      content: |
+        See this [blog post](https://authzed.com/blog/consistent-hash-load-balancing-grpc/) for how this is done in SpiceDB.
+
+  page-9-col-2:
+    "???????":
+      content: |
+        Called the "Dispatch API" in SpiceDB
+    configurable-consistency:
+      content: |
+        These same requests (and LookupResources and LookupSubjects) support configurable consistency in SpiceDB.
+
+  page-11-col-1:
+    "????????":
+      content: |
+        In SpiceDB, these are equivalent to [`minimize_latency`](https://docs.authzed.com/reference/api-consistency#minimize_latency) and [`fully_consistent`](https://docs.authzed.com/reference/api-consistency#fully_consistent).
+
+  page-12-col-1:
+    "?????????":
+      content: |
+        As mentioned here, these hit rates are fairly low. For *most* SpiceDB users, the cache rates should be much higher (around ~25-50%), but it depends highly on traffic patterns and the shape of the data. We are working on SpiceDB on further improvements to push these numbers even higher.
