@@ -39,9 +39,11 @@ The markdown support also includes math typesetting using [Katex] and GitHub fla
 
 ### Paper Content and Layout
 
-Paper content is written in Markdown using GitHub flavored syntax and Katex.
+Paper content is written in Markdown using [GitHub flavored syntax] and [Katex].
 The paper viewer app provides additional components that are used to provide layout instructions to emulate the actual published paper.
 This is in order to preserve the ability to refer to specific column and page numbers of the paper.
+
+[GitHub flavored syntax]: https://github.github.com/gfm/
 
 ### Shareable Highlights
 
@@ -55,7 +57,7 @@ This functionality is based on the [deeplinks.js] library.
 Annotations to paper content can be shown along side the related part of the paper.
 Additionally, specific parts of the paper can be visibily highlighted and associated with an annotation.
 
-The paper layout expects an annotations context.
+The paper layout component expects an annotations context.
 The [default annotation provider] implementation uses YAML files to store all annotations and provides hooks for components to get annotations and annotation related state.
 
 A collection of annotations can be organized into sets.
@@ -74,7 +76,7 @@ label: The short, human readable version of the id
 title: The descriptive name for the set
 subtitle: Additional description of the set
 cta: Short Markdown string for a call to action or link to additional info.
-description: Markdown string for additional information.Can be used
+description: Markdown string for additional information about the set.
 highlightColor: A tailwind color class name used to color code the annotations and highlights for this set. See https://tailwindcss.com/docs/customizing-colors
 
 (Annotations are organized into groups. Each group has an id such as "page-1-col-2" and each annotation has an id such as "across-applications".)
@@ -102,13 +104,15 @@ An individual annotation can be directly linked using:
 
 ### Open Graph Support
 
-Chromium and Puppeteer are used to dynamically generate a description and screenshot preview for selections.
+Chromium and [Puppeteer] are used to dynamically generate a screenshot preview for selections and preview text is dynamically generated using [NextJS] server side rendering and [JSDOM].
 This provides a rich preview of the paper content when a shareable link is posted to another site.
 
 In the dev environment, set the PREVIEW_ENDPOINT env variable to your local instance (usually localhost:3000).
 
 _Note: The paper viewer app relies on a serverless function to generated the previews. Currently, [Vercel] is the only tested hosting service._
 
+[Puppeteer]: https://pptr.dev/
+[JSDOM]: https://github.com/jsdom/jsdom
 [Vercel]: https://vercel.com/
 
 ## Host Your Own Paper
