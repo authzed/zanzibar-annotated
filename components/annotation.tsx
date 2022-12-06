@@ -18,6 +18,7 @@ import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
 import popperStyles from '../styles/Popper.module.css';
 import { gtag } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
+import { Paragraph } from './markdown';
 import { ShareButton } from './SelectionShare';
 
 class AnnotationId {
@@ -317,6 +318,7 @@ type HighlightProps = {
   bgColorClass?: string;
   popperPlacement?: Placement;
   showAnnotation?: boolean;
+  type?: 'inline' | 'paragraph';
 };
 
 /**
@@ -328,6 +330,7 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
     entryId,
     popperPlacement = 'left',
     showAnnotation = false,
+    type = 'inline',
   } = props;
   const [popperVisible, setPopperVisible] = useState(showAnnotation);
   const [highlightRef, setHighlightRef] = useState<HTMLElement | null>(null);
@@ -342,6 +345,7 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
     unfocusAnnotation,
     activeAnnotationSetIds,
   } = useAnnotation();
+  const HighlightType = type === 'paragraph' ? Paragraph : React.Fragment;
   const annotationId = useMemo(() => {
     return new AnnotationId(setId, entryId);
   }, [setId, entryId]);
@@ -380,9 +384,10 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
 
   return (
     <>
-      <span
-        ref={setHighlightRef}
-        className={`bg-${bgColorClass}-100 p-px cursor-pointer
+      <HighlightType>
+        <span
+          ref={setHighlightRef}
+          className={`bg-${bgColorClass}-100 p-px cursor-pointer
         ${popperVisible ? `bg-${bgColorClass}-400` : ''}
         ${
           activeAnnotationId?.equals(setId, entryId)
@@ -395,21 +400,22 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
             : ''
         }
         `}
-        onClick={() => {
-          setPopperVisible(true);
-          activeAnnotationId?.equals(setId, entryId)
-            ? setAnnotationInactive(annotationId)
-            : setAnnotationActive(annotationId);
-        }}
-        onMouseOver={() => {
-          focusAnnotation(annotationId);
-        }}
-        onMouseOut={() => {
-          unfocusAnnotation();
-        }}
-      >
-        {props.children}
-      </span>
+          onClick={() => {
+            setPopperVisible(true);
+            activeAnnotationId?.equals(setId, entryId)
+              ? setAnnotationInactive(annotationId)
+              : setAnnotationActive(annotationId);
+          }}
+          onMouseOver={() => {
+            focusAnnotation(annotationId);
+          }}
+          onMouseOut={() => {
+            unfocusAnnotation();
+          }}
+        >
+          {props.children}
+        </span>
+      </HighlightType>
 
       {popperVisible &&
         portal &&
