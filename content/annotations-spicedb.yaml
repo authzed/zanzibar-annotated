@@ -48,7 +48,7 @@ groups:
   page-3-col-1:
     new-enemy:
       content: |
-        This [blog post](https://authzed.com/blog/new-enemies/) for more details about the New Enemy problem.
+        See this [blog post](https://authzed.com/blog/new-enemies/) for more details about the New Enemy problem.
 
   page-3-col-2:
     zedtoken:
@@ -96,7 +96,8 @@ groups:
         In SpiceDB parlance:
 
         ```
-        permission view = viewer & editor - banned
+        permission view =
+            viewer & editor - banned
         ```
 
         We choose to use an opaque cookie instead of the actual timestamp to discourage our clients from choosing arbitrary timestamps and to allow future extensions.
@@ -165,7 +166,7 @@ groups:
   page-8-col-2:
     timestamp-quantization:
       content: |
-        In SpiceDB, this quantization rounding is configurable and defaults to 5s: this means that caches will be reused for approximately 5s before the next quantization window is chosen.
+        In SpiceDB, this quantization rounding is configurable and defaults to `5s`: this means that caches will be reused for approximately `5s` before the next quantization window is chosen.
 
   page-9-col-2:
     configurable-consistency:
