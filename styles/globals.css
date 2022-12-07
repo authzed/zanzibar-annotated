@@ -62,6 +62,9 @@ div.annotation * {
 div.annotation div.content > p {
   @apply font-sans mb-1;
 }
+div.annotation div.toggle {
+  @apply font-sans;
+}
 div.annotation div.collapsed {
   @apply line-clamp-2;
 }

@@ -53,7 +53,7 @@ groups:
   page-3-col-2:
     zedtoken:
       content: |
-        SpiceDB uses the term "Zedtoken" to differentiate slightly from Zookie, which can be an overloaded term.
+        SpiceDB uses the term "ZedToken" to differentiate slightly from Zookie, which can be an overloaded term.
     level-of-consistency:
       content: |
         In SpiceDB, the client can choose what level of consistency they require: full consistency, at least as fresh as a particular update, etc.
@@ -109,7 +109,7 @@ groups:
   page-5-col-1:
     zedtoken-consistency-performance:
       content: |
-        Zookies/Zedtokens allow for consistency while not sacrificing performance; without them, any implementation has to compromise on one or the other.
+        Zookies/ZedTokens allow for consistency while not sacrificing performance; without them, any implementation has to compromise on one or the other.
     spicedb-consistency-options:
       content: |
         SpiceDB takes this one step further, and allows for client-provided consistency options, to allow for specifying the exact nature of staleness that is considered okay for the request.

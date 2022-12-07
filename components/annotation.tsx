@@ -620,7 +620,7 @@ function Annotation(props: {
               {content}
             </ReactMarkdown>
           </div>
-          <div className="relative text-xs mt-4">
+          <div className="toggle relative text-xs mt-4">
             {collapsed ? (
               <span
                 className="inline-block mt-2 cursor-pointer text-blue-600"
