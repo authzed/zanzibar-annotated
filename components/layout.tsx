@@ -42,6 +42,7 @@ export type SelectionContext = {
  * LayoutProps are props passed from the page to the layout.
  */
 export type LayoutProps = {
+  canonicalUrl: string;
   selectionContext?: SelectionContext | undefined | null;
 };
 
@@ -101,6 +102,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           <Head>
             <title>The Zanzibar Paper, annotated by AuthZed</title>
             <link rel="icon" href="/favicon.ico" />
+            <link rel="canonical" href={props.canonicalUrl} />
             <meta
               name="viewport"
               content="width=device-width, initial-scale=1.0"

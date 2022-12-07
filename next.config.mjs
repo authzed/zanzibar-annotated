@@ -33,6 +33,7 @@ export default withYaml(
     },
     publicRuntimeConfig: {
       GAMeasurementId: 'G-SPCEM7FV1Z',
+      CanonicalUrlBase: 'https://authzed.com/zanzibar',
     },
   })
 );
