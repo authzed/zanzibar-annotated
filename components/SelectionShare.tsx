@@ -57,7 +57,7 @@ export function ShareButton(props: ShareButtonProps) {
         `https://twitter.com/intent/tweet/?url=${encodeURIComponent(
           shareUrl
         )}&text=${
-          shareTitle ?? 'Shared from the Annotated Zanzibar Paper by Authzed'
+          shareTitle ?? 'Shared from the Annotated Zanzibar Paper by AuthZed'
         }`,
         '_blank'
       );
@@ -71,7 +71,7 @@ export function ShareButton(props: ShareButtonProps) {
         `https://reddit.com/submit/?url=${encodeURIComponent(
           shareUrl
         )}&resubmit=true&title=${
-          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by Authzed'
+          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by AuthZed'
         }`,
         '_blank'
       );
@@ -85,7 +85,7 @@ export function ShareButton(props: ShareButtonProps) {
         `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
           shareUrl
         )}&t=${
-          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by Authzed'
+          shareTitle ?? 'Selection from the Annotated Zanzibar Paper by AuthZed'
         }`,
         '_blank'
       );

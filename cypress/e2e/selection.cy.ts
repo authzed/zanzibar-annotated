@@ -20,7 +20,7 @@ describe('selection view', () => {
     cy.get('meta[property="og:title"]').should(
       'have.attr',
       'content',
-      'The Zanzibar Paper, annotated by Authzed'
+      'The Zanzibar Paper, annotated by AuthZed'
     );
     cy.get('meta[property="og:image"]')
       .should('have.attr', 'content')
