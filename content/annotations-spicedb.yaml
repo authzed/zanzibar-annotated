@@ -11,9 +11,6 @@ description: |
 highlightColor: 'sky'
 groups:
   page-1-col-1:
-    "id?":
-      content: |
-        Note that this means namespaces ("schema" in SpiceDB) is also versioned, allowing for older versions to be used for evaluation while their queries are still running.
     config-language:
       content: |
         The callout of a configuration language could indicate a DSL for configuring Zanzibar, like the schema language in SpiceDB.
@@ -35,7 +32,8 @@ groups:
   page-2-col-2:
     relation-tuples:
       content: |
-        "relationships" in SpiceDB parlance. To disambiguate things, we've chosen to use some slightly different terms for SpiceDB.
+        "relationships" in SpiceDB parlance
+        To disambiguate things, we've chosen to use some slightly different terms for SpiceDB.
     relation-tuple-syntax:
       content: |
         This relationship (relation tuple) syntax can be hard to grok at first, especially because it is *inverted* from the expectation of subject-role-object.
@@ -44,15 +42,13 @@ groups:
         Note that in SpiceDB, only a "userset" is supported (called a "Subject"), as there is no predefined set of users IDs ala Google's GAIA.
     relations-vs-permissions:
       content: |
-        In SpiceDB, we've chosen to separate the idea of "permissions" (access control which is abstract) from "relations" (the way objects can relate to one another). This is simply a type checking convention, with all becoming "relations" within the core Zanzibar-like engine.
+        In SpiceDB, we've chosen to separate the idea of "permissions" (access control which is abstract) from "relations" (the way objects can relate to one another).
+        This is simply a type checking convention, with all becoming "relations" within the core Zanzibar-like engine.
 
   page-3-col-1:
     new-enemy:
       content: |
         This [blog post](https://authzed.com/blog/new-enemies/) for more details about the New Enemy problem.
-    "?":
-      content: |
-        In SpiceDB, we use the terms "resource", "permission" and "subject", to be both more descriptive and more generic.
 
   page-3-col-2:
     zedtoken:
@@ -66,6 +62,9 @@ groups:
     object-definitions:
       content: |
         Called "object definitions" in SpiceDB, as the term "namespace" is quite overloaded.
+    extra-relationships:
+      content: |
+        Some simpler implementations of Zanzibar do in fact store a relationship for each object, which can result in improved performance for checks, but adversely affect cache latency and other operations.
     userset-rewrite-rules:
       content: |
         A `permission` in SpiceDB.
@@ -110,9 +109,9 @@ groups:
     zedtoken-consistency-performance:
       content: |
         Zookies/Zedtokens allow for consistency while not sacrificing performance; without them, any implementation has to compromise on one or the other.
-    "??":
+    spicedb-consistency-options:
       content: |
-        Some simpler implementations of Zanzibar do in fact store a relationship for each object, which can result in improved performance for checks, but adversely affect cache latency and other operations.
+        SpiceDB takes this one step further, and allows for client-provided consistency options, to allow for specifying the exact nature of staleness that is considered okay for the request.
     lock-tuple:
       content: |
         We've extended this capability slightly in SpiceDB via the use of preconditions.
@@ -123,10 +122,13 @@ groups:
         This is a key difference in SpiceDB: SpiceDB does not restrict checks to simply users, but any *subject type* defined.
     content-change-check:
       content: |
-        This was originally present in V0 of SpiceDB's API, but was removed in favor of being able to specify a consistency level of "full consistency" on the normal CheckPermission call in V1.
-    "???":
+        This is accomplished in SpiceDB via the use of a fully consistent Check.
+    v0-content-change-check:
       content: |
-        SpiceDB takes this one step further, and allows for client-provided consistency options, to allow for specifying the exact nature of staleness that is considered okay for the request.
+        This was originally present in V0 of SpiceDB's API, but was removed in favor of being able to specify a consistency level of "full consistency" on the normal CheckPermission call in V1.
+    expand-traversals:
+      content: |
+        This is often a non-obvious discovery to those using a Read-like API.
     lookup-subjects:
       content: |
         Note here that Expand does *not* automatically recurse through other subjects, which can make it hard to use for UIs that need to display all reachable subjects.
@@ -134,17 +136,14 @@ groups:
         SpiceDB has added the LookupSubjects API to provide this capability.
 
   page-6-col-1:
-    "????":
+    garbage-collect:
       content: |
-        This is accomplished in SpiceDB via the use of a fully consistent Check.
-    "?????":
-      content: |
-        This is often a non-obvious discovery to those using a Read-like API.
+        By default 24 hours in most datastores in SpiceDB.
 
   page-6-col-2:
     config-changelog:
       content: |
-        Note that this means namespaces ("schema" in SpiceDB) is also versioned, allowing for older versions to be used for evaluation while their queries are still running.
+        Note that this means namespaces ("schema" in SpiceDB) are also versioned, allowing for older versions to be used for evaluation while their queries are still running.
 
   page-7-col-1:
     staleness:
@@ -157,32 +156,31 @@ groups:
         While not given a great detail, Leopard is known to be specialized only to nested group membership, which is often deep and also easy to compute, having no computation besides membership.
 
         In SpiceDB we are planning to generalize this index as the Tiger cache, for any configured relation(s) or permission(s).
-    "??????":
+
+  page-8-col-1:
+    consistent-hashing:
       content: |
-        By default 24 hours in most datastores in SpiceDB.
+        See this [blog post](https://authzed.com/blog/consistent-hash-load-balancing-grpc/) for how this is done in SpiceDB.
 
   page-8-col-2:
     timestamp-quantization:
       content: |
         In SpiceDB, this quantization rounding is configurable and defaults to 5s: this means that caches will be reused for approximately 5s before the next quantization window is chosen.
-    consistent-hashing:
-      content: |
-        See this [blog post](https://authzed.com/blog/consistent-hash-load-balancing-grpc/) for how this is done in SpiceDB.
 
   page-9-col-2:
-    "???????":
-      content: |
-        Called the "Dispatch API" in SpiceDB
     configurable-consistency:
       content: |
         These same requests (and LookupResources and LookupSubjects) support configurable consistency in SpiceDB.
 
   page-11-col-1:
-    "????????":
+    cache-hit-rates:
+      content: |
+        As mentioned here, these hit rates are fairly low.
+        For *most* SpiceDB users, the cache rates should be much higher (around ~25-50%), but it depends highly on traffic patterns and the shape of the data.
+        We are working in SpiceDB on further improvements to push these numbers even higher.
+
+  page-11-col-2:
+    allowable-staleness:
       content: |
         In SpiceDB, these are equivalent to [`minimize_latency`](https://docs.authzed.com/reference/api-consistency#minimize_latency) and [`fully_consistent`](https://docs.authzed.com/reference/api-consistency#fully_consistent).
 
-  page-12-col-1:
-    "?????????":
-      content: |
-        As mentioned here, these hit rates are fairly low. For *most* SpiceDB users, the cache rates should be much higher (around ~25-50%), but it depends highly on traffic patterns and the shape of the data. We are working on SpiceDB on further improvements to push these numbers even higher.

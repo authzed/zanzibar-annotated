@@ -298,7 +298,7 @@ Storage parameters include sharding settings and an <Highlight setId="intro" ent
 
 While relation tuples reflect relationships between objects and users, they do not completely define the effective ACLs.
 For example, some clients specify that users with `editor` permissions on each object should have `viewer` permission on the same object.
-While such relationships between relations can be represented by a relation tuple per object, <Highlight setId="intro" entryId="systems-without-rewrites">storing a tuple for each object in a namespace would be wasteful and make it hard to make modifications across all objects.
+<Highlight setId="spicedb" entryId="extra-relationships">While such relationships between relations can be represented by a relation tuple per object, <Highlight setId="intro" entryId="systems-without-rewrites">storing a tuple for each object in a namespace would be wasteful and make it hard to make modifications across all objects.</Highlight>
 Instead, we let clients define object-agnostic relationships via _userset rewrite rules_ in relation configs.</Highlight>
 <PreviewLink previewComponent={<Figure1 />}>[Figure 1](#figure-1)</PreviewLink> demonstrates a <Highlight setId="intro" entryId="dont-write-proto">simple namespace configuration</Highlight> with concentric relations, where `viewer` contains `editor`, and `editor` contains `owner`.
 
@@ -356,8 +356,8 @@ The set can include a single tuple key, or all tuples with a given object ID or 
 With the tuplesets, clients can look up a specific membership entry, read all entries in an ACL or group, or look up all groups with a given user as a direct member.
 All tuplesets in a read request are processed at a single snapshot.
 
-With the zookie, clients can request a read snapshot no earlier than a previous write if the zookie from the write response is given in the read request, or at the same snapshot as a previous read if the zookie from the earlier read response is given in the subsequent request.
-If the request doesn’t contain a zookie, Zanzibar will choose a reasonably recent snapshot, possibly offering a lower-latency response than if a zookie were provided.
+<Highlight setId="spicedb" entryId="spicedb-consistency-options" type="paragraph">With the zookie, clients can request a read snapshot no earlier than a previous write if the zookie from the write response is given in the read request, or at the same snapshot as a previous read if the zookie from the earlier read response is given in the subsequent request.
+If the request doesn’t contain a zookie, Zanzibar will choose a reasonably recent snapshot, possibly offering a lower-latency response than if a zookie were provided.</Highlight>
 
 Read results only depend on contents of relation tuples and do not reflect userset rewrite rules.
 For example, even if the `viewer` userset always includes the `owner` userset, reading tuples with the `viewer` relation will not return tuples with the `owner` relation.
@@ -396,8 +396,8 @@ The client can use the heartbeat zookie to resume watching where the previous wa
 A check request specifies a userset, represented by ⟨_object#relation_⟩, <Highlight setId="intro" entryId="putative-user-implication">a putative user, often represented by an <Highlight setId="spicedb" entryId="auth-token">authentication token</Highlight></Highlight>, and a zookie corresponding to the desired object version.
 Like reads, a check is always evaluated at a consistent snapshot no earlier than the given zookie.
 
-To authorize application content modifications, our clients send a special type of check request, a _content-change_ check.
-<Highlight setId="intro" entryId="content-change-check"><Highlight setId="spicedb" entryId="content-change-check">A content-change check request does not carry a zookie and is evaluated at the latest snapshot.</Highlight></Highlight>
+<Highlight setId="spicedb" entryId="content-change-check">To authorize application content modifications, our clients send a special type of check request, a _content-change_ check.</Highlight>
+<Highlight setId="intro" entryId="content-change-check"><Highlight setId="spicedb" entryId="v0-content-change-check">A content-change check request does not carry a zookie and is evaluated at the latest snapshot.</Highlight></Highlight>
 If a content change is authorized, the check response includes a zookie for clients to store along with object contents and use for subsequent checks of the content version.
 The zookie encodes the evaluation snapshot and captures any possible causality from ACL changes to content changes, because the zookie’s timestamp will be greater than that of the ACL updates that protect the new content ([§2.2](#2.2-consistency-model)).
 </Section>
@@ -406,7 +406,7 @@ The zookie encodes the evaluation snapshot and captures any possible causality f
 #### 2.4.5 Expand
 
 <Highlight setId="intro" entryId="expand-usefulness">The Expand API returns the effective userset given an ⟨_object#relation_⟩ pair and an optional zookie.</Highlight>
-Unlike the Read API, Expand follows indirect references expressed through userset rewrite rules.
+<Highlight setId="spicedb" entryId="expand-traversals">Unlike the Read API, Expand follows indirect references expressed through userset rewrite rules.</Highlight>
 The result is represented by a _userset tree_ whose leaf nodes are user IDs or <Highlight setId="spicedb" entryId="lookup-subjects">usersets pointing to other ⟨_object#relation_⟩ pairs</Highlight>, and intermediate nodes represent union, intersection, or exclusion operators.
 Expand is crucial for our clients to reason about the complete set of users and groups that have access to their objects, which allows them to build efficient search indices for access-controlled content.
 </Section>
@@ -446,7 +446,7 @@ One such function is to <Highlight setId="intro" entryId="backup">produce dumps 
 <Column>
 <Section titles={["3 Architecture and Implementation"]}>
 tamp.
-Another is to <Highlight setId="intro" entryId="why-garbage-collection">garbage-collect tuple versions</Highlight> older than a threshold configured per namespace.
+<Highlight setId="spicedb" entryId="garbage-collect">Another is to <Highlight setId="intro" entryId="why-garbage-collection">garbage-collect tuple versions</Highlight> older than a threshold configured per namespace.</Highlight>
 
 Leopard is an indexing system used to optimize operations on large and deeply nested sets.
 It reads periodic snapshots of ACL data and watches for changes between snapshots.
@@ -491,8 +491,8 @@ age and the changelog shard in a single transaction.
 
 Namespace configs are stored in a database with two tables.
 One table contains the configs and is keyed by namespace IDs.
-The other is a <Highlight setId="spicedb" entryId="config-changelog">changelog of config updates</Highlight> and is keyed by commit timestamps.
-This structure <Highlight setId="intro" entryId="namespace-new-enemy">allows a Zanzibar server to load all configs upon startup and monitor the changelog to refresh configs continuously.</Highlight>
+The other is a changelog of config updates and is keyed by commit timestamps.
+<Highlight setId="spicedb" entryId="config-changelog">This structure <Highlight setId="intro" entryId="namespace-new-enemy">allows a Zanzibar server to load all configs upon startup and monitor the changelog to refresh configs continuously.</Highlight></Highlight>
 </Section>
 
 <Section titles={["3 Architecture and Implementation", "3.1 Storage", "3.1.4 Replication"]}>
@@ -650,7 +650,7 @@ With normalized data, hot spots on common ACLs (e.g., popular groups) may overlo
 <Highlight setId="intro" entryId="hotspot-latency">We found the handling of hot spots to be the most critical frontier in our pursuit of low latency and high availability.</Highlight>
 
 Zanzibar servers in each cluster form a distributed cache for both reads and check evaluations, including intermediate check results evaluated during pointer chasing.
-Cache entries are distributed across Zanzibar servers with <Highlight setId="spicedb" entryId="consisten-hashing">consistent hashing</Highlight> [[20]](#references-20).
+Cache entries are distributed across Zanzibar servers with <Highlight setId="spicedb" entryId="consistent-hashing">consistent hashing</Highlight> [[20]](#references-20).
 To process checks or reads, we fan out re-
 </Section>
 
@@ -835,7 +835,7 @@ In other words, for every quarter, Zanzibar has less than 2 minutes of global do
 Zanzibar servers delegate checks and reads to each other based on consistent hashing, and both the caller and the callee sides of the delegated operations cache the results to prevent hot spots ([§3.2.5](#3.2.5-handling-hot-spots)).
 At peak, Zanzibar handles 22 million internal “delegated” RPCs per second, split about evenly between reads and checks.
 In-memory caching handles approximately 200 million lookups per second at peak, 150 million from checks and 50 million from reads.
-Caching for
+<Highlight setId="spicedb" entryId="cache-hit-rates">Caching for</Highlight>
 
 </Section>
 </Column>
@@ -849,7 +849,7 @@ Caching for
 <a id="figure-5" />
 <Figure5 className="mb-10 w-full" />
 
-checks has a 10% hit rate on the delegate’s side, with an additional 12% saved by the lock table.
+<Highlight setId="spicedb" entryId="cache-hit-rates">checks has a 10% hit rate on the delegate’s side, with an additional 12% saved by the lock table.</Highlight>
 Meanwhile, caching on the delegator’s side has a 2% hit rate with an additional 3% from the lock table.
 While these hit rates appear low, they prevent 500K internal RPCs per second from creating hot spots.
 
@@ -889,7 +889,7 @@ For instance,
 Similarly, we added `tuple_to_userset` to represent object hierarchy with only one relation tuple per hop.
 The benefits are both space reduction and flexibility—-it allows clients such as Cloud both to express ACL inheritance compactly and to change ACL inheritance rules without having to update large numbers of tuples.
 See [§2.3.1](#2.3.1-relation-configs-and-userset-rewrites).
-* _Freshness requirements are often but not always loose_: Clients often allow unspecified, moderate staleness during ACL evaluation, but sometimes require more precisely specified freshness.
+* _Freshness requirements are often but not always loose_: <Highlight setId="spicedb" entryId="allowable-staleness">Clients often allow unspecified, moderate staleness during ACL evaluation, but sometimes require more precisely specified freshness.</Highlight>
 We designed our zookie protocol around this property so that we can serve most requests from a default, already replicated snapshot, while allowing clients to bound the staleness when needed.
 We also tuned the granularity of our snapshot timestamps to match clients’ freshness requirements.
 The resulting coarse timestamp quanta allow us to perform the majority of authorization checks on a small number of snapshots, thus greatly reducing the frequency of database reads.
