@@ -407,10 +407,14 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
               : setAnnotationActive(annotationId);
           }}
           onMouseOver={() => {
-            focusAnnotation(annotationId);
+            if (activeAnnotationSetIds.includes(setId)) {
+              focusAnnotation(annotationId);
+            }
           }}
           onMouseOut={() => {
-            unfocusAnnotation();
+            if (activeAnnotationSetIds.includes(setId)) {
+              unfocusAnnotation();
+            }
           }}
         >
           {props.children}
