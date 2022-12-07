@@ -34,6 +34,7 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
   if (fragment?.startsWith('_next')) {
     return {
       props: {
+        canonicalUrl: publicRuntimeConfig.CanonicalUrlBase,
         selectionContext: null,
       },
     };
