@@ -99,9 +99,10 @@ export function Banner(props: { isTopOfContent: boolean }) {
               rel="noopener"
               className="text-black hover:text-indigo-200 underline"
             >
-              Authzed
+              AuthZed
             </a>
-            , originally presented at 2019 USENIX Annual Technical Conference
+            &nbsp;| Originally presented at 2019 USENIX Annual Technical
+            Conference
           </h4>
         </div>
         <div className="text-right">

@@ -18,7 +18,7 @@ describe('reader view', () => {
       it('has header and footer', () => {
         cy.get('.header').should('contain', 'Zanzibar');
         cy.get('.footer')
-          .should('contain', 'Authzed')
+          .should('contain', 'AuthZed')
           .and('contain', 'Zanzibar Paper © USENIX and original authors');
       });
 

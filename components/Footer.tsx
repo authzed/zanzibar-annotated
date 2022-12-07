@@ -13,7 +13,7 @@ export function Footer() {
             rel="noopener"
             className="text-white hover:text-indigo-200 underline"
           >
-            Authzed, Inc
+            AuthZed, Inc
           </a>
           . Zanzibar Paper &copy; USENIX and original authors.
         </div>

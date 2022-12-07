@@ -99,7 +99,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
       return (
         <>
           <Head>
-            <title>The Zanzibar Paper, annotated by Authzed</title>
+            <title>The Zanzibar Paper, annotated by AuthZed</title>
             <link rel="icon" href="/favicon.ico" />
             <meta
               name="viewport"
@@ -112,7 +112,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
             <meta property="og:type" content="website" />
             <meta
               property="og:title"
-              content="The Zanzibar Paper, annotated by Authzed"
+              content="The Zanzibar Paper, annotated by AuthZed"
             />
             <meta property="twitter:card" content="summary_large_image" />
             <meta property="twitter:site" content="@authzed" />
@@ -126,7 +126,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
             />
             <meta
               property="twitter:title"
-              content="The Zanzibar Paper, annotated by Authzed"
+              content="The Zanzibar Paper, annotated by AuthZed"
             />
             {!!props.selectionContext?.previewImageUrl && (
               <meta

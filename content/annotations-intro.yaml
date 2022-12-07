@@ -3,8 +3,8 @@ label: 'Introduction to Zanzibar'
 title: 'Introduction to Zanzibar'
 subtitle: 'Highlights and commentary on notable portions of the paper.'
 cta: |
-  Highlights and commentary on notable portions of the paper by [Authzed](https://authzed.com?utm_source=za&utm_medium=toolbar)
-description: 'This paper is hosted by [Authzed](https://authzed.com?utm_source=za&utm_medium=menu), the creator of the open source, Zanzibar inspired, fine-grained permissions database [SpiceDB](https://github.com/authzed/spicedb).'
+  Highlights and commentary on notable portions of the paper by [AuthZed](https://authzed.com?utm_source=za&utm_medium=toolbar)
+description: 'This paper is hosted by [AuthZed](https://authzed.com?utm_source=za&utm_medium=menu), the creator of the open source, Zanzibar inspired, fine-grained permissions database [SpiceDB](https://github.com/authzed/spicedb).'
 highlightColor: 'amber'
 groups:
   page-1-col-2:
@@ -182,7 +182,7 @@ groups:
       content: |
         Content-change checks are an important part of Zanzibar, but they have a steep learning curve for integrators.
         You always want to do a content-change check before modifying content, because you want to make sure you're considering every possible ACL change that could have occurred before giving the user permission to change the content.
-        
+
         One open question that the paper leaves, is how often to check this.
         Do you only do a content-change check when the user expresses their intent to write (e.g. when a doc is opened for editing)?
         Whenever the user saves?
@@ -223,7 +223,7 @@ groups:
     change-streams-or-changelog:
       content: |
         I wonder if Google still uses a changelog table now that Spanner has [change streams](https://cloud.google.com/spanner/docs/change-streams).
-  
+
   page-6-col-2:
     spanner-transaction-coordinator:
       content: |
@@ -239,7 +239,7 @@ groups:
         I believe this is a Spanner limitation where "global" clusters [always have their voting members in North America](https://cloud.google.com/spanner/docs/instance-configurations#three_continents).
         How large is the impact on write latencies for permissions operations occurring abroad?
         Does it necessarily take longer to add a reader to a document in Europe?
-  
+
   page-7-col-1:
     replication-lag-computation:
       content: |
@@ -287,17 +287,17 @@ groups:
 
   page-9-col-1:
     nth-percentile-hedging:
-     content: |
-       It's interesting to note that when you do fixed percentile hedging, you can end up in a steady-state hedging scenario.
-       For example, if you pick "90th percentile" as your slow response cutoff, then that means that 10% of all calls will be hedged regardless of the actual median and outlier response times.
-       If Spanner were always returning within 10±2 milliseconds, your 12 millisecond requests would get hedged despite being _very_ fast.
+      content: |
+        It's interesting to note that when you do fixed percentile hedging, you can end up in a steady-state hedging scenario.
+        For example, if you pick "90th percentile" as your slow response cutoff, then that means that 10% of all calls will be hedged regardless of the actual median and outlier response times.
+        If Spanner were always returning within 10±2 milliseconds, your 12 millisecond requests would get hedged despite being _very_ fast.
 
   page-9-col-2:
     surprising-reads-qps:
       content: |
         It's surprising that there are nearly twice as many reads per second as checks.
         It suggests that services are using Zanzibar storage for more than just permissions computations.
-        Google mentions that some services are storing their entire social graph in Zanzibar in [§5](#5-related-work). 
+        Google mentions that some services are storing their entire social graph in Zanzibar in [§5](#5-related-work).
 
   page-10-col-1:
     combined-latency-percentiles:
@@ -305,7 +305,7 @@ groups:
         It is interesting that Google chooses to report these metrics separated rather than combined.
         Is there some human-factors reason why a user waiting for a permissions check would care about whether the content was changed recently?
         Or was this decision made to help guide the improvements to these numbers independently?
-    
+
   page-10-col-2:
     client-observed-availability-delta:
       content: |
@@ -331,7 +331,7 @@ groups:
         There seems to be a lot of confusion about Zanzibar.
         Some people think all relationship-based access control is "Zanzibar".
         This section really brings to light that the ReBAC concepts have already been explored in depth, and that Zanzibar is really the scaling achievement of bringing those concepts to Google's scale needs.
-  
+
     rbac-on-zanzibar:
       content: |
         RBAC is just one of the many models that ReBAC can host.
