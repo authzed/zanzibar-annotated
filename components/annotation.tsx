@@ -410,10 +410,12 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
         }
         `}
           onClick={() => {
-            setPopperVisible(true);
-            activeAnnotationId?.equals(setId, entryId)
-              ? setAnnotationInactive(annotationId)
-              : setAnnotationActive(annotationId);
+            if (activeAnnotationSetIds.includes(setId)) {
+              setPopperVisible(true);
+              activeAnnotationId?.equals(setId, entryId)
+                ? setAnnotationInactive(annotationId)
+                : setAnnotationActive(annotationId);
+            }
           }}
           onMouseOver={() => {
             if (activeAnnotationSetIds.includes(setId)) {
