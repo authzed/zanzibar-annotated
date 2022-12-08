@@ -166,9 +166,12 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                 <SelectionShare />
                 {props.children}
               </div>
-              <Footer />
+              <Footer canonicalUrl={props.canonicalUrl} />
             </Container>
-            <Banner isTopOfContent={isTopOfContent} />
+            <Banner
+              isTopOfContent={isTopOfContent}
+              canonicalUrl={props.canonicalUrl}
+            />
           </AnnotationManagerProvider>
           <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
           <HighlightProvidedSelection

@@ -14,7 +14,10 @@ export enum BannerHeights {
  * Banner displayed above the first page of the paper.
  * The annotation set nav bar assumes only one annotation set is active at a time.
  */
-export function Banner(props: { isTopOfContent: boolean }) {
+export function Banner(props: {
+  isTopOfContent: boolean;
+  canonicalUrl?: string;
+}) {
   const { activeAnnotationSetIds, getAnnotationSet } = useAnnotation();
 
   const availableAnnotationSets = getAvailableAnnotationSets();
@@ -39,7 +42,7 @@ export function Banner(props: { isTopOfContent: boolean }) {
       >
         <div>
           <img
-            src="/favicon.svg"
+            src={`${props.canonicalUrl ?? ''}/favicon.svg`}
             className={clsx('transition-all', {
               'h-10': props.isTopOfContent,
               'h-5': !props.isTopOfContent,
