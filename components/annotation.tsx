@@ -476,7 +476,7 @@ function AnnotationPopper(props: {
       {
         name: 'flip',
         options: {
-          fallbackPlacements: ['right', 'left', 'top', 'bottom'],
+          fallbackPlacements: ['right', 'left', 'bottom', 'top'],
         },
       },
     ],
