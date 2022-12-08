@@ -230,10 +230,19 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       const parts = window.location.hash.split('/');
       const [prefix, setId, entryId] = parts;
       if (prefix !== '#annotations') return;
-      console.log(prefix, setId, entryId);
 
       if (setId) setAnnotationSetActive(setId);
-      if (entryId) setAnnotationActive(new AnnotationId(setId, entryId));
+      if (entryId) {
+        const annotationId = new AnnotationId(setId, entryId);
+        setAnnotationActive(annotationId);
+        const timer = setTimeout(() => {
+          const el = document.getElementById(
+            `annotation-${annotationId.key()}`
+          );
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
 
       return;
     }
