@@ -11,6 +11,7 @@ export default function Default(props: LayoutProps) {
       <Zanzibar
         selectionContext={props.selectionContext}
         canonicalUrl={props.canonicalUrl}
+        baseUrl={props.baseUrl}
       />
     </>
   );
@@ -34,6 +35,7 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
   if (fragment?.startsWith('_next')) {
     return {
       props: {
+        baseUrl: publicRuntimeConfig.CanonicalUrlBase,
         canonicalUrl: publicRuntimeConfig.CanonicalUrlBase,
         selectionContext: null,
       },
@@ -62,6 +64,7 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
 
   return {
     props: {
+      baseUrl: publicRuntimeConfig.CanonicalUrlBase,
       canonicalUrl: fragment
         ? `${publicRuntimeConfig.CanonicalUrlBase}/${fragment}`
         : publicRuntimeConfig.CanonicalUrlBase,
