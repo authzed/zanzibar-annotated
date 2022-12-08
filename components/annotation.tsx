@@ -622,26 +622,9 @@ function Annotation(props: {
           </div>
           <div className="toggle relative text-xs mt-4">
             {collapsed ? (
-              <span
-                className="inline-block mt-2 cursor-pointer text-blue-600"
-                onClick={(e) => {
-                  setCollapsed(false);
-                  return false;
-                }}
-              >
-                Show more
-              </span>
+              <span className="inline-block mt-2 cursor-pointer">...</span>
             ) : (
-              <span
-                className="inline-block mt-2 cursor-pointer text-blue-600"
-                onClick={(e) => {
-                  setCollapsed(true);
-                  e.stopPropagation();
-                  return false;
-                }}
-              >
-                Show less
-              </span>
+              <span className="inline-block mt-2 cursor-pointer">&nbsp;</span>
             )}
             <span className="ml-2 absolute bottom-0 right-0">
               <ShareButton
