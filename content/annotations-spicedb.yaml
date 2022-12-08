@@ -56,7 +56,15 @@ groups:
         SpiceDB uses the term "ZedToken" to differentiate slightly from Zookie, which can be an overloaded term.
     level-of-consistency:
       content: |
-        In SpiceDB, the client can choose what level of consistency they require: full consistency, at least as fresh as a particular update, etc.
+        In SpiceDB, the client can choose what [level of consistency](https://docs.authzed.com/reference/api-consistency#levels) they require.
+
+        `minimize_latency`: to minimize the latency by using available caches
+
+        `at_least_as_fresh`: to minimize the staleness of data to the point-in-time specified by the ZedToken
+
+        `at_exact_snapshot`: to use the data available at the exact point-in-time specified by the ZedToken
+
+        `fully_consistent`: to use the latest data available within the datastore
 
   page-4-col-1:
     object-definitions:
@@ -99,9 +107,6 @@ groups:
         permission view =
             viewer & editor - banned
         ```
-
-        We choose to use an opaque cookie instead of the actual timestamp to discourage our clients from choosing arbitrary timestamps and to allow future extensions.
-        SpiceDB's ZedToken's are also opaque, for the same reason.
     opaque-tokens:
       content: |
         SpiceDB's ZedToken's are also opaque, for the same reason.
@@ -115,7 +120,7 @@ groups:
         SpiceDB takes this one step further, and allows for client-provided consistency options, to allow for specifying the exact nature of staleness that is considered okay for the request.
     lock-tuple:
       content: |
-        We've extended this capability slightly in SpiceDB via the use of preconditions.
+        We've extended this capability slightly in SpiceDB via the use of [write preconditions](https://buf.build/authzed/api/docs/main:authzed.api.v1#authzed.api.v1.Precondition).
 
   page-5-col-2:
     auth-token:
@@ -156,7 +161,7 @@ groups:
       content: |
         While not given a great detail, Leopard is known to be specialized only to nested group membership, which is often deep and also easy to compute, having no computation besides membership.
 
-        In SpiceDB we are planning to generalize this index as the Tiger cache, for any configured relation(s) or permission(s).
+        In SpiceDB we are planning to generalize this index as the Tiger cache, for any configured relation(s) or permission(s). Read the [proposal](https://spicedb.dev/207).
 
   page-8-col-1:
     consistent-hashing:
