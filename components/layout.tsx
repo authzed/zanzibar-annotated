@@ -42,6 +42,7 @@ export type SelectionContext = {
  * LayoutProps are props passed from the page to the layout.
  */
 export type LayoutProps = {
+  baseUrl: string;
   canonicalUrl: string;
   selectionContext?: SelectionContext | undefined | null;
 };
@@ -166,12 +167,9 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                 <SelectionShare />
                 {props.children}
               </div>
-              <Footer canonicalUrl={props.canonicalUrl} />
+              <Footer baseUrl={props.baseUrl} />
             </Container>
-            <Banner
-              isTopOfContent={isTopOfContent}
-              canonicalUrl={props.canonicalUrl}
-            />
+            <Banner isTopOfContent={isTopOfContent} baseUrl={props.baseUrl} />
           </AnnotationManagerProvider>
           <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
           <HighlightProvidedSelection
