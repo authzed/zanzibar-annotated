@@ -230,10 +230,19 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       const parts = window.location.hash.split('/');
       const [prefix, setId, entryId] = parts;
       if (prefix !== '#annotations') return;
-      console.log(prefix, setId, entryId);
 
       if (setId) setAnnotationSetActive(setId);
-      if (entryId) setAnnotationActive(new AnnotationId(setId, entryId));
+      if (entryId) {
+        const annotationId = new AnnotationId(setId, entryId);
+        setAnnotationActive(annotationId);
+        const timer = setTimeout(() => {
+          const el = document.getElementById(
+            `annotation-${annotationId.key()}`
+          );
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
 
       return;
     }
@@ -401,10 +410,12 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
         }
         `}
           onClick={() => {
-            setPopperVisible(true);
-            activeAnnotationId?.equals(setId, entryId)
-              ? setAnnotationInactive(annotationId)
-              : setAnnotationActive(annotationId);
+            if (activeAnnotationSetIds.includes(setId)) {
+              setPopperVisible(true);
+              activeAnnotationId?.equals(setId, entryId)
+                ? setAnnotationInactive(annotationId)
+                : setAnnotationActive(annotationId);
+            }
           }}
           onMouseOver={() => {
             if (activeAnnotationSetIds.includes(setId)) {
@@ -476,7 +487,7 @@ function AnnotationPopper(props: {
       {
         name: 'flip',
         options: {
-          fallbackPlacements: ['right', 'left', 'top', 'bottom'],
+          fallbackPlacements: ['right', 'left', 'bottom', 'top'],
         },
       },
     ],
@@ -622,26 +633,9 @@ function Annotation(props: {
           </div>
           <div className="toggle relative text-xs mt-4">
             {collapsed ? (
-              <span
-                className="inline-block mt-2 cursor-pointer text-blue-600"
-                onClick={(e) => {
-                  setCollapsed(false);
-                  return false;
-                }}
-              >
-                Show more
-              </span>
+              <span className="inline-block mt-2 cursor-pointer">...</span>
             ) : (
-              <span
-                className="inline-block mt-2 cursor-pointer text-blue-600"
-                onClick={(e) => {
-                  setCollapsed(true);
-                  e.stopPropagation();
-                  return false;
-                }}
-              >
-                Show less
-              </span>
+              <span className="inline-block mt-2 cursor-pointer">&nbsp;</span>
             )}
             <span className="ml-2 absolute bottom-0 right-0">
               <ShareButton

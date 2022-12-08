@@ -466,7 +466,7 @@ We store relation tuples of each namespace in a separate database, where each ro
 Multiple tuple versions are stored on different rows, so that we can evaluate checks and reads at any timestamp within the garbage collection window.
 The ordering of primary keys allows us to look up all relation tuples for a given object ID or _(object ID, relation)_ pair.
 
-<Highlight setId="intro" entryId="user-configurable-sharding">Our clients configure sharding of a namespace according to its data pattern.
+<Highlight setId="intro" entryId="user-configurable-sharding" type="paragraph">Our clients configure sharding of a namespace according to its data pattern.
 Usually the shard ID is determined solely by the object ID.
 In some cases, for example, when a namespace stores groups with very large numbers of members, the shard ID is computed from both object ID and user.</Highlight>
 </Section>

@@ -165,7 +165,11 @@ function SelectionShare() {
   return (
     <>
       {visible && (
-        <ClickAwayListener onClickAway={() => setVisible(false)}>
+        <ClickAwayListener
+          mouseEvent="mousedown"
+          touchEvent="touchend"
+          onClickAway={() => setVisible(false)}
+        >
           <div
             className={popperStyles.tooltip}
             ref={setPopperElement}
