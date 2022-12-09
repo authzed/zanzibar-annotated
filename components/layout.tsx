@@ -47,6 +47,12 @@ export type LayoutProps = {
   selectionContext?: SelectionContext | undefined | null;
 };
 
+function getDefaultPreviewImageUrl() {
+  return process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}/preview.png`
+    : '/preview.png';
+}
+
 /**
  * Paper layout
  */
@@ -98,6 +104,8 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           .join('\n')
           .substring(0, 200);
       }
+      const previewImageUrl =
+        props.selectionContext?.previewImageUrl ?? getDefaultPreviewImageUrl();
       return (
         <>
           <Head>
@@ -131,21 +139,10 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
               property="twitter:title"
               content="The Zanzibar Paper, annotated by AuthZed"
             />
-            {!!props.selectionContext?.previewImageUrl && (
-              <meta
-                property="og:image"
-                content={props.selectionContext.previewImageUrl}
-              />
-            )}
-
+            <meta property="og:image" content={previewImageUrl} />
+            <meta property="twitter:image" content={previewImageUrl} />
             {!!previewText && (
               <meta property="og:image:alt" content={previewText} />
-            )}
-            {!!props.selectionContext?.previewImageUrl && (
-              <meta
-                property="twitter:image"
-                content={props.selectionContext.previewImageUrl}
-              />
             )}
             {!!previewText && (
               <meta property="twitter:image:alt" content={previewText} />
