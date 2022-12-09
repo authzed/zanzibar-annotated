@@ -2,6 +2,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Fragment, useEffect, useState } from 'react';
 import { useAnnotation } from './annotation';
+import { gtag } from './GTag';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -40,6 +41,9 @@ export default function AnnotationSetSelect(props: SelectProps) {
     }
     toggleAnnotationSet(value.value);
     setSelected(value);
+    gtag('event', 'annotation_set_selected', {
+      set_id: value.value,
+    });
   };
 
   return (
