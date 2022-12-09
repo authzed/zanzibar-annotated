@@ -1,4 +1,4 @@
-name: cypress
+name: Test
 "on":
   pull_request:
     types:
@@ -9,6 +9,25 @@ name: cypress
     branches:
       - '*'
 jobs:
+  test:
+    name: Test, Lint, Typecheck and Quick-Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14.17.3
+      - uses: bahmutov/npm-install@v1.8.15
+        with:
+          useRollingCache: true
+      - name: Run Yarn tests
+        run: CI=true yarn test
+      - name: Run Yarn lint
+        run: CI=true yarn lint
+      - name: Run TSC Typecheck
+        run: CI=true tsc -p tsconfig.json --noEmit --incremental
+      - name: Run Yarn Build
+        run: CI=true yarn build
   cypress:
     name: Cypress Tests
     runs-on: ubuntu-latest
