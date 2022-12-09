@@ -330,6 +330,11 @@ type HighlightProps = {
   type?: 'inline' | 'paragraph';
 };
 
+type HighlightDisplayOptions = {
+  colorClass: string;
+  cursorClass: string;
+};
+
 /**
  * Component that visually highlights child components and provides annotation content based on the annotation id.
  */
@@ -358,13 +363,19 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
   const annotationId = useMemo(() => {
     return new AnnotationId(setId, entryId);
   }, [setId, entryId]);
-  const bgColorClass = useMemo(() => {
+  const displayOpts: HighlightDisplayOptions = useMemo(() => {
     if (activeAnnotationSetIds.includes(setId)) {
       const set = getAnnotationSet(setId);
-      return set?.highlightColor ?? 'sky';
+      return {
+        colorClass: set?.highlightColor ?? 'sky',
+        cursorClass: 'cursor-pointer',
+      };
     }
 
-    return 'clear';
+    return {
+      colorClass: 'clear',
+      cursorClass: 'cursor-default',
+    };
   }, [getAnnotationSet, setId, activeAnnotationSetIds]);
 
   useEffect(() => {
@@ -396,16 +407,18 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
       <HighlightType>
         <span
           ref={setHighlightRef}
-          className={`bg-${bgColorClass}-100 p-px cursor-pointer
-        ${popperVisible ? `bg-${bgColorClass}-400` : ''}
+          className={`bg-${displayOpts.colorClass}-100 p-px ${
+            displayOpts.cursorClass
+          }
+        ${popperVisible ? `bg-${displayOpts.colorClass}-400` : ''}
         ${
           activeAnnotationId?.equals(setId, entryId)
-            ? `bg-${bgColorClass}-400`
+            ? `bg-${displayOpts.colorClass}-400`
             : ''
         }
         ${
           focusedAnnotationId?.equals(setId, entryId)
-            ? `bg-${bgColorClass}-300`
+            ? `bg-${displayOpts.colorClass}-300`
             : ''
         }
         `}
@@ -440,7 +453,7 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
             referenceRef={highlightRef}
             placement={popperPlacement}
             setVisible={setPopperVisible}
-            colorClass={bgColorClass}
+            colorClass={displayOpts.colorClass}
           />,
           portal
         )}
