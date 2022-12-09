@@ -19,6 +19,7 @@ import popperStyles from '../styles/Popper.module.css';
 import { gtag } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 import { Paragraph } from './markdown';
+import { getPathSegments } from './pathsegments';
 import { ShareButton } from './SelectionShare';
 
 class AnnotationId {
@@ -586,12 +587,15 @@ function Annotation(props: {
   }, [props.annotationId, getAnnotation, content]);
 
   useEffect(() => {
+    const { basePath, pathPrefix } = getPathSegments(window.location.pathname);
     const urlFragment = `#annotations/${encodeURIComponent(
       props.annotationId.setId
     )}/${encodeURIComponent(props.annotationId.entryId)}`;
     // Handle existing URL fragments present
     const origin = new URL(document.URL).origin;
-    const url = new URL(`${origin}${urlFragment}`);
+    const url = new URL(
+      `${location.origin}${basePath ? `/${basePath}` : ''}${urlFragment}`
+    );
     setShareUrl(url.toString());
   }, [props.annotationId]);
 
