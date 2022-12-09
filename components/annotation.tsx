@@ -232,8 +232,10 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       const [prefix, setId, entryId] = parts;
       if (prefix !== '#annotations') return;
 
-      if (setId && allAnnotationSetIds.includes(setId))
+      if (setId && allAnnotationSetIds.includes(setId)) {
         setAnnotationSetActive(setId);
+      }
+
       if (entryId) {
         const annotationId = new AnnotationId(setId, entryId);
         setAnnotationActive(annotationId);

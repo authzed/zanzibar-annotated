@@ -54,8 +54,11 @@ export function getPathSegments(pathname: string): PathSegments {
         selectionId = part;
         pathPrefix = pathParts.pop();
         basePath = pathParts.pop();
+      } else {
+        // <unknown format>
+        // Preserve base path, ignore remainder of path
+        basePath = pathParts[0];
       }
-      // <unknown format>
       break;
     default:
       console.log('Unsupported path format');
