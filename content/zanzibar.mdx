@@ -593,7 +593,7 @@ A <Highlight setId="spicedb" entryId="leopard-index">Leopard index</Highlight> r
 A query evaluates an expression of union, intersection, or exclusion of named sets and returns the result set ordered by the element ID up to a specified number of results.
 
 To index and evaluate group membership, Zanzibar represents group membership with two set types, `GROUP2GROUP` and `MEMBER2GROUP`, which we show here as functions mapping from a set ID to element IDs:
-* $\mathrm{GROUP2GROUP}(s)\rarr{e}$, where $s$ represents anancestor group and $e$ represents a descendent group that is _directly_ or _indirectly_ a sub-group of the ancestor group.
+* $\mathrm{GROUP2GROUP}(s)\rarr{e}$, where $s$ represents ancestor group and $e$ represents a descendent group that is _directly_ or _indirectly_ a sub-group of the ancestor group.
 * $\mathrm{MEMBER2GROUP}(s)\rarr{e}$, where s represents an individual user and $e$ represents a parent group in which the user is a _direct_ member.
 
 To evaluate whether user _U_ is a member of group _G_, we check whether
