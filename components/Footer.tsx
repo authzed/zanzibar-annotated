@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { useMemo } from 'react';
 
 /**
  * Displayed after the last page of the paper.
@@ -7,12 +8,14 @@ export function Footer() {
   const assetUrl = process.env.NEXT_PUBLIC_VERCEL_URL
     ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
     : '';
-
+  const year = useMemo(() => {
+    return new Date().getFullYear();
+  }, []);
   return (
     <>
       <div className="footer w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
         <div>
-          Annotations &copy; 2022{' '}
+          Annotations &copy; {year}{' '}
           <a
             href="https://authzed.com"
             target="_blank"
