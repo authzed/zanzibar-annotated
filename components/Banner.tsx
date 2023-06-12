@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import Image from 'next/image';
 import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -41,15 +40,13 @@ export function Banner(props: { isTopOfContent: boolean }) {
         )}
       >
         <div>
-          <Image
+          {/* Use img to allow resizing */}
+          <img
             src={`${assetUrl}/favicon.svg`}
             className={clsx('transition-all', {
               'h-10': props.isTopOfContent,
               'h-5': !props.isTopOfContent,
             })}
-            alt=""
-            width={40}
-            height={40}
           />
         </div>
         <div className="text-left pl-2 truncate text-ellipsis">
