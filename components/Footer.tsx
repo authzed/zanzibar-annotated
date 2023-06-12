@@ -1,12 +1,21 @@
+import Image from 'next/image';
+import { useMemo } from 'react';
+
 /**
  * Displayed after the last page of the paper.
  */
-export function Footer(props: { baseUrl?: string }) {
+export function Footer() {
+  const assetUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    : '';
+  const year = useMemo(() => {
+    return new Date().getFullYear();
+  }, []);
   return (
     <>
       <div className="footer w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
         <div>
-          Annotations &copy; 2022{' '}
+          Annotations &copy; {year}{' '}
           <a
             href="https://authzed.com"
             target="_blank"
@@ -34,7 +43,12 @@ export function Footer(props: { baseUrl?: string }) {
           rel="noopener"
           className="text-white hover:text-indigo-200 underline"
         >
-          <img src={`${props.baseUrl ?? ''}/authzed-logo.svg`} />
+          <Image
+            src={`${assetUrl}/authzed-logo.svg`}
+            width={140}
+            height={38}
+            alt="AuthZed"
+          />
         </a>
       </div>
     </>

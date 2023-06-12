@@ -1,17 +1,17 @@
 import Head from 'next/head';
 import { PropsWithChildren, useState } from 'react';
-import {
-  AnnotationGroup,
-  AnnotationManagerProvider,
-  NoAnnotationManagerProvider,
-} from './annotation';
 import { Banner } from './Banner';
 import { Container, ContentContainer } from './Container';
 import { Footer } from './Footer';
 import { GTagScript } from './GTag';
 import { HighlightProvidedSelection } from './HighlightProvidedSelection';
-import { RenderingState, useRenderState } from './renderstate';
 import SelectionShare from './SelectionShare';
+import {
+  AnnotationGroup,
+  AnnotationManagerProvider,
+  NoAnnotationManagerProvider,
+} from './annotation';
+import { RenderingState, useRenderState } from './renderstate';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
 
@@ -58,7 +58,7 @@ function getDefaultPreviewImageUrl() {
  */
 export function Layout(props: PropsWithChildren<LayoutProps>) {
   const [isTopOfContent, setIsTopOfContent] = useState(true);
-
+  const assetUrl = `https://${process.env.VERCEL_URL}` ?? '';
   const renderState = useRenderState();
   switch (renderState.state) {
     case RenderingState.FOR_SELECTION:
@@ -110,7 +110,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         <>
           <Head>
             <title>The Google Zanzibar Paper, annotated by AuthZed</title>
-            <link rel="icon" href="/favicon.ico" />
+            <link rel="icon" href={`${assetUrl}/favicon.ico`} />
             <link rel="canonical" href={props.canonicalUrl} />
             <meta
               name="viewport"
@@ -164,9 +164,9 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                 <SelectionShare />
                 {props.children}
               </div>
-              <Footer baseUrl={props.baseUrl} />
+              <Footer />
             </Container>
-            <Banner isTopOfContent={isTopOfContent} baseUrl={props.baseUrl} />
+            <Banner isTopOfContent={isTopOfContent} />
           </AnnotationManagerProvider>
           <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
           <HighlightProvidedSelection
