@@ -6,6 +6,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import withYaml from 'next-plugin-yaml';
 
+const isProd = process.env.NODE_ENV === 'production'
 
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
@@ -23,6 +24,7 @@ export default withYaml(
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     reactStrictMode: true,
     swcMinify: true,
+    assetPrefix: isProd ? `https://${process.env.VERCEL_URL}` : undefined,
     webpack(config) {
       config.module.rules.push({
         test: /\.svg$/,
