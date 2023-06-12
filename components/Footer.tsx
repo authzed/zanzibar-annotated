@@ -1,7 +1,13 @@
+import Image from 'next/image';
+
 /**
  * Displayed after the last page of the paper.
  */
-export function Footer(props: { baseUrl?: string }) {
+export function Footer() {
+  const assetUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    : '';
+
   return (
     <>
       <div className="footer w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
@@ -34,7 +40,12 @@ export function Footer(props: { baseUrl?: string }) {
           rel="noopener"
           className="text-white hover:text-indigo-200 underline"
         >
-          <img src={`${props.baseUrl ?? ''}/authzed-logo.svg`} />
+          <Image
+            src={`${assetUrl}/authzed-logo.svg`}
+            width={140}
+            height={38}
+            alt="AuthZed"
+          />
         </a>
       </div>
     </>

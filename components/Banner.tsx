@@ -1,9 +1,10 @@
 import clsx from 'clsx';
+import Image from 'next/image';
 import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { getAvailableAnnotationSets, useAnnotation } from './annotation';
 import AnnotationSetSelect from './AnnotationSetSelect';
+import { getAvailableAnnotationSets, useAnnotation } from './annotation';
 
 export enum BannerHeights {
   Large = '55px',
@@ -14,10 +15,12 @@ export enum BannerHeights {
  * Banner displayed above the first page of the paper.
  * The annotation set nav bar assumes only one annotation set is active at a time.
  */
-export function Banner(props: { isTopOfContent: boolean; baseUrl?: string }) {
+export function Banner(props: { isTopOfContent: boolean }) {
   const { activeAnnotationSetIds, getAnnotationSet } = useAnnotation();
-
   const availableAnnotationSets = getAvailableAnnotationSets();
+  const assetUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    : '';
 
   const annotationSet = useMemo(() => {
     if (activeAnnotationSetIds.length === 1) {
@@ -38,12 +41,15 @@ export function Banner(props: { isTopOfContent: boolean; baseUrl?: string }) {
         )}
       >
         <div>
-          <img
-            src={`${props.baseUrl ?? ''}/favicon.svg`}
+          <Image
+            src={`${assetUrl}/favicon.svg`}
             className={clsx('transition-all', {
               'h-10': props.isTopOfContent,
               'h-5': !props.isTopOfContent,
             })}
+            alt=""
+            width={40}
+            height={40}
           />
         </div>
         <div className="text-left pl-2 truncate text-ellipsis">
