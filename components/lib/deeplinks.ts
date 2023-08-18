@@ -228,6 +228,11 @@ function getRangeFromFragmentPart(doc: Document, fragmentPart: string): Range {
   } else {
     [[startHash, startOffset], [endHash, endOffset]] = split;
   }
+
+  if (!startOffset || !endOffset) {
+    throw new Error(`Invalid deep link fragment: ${fragmentPart}`);
+  }
+
   [startOffset, endOffset] = [startOffset, endOffset].map(toNumber);
 
   // the boolean represents whether it's a start node (true) or end node (false)
