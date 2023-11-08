@@ -110,7 +110,6 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         <>
           <Head>
             <title>The Google Zanzibar Paper, annotated by AuthZed</title>
-            <link rel="icon" href={`${assetUrl}/favicon.ico`} />
             <link rel="canonical" href={props.canonicalUrl} />
             <meta
               name="viewport"
