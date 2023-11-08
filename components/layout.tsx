@@ -1,19 +1,19 @@
-import Head from 'next/head';
-import { PropsWithChildren, useState } from 'react';
-import { Banner } from './Banner';
-import { Container, ContentContainer } from './Container';
-import { Footer } from './Footer';
-import { GTagScript } from './GTag';
-import { HighlightProvidedSelection } from './HighlightProvidedSelection';
-import SelectionShare from './SelectionShare';
+import Head from "next/head";
+import { PropsWithChildren, useState } from "react";
+import { Banner } from "./Banner";
+import { Container, ContentContainer } from "./Container";
+import { Footer } from "./Footer";
+import { GTagScript } from "./GTag";
+import { HighlightProvidedSelection } from "./HighlightProvidedSelection";
+import SelectionShare from "./SelectionShare";
 import {
   AnnotationGroup,
   AnnotationManagerProvider,
   NoAnnotationManagerProvider,
-} from './annotation';
-import { RenderingState, useRenderState } from './renderstate';
+} from "./annotation";
+import { RenderingState, useRenderState } from "./renderstate";
 
-export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
+export const ANNOTATIONS_PORTAL_CONTAINER_ID = "annotations-root";
 
 const SOCIAL_CARD_COLUMN_WIDTH = 412; // pixels
 const SOCIAL_CARD_COLUMN_PADDING = 8; // pixels
@@ -50,7 +50,7 @@ export type LayoutProps = {
 function getDefaultPreviewImageUrl() {
   return process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}/preview.png`
-    : '/preview.png';
+    : "/preview.png";
 }
 
 /**
@@ -58,7 +58,7 @@ function getDefaultPreviewImageUrl() {
  */
 export function Layout(props: PropsWithChildren<LayoutProps>) {
   const [isTopOfContent, setIsTopOfContent] = useState(true);
-  const assetUrl = `https://${process.env.VERCEL_URL}` ?? '';
+  const assetUrl = `https://${process.env.VERCEL_URL}` ?? "";
   const renderState = useRenderState();
   switch (renderState.state) {
     case RenderingState.FOR_SELECTION:
@@ -80,14 +80,14 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                 SOCIAL_CARD_COLUMN_WIDTH + SOCIAL_CARD_COLUMN_PADDING * 2
               }px`,
               padding: `${SOCIAL_CARD_COLUMN_PADDING}px`,
-              backgroundColor: 'white',
+              backgroundColor: "white",
             }}
           >
             <NoAnnotationManagerProvider>
               {props.children}
             </NoAnnotationManagerProvider>
             <HighlightProvidedSelection
-              options={{ block: 'center', behavior: 'auto' }}
+              options={{ block: "center", behavior: "auto" }}
               skipSelectionMonitoring
               pathPrefix="_render/"
             />
@@ -99,9 +99,9 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
       let previewText: string | undefined = undefined;
       if (props.selectionContext?.previewText) {
         previewText = props.selectionContext.previewText
-          .split('\n')
+          .split("\n")
           .map((l) => `> ${l}`)
-          .join('\n')
+          .join("\n")
           .substring(0, 200);
       }
       const previewImageUrl =
@@ -110,7 +110,6 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         <>
           <Head>
             <title>The Google Zanzibar Paper, annotated by AuthZed</title>
-            <link rel="icon" href={`${assetUrl}/favicon.ico`} />
             <link rel="canonical" href={props.canonicalUrl} />
             <meta
               name="viewport"
@@ -170,7 +169,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           </AnnotationManagerProvider>
           <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
           <HighlightProvidedSelection
-            options={{ block: 'center', behavior: 'smooth' }}
+            options={{ block: "center", behavior: "smooth" }}
             pathPrefix="/"
           />
         </>
