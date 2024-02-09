@@ -63,7 +63,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
   switch (renderState.state) {
     case RenderingState.FOR_SELECTION:
       return (
-        <div className='font-serif'>
+        <div className="font-serif">
           <NoAnnotationManagerProvider>
             {props.children}
           </NoAnnotationManagerProvider>
@@ -74,7 +74,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
       return (
         <>
           <div
-            className='font-serif'
+            className="font-serif"
             style={{
               width: `${
                 SOCIAL_CARD_COLUMN_WIDTH + SOCIAL_CARD_COLUMN_PADDING * 2
@@ -89,7 +89,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
             <HighlightProvidedSelection
               options={{ block: 'center', behavior: 'auto' }}
               skipSelectionMonitoring
-              pathPrefix='_render/'
+              pathPrefix="_render/"
             />
           </div>
         </>
@@ -110,47 +110,47 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         <>
           <Head>
             <title>The Google Zanzibar Paper, annotated by AuthZed</title>
-            <link rel='canonical' href={props.canonicalUrl} />
+            <link rel="canonical" href={props.canonicalUrl} />
             <meta
-              name='viewport'
-              content='width=device-width, initial-scale=1.0'
+              name="viewport"
+              content="width=device-width, initial-scale=1.0"
             />
             <meta
-              name='description'
-              content='Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019.'
+              name="description"
+              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
             />
-            <meta property='og:type' content='website' />
+            <meta property="og:type" content="website" />
             <meta
-              property='og:title'
-              content='The Google Zanzibar Paper, annotated by AuthZed'
+              property="og:title"
+              content="The Google Zanzibar Paper, annotated by AuthZed"
             />
-            <meta property='twitter:card' content='summary_large_image' />
-            <meta property='twitter:site' content='@authzed' />
+            <meta property="twitter:card" content="summary_large_image" />
+            <meta property="twitter:site" content="@authzed" />
             <meta
-              property='twitter:description'
-              content='Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019.'
-            />
-            <meta
-              property='og:description'
-              content='Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019.'
+              property="twitter:description"
+              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
             />
             <meta
-              property='twitter:title'
-              content='The Google Zanzibar Paper, annotated by AuthZed'
+              property="og:description"
+              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
             />
-            <meta property='og:image' content={previewImageUrl} />
-            <meta property='twitter:image' content={previewImageUrl} />
+            <meta
+              property="twitter:title"
+              content="The Google Zanzibar Paper, annotated by AuthZed"
+            />
+            <meta property="og:image" content={previewImageUrl} />
+            <meta property="twitter:image" content={previewImageUrl} />
             {!!previewText && (
-              <meta property='og:image:alt' content={previewText} />
+              <meta property="og:image:alt" content={previewText} />
             )}
             {!!previewText && (
-              <meta property='twitter:image:alt' content={previewText} />
+              <meta property="twitter:image:alt" content={previewText} />
             )}
             {!!props.selectionContext?.previewSection && (
               <>
-                <meta name='twitter:label1' content='Section' />
+                <meta name="twitter:label1" content="Section" />
                 <meta
-                  name='twitter:data1'
+                  name="twitter:data1"
                   content={props.selectionContext.previewSection}
                 />
               </>
@@ -159,7 +159,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           <GTagScript />
           <AnnotationManagerProvider>
             <Container onScrolled={setIsTopOfContent}>
-              <div className='container mx-auto max-w-5xl mt-0 mb-20 font-serif'>
+              <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
                 <SelectionShare />
                 {props.children}
               </div>
@@ -170,7 +170,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
           <HighlightProvidedSelection
             options={{ block: 'center', behavior: 'smooth' }}
-            pathPrefix='/'
+            pathPrefix="/"
           />
         </>
       );
@@ -187,24 +187,24 @@ export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
   }
 
   return (
-    <div className='relative z-100'>
-      <div className='hidden lg:block absolute h-full w-80 -left-[20rem] top-0 z-10'>
+    <div className="relative z-100">
+      <div className="hidden lg:block absolute h-full w-80 -left-[20rem] top-0 z-10">
         <AnnotationGroup
           pageNumber={props.pageNumber}
-          groupId='col-1'
-          orientation='left'
+          groupId="col-1"
+          orientation="left"
         />
       </div>
       <ContentContainer>
-        <div className='md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow z-10'>
+        <div className="md:grid md:grid-cols-2 gap-x-10 p-10 md:p-20 mt-20 break-words bg-white shadow z-10">
           {props.children}
         </div>
       </ContentContainer>
-      <div className='hidden lg:block absolute h-full w-80 -right-[20rem] top-0 z-10'>
+      <div className="hidden lg:block absolute h-full w-80 -right-[20rem] top-0 z-10">
         <AnnotationGroup
           pageNumber={props.pageNumber}
-          groupId='col-2'
-          orientation='right'
+          groupId="col-2"
+          orientation="right"
         />
       </div>
     </div>
@@ -216,7 +216,7 @@ export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
  */
 export function Header(props: PropsWithChildren) {
   return (
-    <div className='header w-3/4 my-10 mx-auto md:col-span-2 text-center'>
+    <div className="header w-3/4 my-10 mx-auto md:col-span-2 text-center">
       {props.children}
     </div>
   );
@@ -226,7 +226,7 @@ export function Header(props: PropsWithChildren) {
  * Page column layout
  */
 export function Column(props: PropsWithChildren) {
-  return <div className='page-column'>{props.children}</div>;
+  return <div className="page-column">{props.children}</div>;
 }
 
 /**
