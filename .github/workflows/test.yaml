@@ -13,7 +13,7 @@ jobs:
     name: Test, Lint, Typecheck and Quick-Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 14.17.3
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     container: cypress/browsers:node14.17.6-chrome100-ff98
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: bahmutov/npm-install@v1.8.15
         with:
           useRollingCache: true
