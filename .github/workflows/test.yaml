@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 14.17.3
+          node-version: 18.18.0
       - uses: bahmutov/npm-install@v1.10.1
         with:
           useRollingCache: true
@@ -31,7 +31,7 @@ jobs:
   cypress:
     name: Cypress Tests
     runs-on: ubuntu-latest
-    container: cypress/browsers:node14.17.6-chrome100-ff98
+    container: cypress/browsers:node-20.11.1-chrome-123.0.6312.58-1-ff-124.0-edge-122.0.2365.92-1
     steps:
       - uses: actions/checkout@v4
       - uses: bahmutov/npm-install@v1.10.1
