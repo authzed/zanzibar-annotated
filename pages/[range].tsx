@@ -18,6 +18,7 @@ export default function Default(props: LayoutProps) {
 }
 
 export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
+  res,
   req,
 }) => {
   const { publicRuntimeConfig } = getConfig();
@@ -61,6 +62,12 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
   const sections = selectionRanges?.map((sr) => {
     return findSection(sr.startContainer);
   });
+
+  // Cache range response for a week, allow stale for a day
+  res.setHeader(
+    'Cache-Control',
+    's-maxage=604800, stale-while-revalidate=86400'
+  );
 
   return {
     props: {
