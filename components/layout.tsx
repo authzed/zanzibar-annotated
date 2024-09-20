@@ -58,7 +58,6 @@ function getDefaultPreviewImageUrl() {
  */
 export function Layout(props: PropsWithChildren<LayoutProps>) {
   const [isTopOfContent, setIsTopOfContent] = useState(true);
-  const assetUrl = `https://${process.env.VERCEL_URL}` ?? '';
   const renderState = useRenderState();
   switch (renderState.state) {
     case RenderingState.FOR_SELECTION:
