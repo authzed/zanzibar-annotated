@@ -154,7 +154,7 @@ groups:
   page-7-col-1:
     staleness:
       content: |
-        This is often surprising to people new to the Zanzibar model: staleness is tolerated, so long as it is "safe" to do so, either via specifying MInimizeLatency or giving a ZedToken with an explicit lower bound.
+        This is often surprising to people new to the Zanzibar model: staleness is tolerated, so long as it is "safe" to do so, either via specifying `minimize_latency` or giving a ZedToken with an explicit lower bound.
 
   page-7-col-2:
     leopard-index:
