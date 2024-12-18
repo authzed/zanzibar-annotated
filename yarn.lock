@@ -7672,10 +7672,10 @@ queue-tick@^1.0.1:
   resolved "https://registry.yarnpkg.com/queue-tick/-/queue-tick-1.0.1.tgz#f6f07ac82c1fd60f82e098b417a80e52f1f4c142"
   integrity sha512-kJt5qhMxoszgU/62PLP1CJytzd2NKetjSRnyuj31fDd3Rlcz3fzlFdFLD1SItunPwyqEOkca6GbV612BWfaBag==
 
-react-click-away-listener@^2.2.3:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/react-click-away-listener/-/react-click-away-listener-2.2.3.tgz#a5c3e37d94cc86dac3546dbb753db14bacb63186"
-  integrity sha512-p63JRQtK9d085+QHUJ2Pje22P/N4tEaXsS2x7tbbptriQqZ9o8xEk7G1JrxwND5YmEVc/VO4fC3+cSBsqqgLUQ==
+react-click-away-listener@^2.2.4:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/react-click-away-listener/-/react-click-away-listener-2.2.4.tgz#0bb69c5d9b456850bb7b8bc2588f8b873970a84a"
+  integrity sha512-cwdiIPt5dlNATewJIj/oro9aHg61vjnpkMzL4TfA3+lY4zNWV6d9PxWDSXFCYlADcb0bnVlGWVFkyY+WzFXznA==
 
 react-dom@18.2.0:
   version "18.2.0"
