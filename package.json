@@ -26,7 +26,7 @@
     "clsx": "^2.1.1",
     "jsdom": "^24.1.1",
     "lodash.debounce": "^4.0.8",
-    "next": "14.2.16",
+    "next": "14.2.21",
     "puppeteer-core": "~22.15.0",
     "react": "18.2.0",
     "react-click-away-listener": "^2.2.4",
