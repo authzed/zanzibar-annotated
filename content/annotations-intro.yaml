@@ -232,7 +232,8 @@ groups:
     namespace-new-enemy:
       content: |
         Here it looks like each `aclserver` is updating and caching versions of the namespace configuration individually by watching a change feed.
-        Interesting to note that this could theoretically lead to a "new-enemy problem" where older versions of a namespace are incorrectly interpreting tuples that were written at a later time.
+        Zanzibar avoids a namespace-based "new-enemy problem", where older versions of a namespace are incorrectly interpreting tuples that were written at a later time, by globally tracking the highest timestamp at which all nodes have the namespace version available.
+        See [§3.2.2](#3.2.2-config-consistency).
 
     voting-replica-write-latency-abroad:
       content: |
