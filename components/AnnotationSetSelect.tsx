@@ -1,4 +1,4 @@
-import { Listbox, Transition } from '@headlessui/react';
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Fragment, useEffect, useState } from 'react';
 import { useAnnotation } from './annotation';
@@ -51,7 +51,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
       {({ open }) => (
         <>
           <div className="relative inline-block">
-            <Listbox.Button className="relative cursor-default rounded border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-0">
+            <ListboxButton className="relative cursor-default rounded border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-0">
               <span
                 className={classNames(
                   selected?.color ? `bg-${selected?.color}-300` : '',
@@ -64,7 +64,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
               <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
                 <ChevronUpDownIcon className="h-5 w-5" aria-hidden="true" />
               </span>
-            </Listbox.Button>
+            </ListboxButton>
 
             <Transition
               show={open}
@@ -73,9 +73,9 @@ export default function AnnotationSetSelect(props: SelectProps) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute w-fit z-10 mt-1 max-h-56 overflow-auto rounded bg-white py-1 right-0 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <ListboxOptions className="absolute w-fit z-10 mt-1 max-h-56 overflow-auto rounded bg-white py-1 right-0 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {props.items.map((item) => (
-                  <Listbox.Option
+                  <ListboxOption
                     key={item.value}
                     className="text-black relative cursor-default select-none py-2 pl-3 pr-9"
                     value={item}
@@ -112,9 +112,9 @@ export default function AnnotationSetSelect(props: SelectProps) {
                         ) : null}
                       </>
                     )}
-                  </Listbox.Option>
+                  </ListboxOption>
                 ))}
-              </Listbox.Options>
+              </ListboxOptions>
             </Transition>
           </div>
         </>
