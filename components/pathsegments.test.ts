@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect, describe, test } from 'vitest';
 import { getPathSegments } from './pathsegments';
 
 test('root path', () => {
