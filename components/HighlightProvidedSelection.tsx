@@ -1,6 +1,5 @@
 import debounce from 'lodash.debounce';
 import { useEffect } from 'react';
-import useDeepCompareEffect from 'use-deep-compare-effect';
 import { isUnderContentContainer } from './Container';
 import { fragmentToRangeList, selectionToFragment } from './lib/deeplinks';
 import { selectRanges, SelectRangesOptions } from './lib/selectranges';
@@ -16,7 +15,7 @@ export function HighlightProvidedSelection(props: {
   const renderState = useRenderState();
   const ranges = renderState.ranges;
 
-  useDeepCompareEffect(() => {
+  useEffect(() => {
     const pathSegments = getPathSegments(window.location.pathname);
 
     if (pathSegments?.selectionId) {

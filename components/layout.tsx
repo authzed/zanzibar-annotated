@@ -12,6 +12,7 @@ import {
   NoAnnotationManagerProvider,
 } from './annotation';
 import { RenderingState, useRenderState } from './renderstate';
+import {SelectRangesOptions} from './lib/selectranges';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
 
@@ -53,6 +54,9 @@ function getDefaultPreviewImageUrl() {
     : '/preview.png';
 }
 
+const forRenderingHighlightOptions = { block: 'center', behavior: 'auto' } satisfies SelectRangesOptions
+const defaultHighlightOptions = { block: 'center', behavior: 'smooth' } satisfies SelectRangesOptions
+
 /**
  * Paper layout
  */
@@ -86,7 +90,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
               {props.children}
             </NoAnnotationManagerProvider>
             <HighlightProvidedSelection
-              options={{ block: 'center', behavior: 'auto' }}
+              options={forRenderingHighlightOptions}
               skipSelectionMonitoring
               pathPrefix="_render/"
             />
@@ -168,7 +172,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           </AnnotationManagerProvider>
           <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
           <HighlightProvidedSelection
-            options={{ block: 'center', behavior: 'smooth' }}
+            options={defaultHighlightOptions}
             pathPrefix="/"
           />
         </>
