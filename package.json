@@ -27,7 +27,7 @@
     "react": "19.1.0",
     "react-click-away-listener": "^2.4.0",
     "react-dom": "19.1.0",
-    "react-markdown": "^9.1.0",
+    "react-markdown": "^10.1.0",
     "react-popper": "^2.3.0",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
