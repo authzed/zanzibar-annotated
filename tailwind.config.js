@@ -12,7 +12,6 @@ module.exports = {
     },
     extend: {},
   },
-  plugins: [require('@tailwindcss/line-clamp')],
   safelist: [
     {
       pattern: /(bg|border|text)-(amber|sky)-(100|200|300|400)/,
