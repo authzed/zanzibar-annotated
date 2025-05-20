@@ -11,7 +11,7 @@ export const getParsedPaperDOM = async (endpoint: string) => {
     return parsedDOM.value;
   }
 
-  const previewEndpointHTML = await (await fetch(`${endpoint}`)).text();
+  const previewEndpointHTML = await (await fetch(endpoint)).text();
 
   const dom = new JSDOM(previewEndpointHTML);
   parsedDOM.value = dom;

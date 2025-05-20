@@ -36,10 +36,10 @@ export function useRenderState() {
     state = RenderingState.FOR_SELECTION;
   }
 
-  return {
+  return useMemo(() => ({
     isForSocialCardRendering: state == RenderingState.FOR_RENDERING,
     isForSelectionRendering: state == RenderingState.FOR_SELECTION,
     ranges: ranges,
     state: state,
-  };
+  }), [ranges, state]);
 }

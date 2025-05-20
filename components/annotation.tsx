@@ -109,20 +109,20 @@ interface AnnotationManagerInterface {
 }
 
 const NoopAnnotationManagerProvider = {
-  getAnnotation: (id: AnnotationId) => {
+  getAnnotation: (_id: AnnotationId) => {
     return undefined;
   },
-  getAnnotationGroup: (setId: string, groupId: string) => [],
-  getAnnotationSet: (setId: string) => undefined,
+  getAnnotationGroup: (_setId: string, _groupId: string) => [],
+  getAnnotationSet: (_setId: string) => undefined,
   activeAnnotationId: undefined,
-  setAnnotationActive: (id: AnnotationId) => {},
-  setAnnotationInactive: (id: AnnotationId) => {},
+  setAnnotationActive: (_id: AnnotationId) => {},
+  setAnnotationInactive: (_id: AnnotationId) => {},
   focusedAnnotationId: undefined,
-  focusAnnotation: (id: AnnotationId) => {},
+  focusAnnotation: (_id: AnnotationId) => {},
   unfocusAnnotation: () => {},
-  setAnnotationSetActive: (setId: string) => {},
-  setAnnotationSetInactive: (setId: string) => {},
-  toggleAnnotationSet: (setId: string) => {},
+  setAnnotationSetActive: (_setId: string) => {},
+  setAnnotationSetInactive: (_setId: string) => {},
+  toggleAnnotationSet: (_setId: string) => {},
   activeAnnotationSetIds: [],
   allAnnotationSetIds: [],
 };
@@ -206,8 +206,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   );
 
   const setAnnotationSetActive = useCallback((setId: string) => {
-    const updated = activeAnnotationSets.concat(setId);
-    setActiveAnnotationSets(updated);
+    setActiveAnnotationSets(prevSets => prevSets.concat(setId));
   }, []);
 
   const setAnnotationSetInactive = (setId: string) => {
@@ -465,26 +464,6 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
   );
 }
 
-// From https://heroicons.dev/?query=x
-function XIcon(props: { className: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className={props.className}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6 18L18 6M6 6l12 12"
-      />
-    </svg>
-  );
-}
-
 /**
  * Annotation
  */
@@ -566,7 +545,6 @@ function Annotation(props: {
     unfocusAnnotation,
     activeAnnotationSetIds,
   } = useAnnotation();
-  const [visible, setVisible] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
   const [content, setContent] = useState('');
   const [shareUrl, setShareUrl] = useState('');
@@ -589,12 +567,11 @@ function Annotation(props: {
   }, [props.annotationId, getAnnotation, content]);
 
   useEffect(() => {
-    const { basePath, pathPrefix } = getPathSegments(window.location.pathname);
+    const { basePath } = getPathSegments(window.location.pathname);
     const urlFragment = `#annotations/${encodeURIComponent(
       props.annotationId.setId
     )}/${encodeURIComponent(props.annotationId.entryId)}`;
     // Handle existing URL fragments present
-    const origin = new URL(document.URL).origin;
     const url = new URL(
       `${location.origin}${basePath ? `/${basePath}` : ''}${urlFragment}`
     );
@@ -622,76 +599,72 @@ function Annotation(props: {
       : 'cursor-auto';
 
   return (
-    <>
-      {visible && (
-        <div
-          className={`annotation mt-4 p-4 z-50
-          bg-white border-t-4 border-${bgColorClass}-400 outline outline-slate-400
-          transition transition-transform ease-in-out duration-[250ms]
-          text-sm
-          ${activeAnnotationId?.equalsId(props.annotationId) ? activeStyle : ''}
-          ${
-            focusedAnnotationId?.equalsId(props.annotationId)
-              ? 'shadow-lg outline-2'
-              : 'outline-1'
-          }
-          ${cursorStyle}
-          ${opacityStyle}
-          `}
-          onClick={() => {
-            setAnnotationActive(props.annotationId);
-            setCollapsed(false);
-          }}
-          onMouseOver={() => focusAnnotation(props.annotationId)}
-          onMouseOut={() => unfocusAnnotation()}
-        >
-          <a id={`annotation-${props.annotationId.key()}`} />
-          <div className={`content ${collapsed ? 'collapsed' : ''}`}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
-              {content}
-            </ReactMarkdown>
-          </div>
-          <div className="toggle relative text-xs mt-4">
-            {collapsed ? (
-              <span className="inline-block mt-2 cursor-pointer">...</span>
-            ) : (
-              <span className="inline-block mt-2 cursor-pointer">&nbsp;</span>
-            )}
-            <span className="ml-2 absolute bottom-0 right-0">
-              <ShareButton
-                type="link"
-                shareUrl={shareUrl}
-                title="Copy share URL to clipboard"
-                className="text-sm p-1 pb-0"
-                iconClassName="w-4 hover:fill-black fill-gray-300"
-                callback={() => (window.location.href = shareUrl)}
-              />
-              <ShareButton
-                title="Tweet this annotation"
-                type="twitter"
-                shareUrl={shareUrl}
-                className="text-sm p-1 pb-0"
-                iconClassName="w-4 hover:fill-black fill-gray-300"
-              />
-              <ShareButton
-                type="hn"
-                title="Post annotation to Hacker News"
-                shareUrl={shareUrl}
-                className="text-sm p-1 pb-0"
-                iconClassName="w-4 hover:fill-black fill-gray-300"
-              />
-              <ShareButton
-                type="reddit"
-                title="Submit on Reddit"
-                shareUrl={shareUrl}
-                className="text-sm p-1 pb-0"
-                iconClassName="w-4 hover:fill-black fill-gray-300"
-              />
-            </span>
-          </div>
-        </div>
-      )}
-    </>
+    <div
+      className={`annotation mt-4 p-4 z-50
+      bg-white border-t-4 border-${bgColorClass}-400 outline outline-slate-400
+      transition transition-transform ease-in-out duration-[250ms]
+      text-sm
+      ${activeAnnotationId?.equalsId(props.annotationId) ? activeStyle : ''}
+      ${
+        focusedAnnotationId?.equalsId(props.annotationId)
+          ? 'shadow-lg outline-2'
+          : 'outline-1'
+      }
+      ${cursorStyle}
+      ${opacityStyle}
+      `}
+      onClick={() => {
+        setAnnotationActive(props.annotationId);
+        setCollapsed(false);
+      }}
+      onMouseOver={() => focusAnnotation(props.annotationId)}
+      onMouseOut={() => unfocusAnnotation()}
+    >
+      <a id={`annotation-${props.annotationId.key()}`} />
+      <div className={`content ${collapsed ? 'collapsed' : ''}`}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
+          {content}
+        </ReactMarkdown>
+      </div>
+      <div className="toggle relative text-xs mt-4">
+        {collapsed ? (
+          <span className="inline-block mt-2 cursor-pointer">...</span>
+        ) : (
+          <span className="inline-block mt-2 cursor-pointer">&nbsp;</span>
+        )}
+        <span className="ml-2 absolute bottom-0 right-0">
+          <ShareButton
+            type="link"
+            shareUrl={shareUrl}
+            title="Copy share URL to clipboard"
+            className="text-sm p-1 pb-0"
+            iconClassName="w-4 hover:fill-black fill-gray-300"
+            callback={() => (window.location.href = shareUrl)}
+          />
+          <ShareButton
+            title="Tweet this annotation"
+            type="twitter"
+            shareUrl={shareUrl}
+            className="text-sm p-1 pb-0"
+            iconClassName="w-4 hover:fill-black fill-gray-300"
+          />
+          <ShareButton
+            type="hn"
+            title="Post annotation to Hacker News"
+            shareUrl={shareUrl}
+            className="text-sm p-1 pb-0"
+            iconClassName="w-4 hover:fill-black fill-gray-300"
+          />
+          <ShareButton
+            type="reddit"
+            title="Submit on Reddit"
+            shareUrl={shareUrl}
+            className="text-sm p-1 pb-0"
+            iconClassName="w-4 hover:fill-black fill-gray-300"
+          />
+        </span>
+      </div>
+    </div>
   );
 }
 

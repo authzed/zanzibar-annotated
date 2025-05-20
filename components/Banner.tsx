@@ -43,6 +43,7 @@ export function Banner(props: { isTopOfContent: boolean }) {
           {/* Use img to allow resizing */}
           <img
             src={`${assetUrl}/favicon.svg`}
+            alt="logo for zanzibar"
             className={clsx('transition-all', {
               'h-10': props.isTopOfContent,
               'h-5': !props.isTopOfContent,

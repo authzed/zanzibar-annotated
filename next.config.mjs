@@ -23,7 +23,6 @@ export default withYaml(
     // Append the default value with md extensions
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     reactStrictMode: true,
-    swcMinify: true,
     assetPrefix: isProd ? `https://${process.env.VERCEL_URL}` : undefined,
     webpack(config) {
       config.module.rules.push({
