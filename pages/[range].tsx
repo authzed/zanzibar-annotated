@@ -7,13 +7,11 @@ import { getParsedPaperDOM } from '../util/parseddom';
 
 export default function Default(props: LayoutProps) {
   return (
-    <>
-      <Zanzibar
-        selectionContext={props.selectionContext}
-        canonicalUrl={props.canonicalUrl}
-        baseUrl={props.baseUrl}
-      />
-    </>
+    <Zanzibar
+      selectionContext={props.selectionContext}
+      canonicalUrl={props.canonicalUrl}
+      baseUrl={props.baseUrl}
+    />
   );
 }
 
