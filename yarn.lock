@@ -1711,10 +1711,10 @@
   dependencies:
     fast-glob "3.3.1"
 
-"@next/mdx@^15.3.4":
-  version "15.3.4"
-  resolved "https://registry.yarnpkg.com/@next/mdx/-/mdx-15.3.4.tgz#1254e37396a5fefec9559be800b787dc1bcb1f00"
-  integrity sha512-Ok4Laq+Yxxu0hPefpE7Yi19dj8BBTIw9/Kf0fbRByn2sYF1cAINFG1EcfcZUy6tZ5ctB8jEtjzixUsKXvFuRXA==
+"@next/mdx@^15.3.5":
+  version "15.4.4"
+  resolved "https://registry.yarnpkg.com/@next/mdx/-/mdx-15.4.4.tgz#5d0adec386d8ee81b5b3d68b9dfb314b3a0d849d"
+  integrity sha512-DB64O/+wlcqr0XrATgGLTk3FqxdOgC035iC4wDlmG2QugNVq7godC6bLhVdNbo9uW7ib0tmgESXcG3JV7l9HiA==
   dependencies:
     source-map "^0.7.0"
 
