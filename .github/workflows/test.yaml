@@ -16,8 +16,9 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
-          node-version: 18.18.0
+          node-version: 24
       - uses: bahmutov/npm-install@v1.10.10
+
         with:
           useRollingCache: true
       - name: Run Yarn tests
