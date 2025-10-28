@@ -26,7 +26,7 @@
     "lodash.debounce": "^4.0.8",
     "next": "15.5.3",
     "puppeteer-core": "^24.20.0",
-    "react": "19.1.1",
+    "react": "19.2.0",
     "react-click-away-listener": "^2.4.0",
     "react-dom": "19.1.1",
     "react-markdown": "^10.1.0",
