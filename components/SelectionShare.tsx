@@ -17,6 +17,7 @@ type VirtualElement = {
 
 type ShareButtonProps = {
   callback?: () => void;
+  onError?: () => void;
   title: string;
   type: 'link' | 'twitter' | 'reddit' | 'hn';
   shareUrl: string;
@@ -28,6 +29,7 @@ type ShareButtonProps = {
 export function ShareButton(props: ShareButtonProps) {
   const {
     callback,
+    onError,
     title,
     type,
     shareUrl,
@@ -44,12 +46,50 @@ export function ShareButton(props: ShareButtonProps) {
   };
 
   const shareFuncs = {
-    link: () => {
-      navigator.clipboard.writeText(shareUrl);
+    link: async () => {
+      const copyWithFallback = (): boolean => {
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        let success = false;
+        try {
+          success = document.execCommand('copy');
+        } catch {
+          success = false;
+        }
+        document.body.removeChild(textArea);
+        return success;
+      };
 
-      gtag('event', 'selection_share_clipboard', {
-        share_url: shareUrl,
-      });
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+        } else if (!copyWithFallback()) {
+          return false;
+        }
+
+        gtag('event', 'selection_share_clipboard', {
+          share_url: shareUrl,
+        });
+
+        return true;
+      } catch (err) {
+        // Clipboard API can fail on permissions or non-secure contexts
+        console.warn('Clipboard API failed, trying fallback:', err);
+        if (copyWithFallback()) {
+          gtag('event', 'selection_share_clipboard', {
+            share_url: shareUrl,
+          });
+          return true;
+        }
+        console.error('Failed to copy to clipboard:', err);
+        return false;
+      }
     },
     twitter: () => {
       window.open(
@@ -95,9 +135,18 @@ export function ShareButton(props: ShareButtonProps) {
     },
   };
 
-  const onClick = () => {
-    shareFuncs[type]();
-    callback && callback();
+  const onClick = async () => {
+    if (type === 'link') {
+      const success = await shareFuncs.link();
+      if (success) {
+        callback?.();
+      } else {
+        onError?.();
+      }
+    } else {
+      shareFuncs[type]();
+      callback?.();
+    }
   };
 
   const Icon = icons[type];
@@ -184,6 +233,9 @@ function SelectionShare() {
                   className="popper-button border-l-0"
                   iconClassName="popper-icon"
                   callback={() => setStatusMsg('URL copied to your clipboard!')}
+                  onError={() =>
+                    setStatusMsg("Couldn't copy URL. Try selecting it manually.")
+                  }
                   title="Copy share URL to clipboard"
                 />
                 <ShareButton
