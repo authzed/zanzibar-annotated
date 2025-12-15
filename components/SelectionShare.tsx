@@ -18,6 +18,7 @@ type VirtualElement = {
 
 type ShareButtonProps = {
   callback?: () => void;
+  onError?: () => void;
   title: string;
   type: "link" | "twitter" | "reddit" | "hn";
   shareUrl: string;
@@ -29,6 +30,7 @@ type ShareButtonProps = {
 export function ShareButton(props: ShareButtonProps) {
   const {
     callback,
+    onError,
     title,
     type,
     shareUrl,
@@ -141,10 +143,16 @@ export function ShareButton(props: ShareButtonProps) {
   };
 
   const onClick = async () => {
-    const result = await shareFuncs[type]();
-    // Only call callback for link type if copy succeeded, always for others
-    if (type !== "link" || result !== false) {
-      callback && callback();
+    if (type === "link") {
+      const success = await shareFuncs.link();
+      if (success) {
+        callback?.();
+      } else {
+        onError?.();
+      }
+    } else {
+      shareFuncs[type]();
+      callback?.();
     }
   };
 
@@ -231,6 +239,11 @@ function SelectionShare() {
                   className={`${popperStyles.button} border-l-0`}
                   iconClassName={popperStyles.icon}
                   callback={() => setStatusMsg("URL copied to your clipboard!")}
+                  onError={() =>
+                    setStatusMsg(
+                      "Couldn't copy URL. Try selecting it manually.",
+                    )
+                  }
                   title="Copy share URL to clipboard"
                 />
                 <ShareButton
