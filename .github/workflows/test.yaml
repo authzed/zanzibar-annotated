@@ -13,11 +13,11 @@ jobs:
     name: Test, Lint, Typecheck and Quick-Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
-      - uses: bahmutov/npm-install@v1.10.10
+      - uses: bahmutov/npm-install@v1.11.2
 
         with:
           useRollingCache: true
@@ -34,11 +34,11 @@ jobs:
     runs-on: ubuntu-latest
     container: cypress/browsers:node-20.11.1-chrome-123.0.6312.58-1-ff-124.0-edge-122.0.2365.92-1
     steps:
-      - uses: actions/checkout@v5
-      - uses: bahmutov/npm-install@v1.10.10
+      - uses: actions/checkout@v6
+      - uses: bahmutov/npm-install@v1.11.2
         with:
           useRollingCache: true
-      - uses: cypress-io/github-action@v6
+      - uses: cypress-io/github-action@v7
         with:
           install: "false"
           browser: chrome
@@ -47,12 +47,12 @@ jobs:
           config-file: cypress.config.ts
         env:
           PREVIEW_ENDPOINT: "http://localhost:3000"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: ${{ failure() }}
         with:
           name: cypress-screenshots
           path: ./cypress/screenshots
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: ${{ failure() }}
         with:
           name: cypress-videos
