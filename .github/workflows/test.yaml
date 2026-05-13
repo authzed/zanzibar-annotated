@@ -13,31 +13,35 @@ jobs:
     name: Test, Lint, Typecheck and Quick-Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
-      - uses: bahmutov/npm-install@v1.10.10
-
+      - uses: "pnpm/action-setup@v6"
         with:
-          useRollingCache: true
+          cache: true
+          run_install: true
       - name: Run Yarn tests
-        run: CI=true yarn test
+        run: pnpm test
       - name: Run Yarn lint
-        run: CI=true yarn lint
+        run: pnpm lint
       - name: Run TSC Typecheck
-        run: CI=true tsc -p tsconfig.json --noEmit --incremental
+        run: pnpm tsc --noEmit --incremental
       - name: Run Yarn Build
-        run: CI=true yarn build
+        run: pnpm build
   cypress:
     name: Cypress Tests
     runs-on: ubuntu-latest
     container: cypress/browsers:node-20.11.1-chrome-123.0.6312.58-1-ff-124.0-edge-122.0.2365.92-1
     steps:
-      - uses: actions/checkout@v5
-      - uses: bahmutov/npm-install@v1.10.10
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          useRollingCache: true
+          node-version: 24
+      - uses: "pnpm/action-setup@v6"
+        with:
+          cache: true
+          run_install: true
       - uses: cypress-io/github-action@v6
         with:
           install: "false"
