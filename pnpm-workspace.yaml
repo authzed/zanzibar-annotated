@@ -1,0 +1,4 @@
+allowBuilds:
+  cypress: true
+  esbuild: true
+  sharp: false
