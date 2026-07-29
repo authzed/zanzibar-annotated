@@ -156,13 +156,17 @@ const realHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await browser.close();
 
+  if (req.query.debugJson) {
+    res.status(200).json({
+      diag,
+      rescroll,
+      consoleMessages: consoleMessages.slice(0, 20),
+    });
+    return res;
+  }
+
   res.setHeader('Content-Type', 'image/png');
   res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Debug-Diag', JSON.stringify({ ...diag, ...rescroll }));
-  res.setHeader(
-    'X-Debug-Console',
-    JSON.stringify(consoleMessages.slice(0, 20))
-  );
   res.send(result);
 };
 
