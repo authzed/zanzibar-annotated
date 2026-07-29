@@ -73,10 +73,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const renderURL = `${endpoint}/_render/${ranges}`;
   console.log(renderURL);
+  const consoleMessages: string[] = [];
+  page.on('console', (msg) => consoleMessages.push(msg.text()));
+  page.on('pageerror', (err) => consoleMessages.push(`pageerror: ${err}`));
   await page.goto(renderURL);
 
   await page.waitForFunction('!!window._scrolled', {
     timeout: 1000,
+  });
+
+  const diag = await page.evaluate(() => {
+    const body = document.body;
+    const rect = body.getBoundingClientRect();
+    return {
+      bodyTextLength: body.innerText?.length ?? -1,
+      bodyHTMLLength: body.innerHTML?.length ?? -1,
+      scrollY: window.scrollY,
+      bodyRect: { width: rect.width, height: rect.height },
+      bodyBg: getComputedStyle(body).backgroundColor,
+      fontsReady: document.fonts.status,
+    };
   });
 
   const result = await page.screenshot({
@@ -88,8 +104,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await browser.close();
 
   res.setHeader('Content-Type', 'image/png');
-  res.setHeader('Cache-Control', `max-age=${MAX_AGE}, public`);
-  res.setHeader('Cache-Control', `s-maxage=${MAX_AGE}`);
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Debug-Diag', JSON.stringify(diag));
+  res.setHeader(
+    'X-Debug-Console',
+    JSON.stringify(consoleMessages.slice(0, 20))
+  );
   res.send(result);
 };
 
