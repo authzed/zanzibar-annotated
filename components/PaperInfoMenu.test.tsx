@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { posthogJsMockFactory } from '../test/mockPosthog';
 
-vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
+vi.mock('posthog-js', () => posthogJsMockFactory());
 
 import posthog from 'posthog-js';
 import { PaperInfoMenu } from './PaperInfoMenu';

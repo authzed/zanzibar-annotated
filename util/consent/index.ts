@@ -6,7 +6,6 @@
 export {
   readConsentCookie,
   parseConsentCookie,
-  consentedIdentify,
   shouldOptOutCapturing,
   CONSENT_COOKIE_NAME,
 } from './storage';

@@ -239,6 +239,11 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
 
       if (entryId) {
         const annotationId = new AnnotationId(setId, entryId);
+        // Same pre-existing set-state-in-effect pattern as
+        // setAnnotationSetActive(setId) above: ESLint only flags the first
+        // setState call it finds per effect, so this one needs its own
+        // explicit disable too.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setAnnotationActive(annotationId);
         const timer = setTimeout(() => {
           const el = document.getElementById(
@@ -253,6 +258,8 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
     }
 
     // Default annotation set
+    // Same pre-existing set-state-in-effect pattern as above in this effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAnnotationSetActive('intro');
   }, [setAnnotationSetActive, setAnnotationActive]);
 
@@ -402,7 +409,8 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
       el.setAttribute('id', portalId);
       annotationsRoot.appendChild(el);
     }
-    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPortal(el);
 
@@ -503,9 +511,13 @@ function AnnotationPopper(props: {
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
-      // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+      // Same pre-existing set-state-in-effect pattern as above (see
+      // AnnotationManagerProvider's URL-fragment effect near the top of this file).
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(annotation.title ?? '');
+      // Same pattern; ESLint only flags the first setState call it finds
+      // per effect, so this one needs its own explicit disable too.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setContent(annotation.content);
     }
   }, [props.annotationId, getAnnotation, setTitle, setContent]);
@@ -572,7 +584,8 @@ function Annotation(props: {
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
-      // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+      // Same pre-existing set-state-in-effect pattern as above (see
+      // AnnotationManagerProvider's URL-fragment effect near the top of this file).
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setContent(annotation.content);
     }
@@ -587,14 +600,16 @@ function Annotation(props: {
     const url = new URL(
       `${location.origin}${basePath ? `/${basePath}` : ''}${urlFragment}`
     );
-    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setShareUrl(url.toString());
   }, [props.annotationId]);
 
   useEffect(() => {
     // Auto expand/collapse
-    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCollapsed(!activeAnnotationId?.equalsId(props.annotationId));
   }, [props.annotationId, activeAnnotationId]);
@@ -707,7 +722,8 @@ export function AnnotationGroup(props: {
       annotations.push(...group);
     });
 
-    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setGroupData(annotations);
   }, [

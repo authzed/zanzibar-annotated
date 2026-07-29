@@ -1,8 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { posthogJsMockFactory } from '../test/mockPosthog';
 
 vi.mock('./layout', () => ({ ANNOTATIONS_PORTAL_CONTAINER_ID: 'annotations-root' }));
-vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
+vi.mock('posthog-js', () => posthogJsMockFactory());
 vi.mock('./SelectionShare', () => ({
   ShareButton: () => null,
 }));

@@ -10,12 +10,10 @@ export function readConsentCookie(): ConsentPreferences | null {
   if (!raw) return null;
 
   try {
-    const parsed = JSON.parse(raw);
-    if (parsed.version === COOKIE_VERSION) return parsed as ConsentPreferences;
+    return validateParsedCookie(JSON.parse(raw));
   } catch {
-    // invalid cookie
+    return null;
   }
-  return null;
 }
 
 export function parseConsentCookie(
@@ -23,26 +21,27 @@ export function parseConsentCookie(
 ): ConsentPreferences | null {
   if (!rawValue) return null;
   try {
-    const parsed = JSON.parse(decodeURIComponent(rawValue));
-    if (parsed.version === COOKIE_VERSION) return parsed as ConsentPreferences;
+    return validateParsedCookie(JSON.parse(decodeURIComponent(rawValue)));
   } catch {
-    // invalid cookie
+    return null;
+  }
+}
+
+// Shared by readConsentCookie/parseConsentCookie: both JSON.parse a raw
+// cookie value differently (document.cookie vs. an already-extracted raw
+// string) but need identical version validation afterward.
+function validateParsedCookie(parsed: unknown): ConsentPreferences | null {
+  if (
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    (parsed as { version?: unknown }).version === COOKIE_VERSION
+  ) {
+    return parsed as ConsentPreferences;
   }
   return null;
 }
 
 export const CONSENT_COOKIE_NAME = COOKIE_NAME;
-
-export function consentedIdentify(
-  ph: { identify: (id: string, props?: Record<string, unknown>) => void },
-  distinctId: string,
-  properties?: Record<string, unknown>
-): void {
-  const consent = readConsentCookie();
-  if (consent?.statistics) {
-    ph.identify(distinctId, properties);
-  }
-}
 
 export function shouldOptOutCapturing(isEU: boolean): boolean {
   const consent = readConsentCookie();

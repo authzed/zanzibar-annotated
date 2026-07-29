@@ -1,8 +1,9 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { posthogJsMockFactory } from '../test/mockPosthog';
 
-vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
+vi.mock('posthog-js', () => posthogJsMockFactory());
 
 import posthog from 'posthog-js';
 import SelectionShare, { ShareButton } from './SelectionShare';
@@ -15,15 +16,37 @@ describe('ShareButton', () => {
 
   it('copies the URL and fires selection_share_clipboard on link click', async () => {
     const writeText = vi.fn();
-    Object.assign(navigator, { clipboard: { writeText } });
-
-    render(<ShareButton type="link" shareUrl="https://zanzibar.tech/x" title="Copy" />);
-    await userEvent.click(screen.getByTitle('Copy'));
-
-    expect(writeText).toHaveBeenCalledWith('https://zanzibar.tech/x');
-    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_selection_share_clipboard', {
-      share_url: 'https://zanzibar.tech/x',
+    // jsdom doesn't implement the Clipboard API by default, so
+    // `navigator.clipboard` has no own or prototype property to begin with
+    // (verified: `Object.getOwnPropertyDescriptor(navigator, 'clipboard')` is
+    // `undefined` before this runs). Save whatever *is* there (nothing, in
+    // practice) and restore it in this test's own try/finally -- the shared
+    // `afterEach(() => { vi.restoreAllMocks(); vi.clearAllMocks(); })` above
+    // only undoes `vi.spyOn`/`vi.fn` mocks, not this direct property
+    // mutation, so without this the stub would otherwise leak into every
+    // later test in this file.
+    const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+      writable: true,
     });
+
+    try {
+      render(<ShareButton type="link" shareUrl="https://zanzibar.tech/x" title="Copy" />);
+      await userEvent.click(screen.getByTitle('Copy'));
+
+      expect(writeText).toHaveBeenCalledWith('https://zanzibar.tech/x');
+      expect(posthog.capture).toHaveBeenCalledWith('zanzibar_selection_share_clipboard', {
+        share_url: 'https://zanzibar.tech/x',
+      });
+    } finally {
+      if (originalClipboard) {
+        Object.defineProperty(navigator, 'clipboard', originalClipboard);
+      } else {
+        delete (navigator as { clipboard?: unknown }).clipboard;
+      }
+    }
   });
 
   it('opens a Twitter intent and fires selection_share_twitter on twitter click', async () => {
