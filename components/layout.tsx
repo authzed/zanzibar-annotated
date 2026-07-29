@@ -3,7 +3,7 @@ import { PropsWithChildren, useState } from 'react';
 import { Banner } from './Banner';
 import { Container, ContentContainer } from './Container';
 import { Footer } from './Footer';
-import { GTagScript } from './GTag';
+import { ExternalScripts } from './ExternalScripts';
 import { HighlightProvidedSelection } from './HighlightProvidedSelection';
 import SelectionShare from './SelectionShare';
 import {
@@ -159,7 +159,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
               </>
             )}
           </Head>
-          <GTagScript />
+          <ExternalScripts />
           <AnnotationManagerProvider>
             <Container onScrolled={setIsTopOfContent}>
               <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">

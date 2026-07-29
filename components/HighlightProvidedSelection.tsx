@@ -16,17 +16,11 @@ export function HighlightProvidedSelection(props: {
   const ranges = renderState.ranges;
 
   useEffect(() => {
-    const pathSegments = getPathSegments(window.location.pathname);
-
-    if (pathSegments?.selectionId) {
-      const selectionRanges = fragmentToRangeList(
-        document,
-        pathSegments.selectionId
-      );
-      selectRanges(selectionRanges, props.options);
-      return;
-    }
-
+    // Checked first: `ranges` (sourced from the `_render` page's query param)
+    // signals social-card/OG-image rendering, which must set `_scrolled` so
+    // the screenshotting API knows the selection has been applied. A URL's
+    // colon-containing path segment (e.g. `/_render/<range>`) would otherwise
+    // also match the selectionId branch below and return before that flag is set.
     if (ranges !== undefined && ranges.length > 0) {
       try {
         const selectionRanges = fragmentToRangeList(document, ranges[0]);
@@ -35,6 +29,16 @@ export function HighlightProvidedSelection(props: {
       } catch (e) {
         // Ignore.
       }
+      return;
+    }
+
+    const pathSegments = getPathSegments(window.location.pathname);
+    if (pathSegments?.selectionId) {
+      const selectionRanges = fragmentToRangeList(
+        document,
+        pathSegments.selectionId
+      );
+      selectRanges(selectionRanges, props.options);
       return;
     }
   }, [ranges, props.pathPrefix, props.options]);

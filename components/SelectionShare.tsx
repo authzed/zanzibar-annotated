@@ -9,7 +9,7 @@ import RedditIcon from '../content/RedditIcon.svg';
 import TwitterIcon from '../content/TwitterIcon.svg';
 import popperStyles from '../styles/Popper.module.css';
 import { isUnderContentContainer } from './Container';
-import { gtag } from './GTag';
+import posthog from 'posthog-js';
 
 type VirtualElement = {
   getBoundingClientRect: () => DOMRect;
@@ -48,7 +48,7 @@ export function ShareButton(props: ShareButtonProps) {
     link: () => {
       navigator.clipboard.writeText(shareUrl);
 
-      gtag('event', 'selection_share_clipboard', {
+      posthog.capture('zanzibar_selection_share_clipboard', {
         share_url: shareUrl,
       });
     },
@@ -62,7 +62,7 @@ export function ShareButton(props: ShareButtonProps) {
         '_blank'
       );
 
-      gtag('event', 'selection_share_twitter', {
+      posthog.capture('zanzibar_selection_share_twitter', {
         share_url: shareUrl,
       });
     },
@@ -76,7 +76,7 @@ export function ShareButton(props: ShareButtonProps) {
         '_blank'
       );
 
-      gtag('event', 'selection_share_reddit', {
+      posthog.capture('zanzibar_selection_share_reddit', {
         share_url: shareUrl,
       });
     },
@@ -90,7 +90,7 @@ export function ShareButton(props: ShareButtonProps) {
         '_blank'
       );
 
-      gtag('event', 'selection_share_hn', {
+      posthog.capture('zanzibar_selection_share_hn', {
         share_url: shareUrl,
       });
     },
@@ -140,7 +140,7 @@ function SelectionShare() {
           setShareUrl(document.URL);
           setStatusMsg('');
 
-          gtag('event', 'selection_share_viewed', {
+          posthog.capture('zanzibar_selection_share_viewed', {
             share_url: document.URL,
             selection_length: range.toString().length,
           });

@@ -24,6 +24,18 @@ PREVIEW_ENDPOINT=http://localhost:3000 yarn run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the paper.
 
+### Environment Variables
+
+Optional for local development, but required in Vercel project settings for the consent-gated analytics to run in production. Every one of these degrades silently to a no-op if unset:
+
+```bash
+NEXT_PUBLIC_VERCEL_ENV=production   # Gates all analytics/consent code below; only "production" activates it
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX      # Google Tag Manager container ID -- match authzed/web's container
+NEXT_PUBLIC_POSTHOG_KEY=phc_...     # PostHog project API key -- shared "Web+Cloud" PostHog project
+NEXT_PUBLIC_POSTHOG_HOST=https://us.posthog.com   # PostHog ingestion host
+NEXT_PUBLIC_HUBSPOT_ID=1234567      # Optional: HubSpot tracking script portal ID
+```
+
 ## Overview
 
 The paper is presented by a reader app developed using the [NextJS] framework, [Tailwind CSS] for styling, and [MDX] for markdown integration in React.

@@ -39,3 +39,9 @@ next-env.d.ts
 cypress/screenshots/*
 cypress/videos/*
 cypress/downloads/*
+
+# superpowers subagent-driven-development scratch workspace
+.superpowers/
+
+# superpowers spec/plan docs (kept local only, not committed)
+docs/superpowers/

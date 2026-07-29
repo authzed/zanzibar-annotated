@@ -16,7 +16,7 @@ import remarkGfm from 'remark-gfm';
 import annotationsIntro from '../content/annotations-intro.yaml';
 import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
 import popperStyles from '../styles/Popper.module.css';
-import { gtag } from './GTag';
+import posthog from 'posthog-js';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 import { Paragraph } from './markdown';
 import { getPathSegments } from './pathsegments';
@@ -217,7 +217,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   const setAnnotationActive = useCallback((id: AnnotationId) => {
     setActiveAnnotationId(id);
 
-    gtag('event', 'annotation_active', {
+    posthog.capture('zanzibar_annotation_active', {
       set_id: id.setId,
       entry_id: id.entryId,
     });
@@ -232,11 +232,20 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       if (prefix !== '#annotations') return;
 
       if (setId && allAnnotationSetIds.includes(setId)) {
+        // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setAnnotationSetActive(setId);
       }
 
       if (entryId) {
         const annotationId = new AnnotationId(setId, entryId);
+        // Same set-state-in-effect pattern as setAnnotationSetActive(setId)
+        // above. ESLint's react-hooks/set-state-in-effect rule only ever
+        // reports the first setState call it finds per effect, so this line
+        // isn't independently flagged today -- no disable directive here
+        // (it would be reported as unused). If the call above is ever
+        // removed or reordered, this line may need its own disable comment
+        // added at that point.
         setAnnotationActive(annotationId);
         const timer = setTimeout(() => {
           const el = document.getElementById(
@@ -250,7 +259,12 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       return;
     }
 
-    // Default annotation set
+    // Default annotation set. Same set-state-in-effect pattern as above in
+    // this effect. ESLint only ever reports the first setState call it
+    // finds per effect, so this line isn't independently flagged today --
+    // no disable directive here (it would be reported as unused). If an
+    // earlier call in this effect is ever removed or reordered, this line
+    // may need its own disable comment added at that point.
     setAnnotationSetActive('intro');
   }, [setAnnotationSetActive, setAnnotationActive]);
 
@@ -265,6 +279,10 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
         setAnnotationInactive: (id: AnnotationId) => {
           if (activeAnnotationId?.equalsId(id)) {
             setActiveAnnotationId(undefined);
+            posthog.capture('zanzibar_annotation_inactive', {
+              set_id: id.setId,
+              entry_id: id.entryId,
+            });
           }
         },
         focusedAnnotationId,
@@ -396,6 +414,9 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
       el.setAttribute('id', portalId);
       annotationsRoot.appendChild(el);
     }
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPortal(el);
 
     return () => {
@@ -495,7 +516,17 @@ function AnnotationPopper(props: {
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
+      // Same pre-existing set-state-in-effect pattern as above (see
+      // AnnotationManagerProvider's URL-fragment effect near the top of this file).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(annotation.title ?? '');
+      // Same set-state-in-effect pattern as setTitle above. ESLint's
+      // react-hooks/set-state-in-effect rule only ever reports the first
+      // setState call it finds per effect, so this line isn't independently
+      // flagged today -- no disable directive here (it would be reported as
+      // unused). If setTitle's call above is ever removed or reordered,
+      // this line becomes the first setState call in the effect and will
+      // need its own eslint-disable-next-line at that point.
       setContent(annotation.content);
     }
   }, [props.annotationId, getAnnotation, setTitle, setContent]);
@@ -562,6 +593,9 @@ function Annotation(props: {
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
+      // Same pre-existing set-state-in-effect pattern as above (see
+      // AnnotationManagerProvider's URL-fragment effect near the top of this file).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setContent(annotation.content);
     }
   }, [props.annotationId, getAnnotation, content]);
@@ -575,11 +609,17 @@ function Annotation(props: {
     const url = new URL(
       `${location.origin}${basePath ? `/${basePath}` : ''}${urlFragment}`
     );
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShareUrl(url.toString());
   }, [props.annotationId]);
 
   useEffect(() => {
     // Auto expand/collapse
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCollapsed(!activeAnnotationId?.equalsId(props.annotationId));
   }, [props.annotationId, activeAnnotationId]);
 
@@ -691,6 +731,9 @@ export function AnnotationGroup(props: {
       annotations.push(...group);
     });
 
+    // Same pre-existing set-state-in-effect pattern as above (see
+    // AnnotationManagerProvider's URL-fragment effect near the top of this file).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGroupData(annotations);
   }, [
     props.groupId,

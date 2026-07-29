@@ -2,7 +2,7 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Transition } fro
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Fragment, useEffect, useState } from 'react';
 import { useAnnotation } from './annotation';
-import { gtag } from './GTag';
+import posthog from 'posthog-js';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -28,6 +28,9 @@ export default function AnnotationSetSelect(props: SelectProps) {
 
   useEffect(() => {
     if (activeAnnotationSetIds.length === 1) {
+      // Same pre-existing set-state-in-effect pattern as above (see
+      // components/annotation.tsx's AnnotationManagerProvider URL-fragment effect).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelected(
         props.items.find((item) => item.value === activeAnnotationSetIds[0])
       );
@@ -41,7 +44,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
     }
     toggleAnnotationSet(value.value);
     setSelected(value);
-    gtag('event', 'annotation_set_selected', {
+    posthog.capture('zanzibar_annotation_set_selected', {
       set_id: value.value,
     });
   };
