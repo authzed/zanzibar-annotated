@@ -61,7 +61,7 @@ const realHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           // binary @sparticuz/chromium ships does not support and silently
           // fails to paint under, producing blank screenshots.
           args: puppeteer.defaultArgs({
-            args: chromium.args.filter((a) => a !== '--single-process'),
+            args: chromium.args,
             headless: 'shell',
           }),
           executablePath,
