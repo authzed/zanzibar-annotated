@@ -21,6 +21,7 @@ const yamlPlugin: VitePlugin = {
 };
 
 export default defineConfig({
+  esbuild: { jsx: 'automatic' },
   plugins: [yamlPlugin],
   test: {
     environment: 'jsdom',
