@@ -19,8 +19,13 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
   req,
 }) => {
   let endpoint = process.env.PREVIEW_ENDPOINT;
-  if (!endpoint) {
+  if (!endpoint && process.env.VERCEL_URL) {
     endpoint = `https://${process.env.VERCEL_URL}`;
+  }
+  // Local dev fallback: neither PREVIEW_ENDPOINT nor VERCEL_URL is set
+  // (VERCEL_URL is only populated by Vercel's own deployment infrastructure).
+  if (!endpoint) {
+    endpoint = 'http://localhost:3000';
   }
 
   let fragment = undefined;
