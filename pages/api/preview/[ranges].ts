@@ -24,6 +24,17 @@ const isProd = process.env.NODE_ENV === 'production';
 const MAX_AGE = 31536000;
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    return await realHandler(req, res);
+  } catch (e) {
+    res.status(500).json({
+      debugError: e instanceof Error ? e.stack ?? e.message : String(e),
+    });
+    return res;
+  }
+};
+
+const realHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ranges } = req.query;
   if (!ranges?.includes(':')) {
     const filePath = path.resolve('.', 'assets/empty.png');
