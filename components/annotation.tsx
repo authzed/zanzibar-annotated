@@ -239,11 +239,13 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
 
       if (entryId) {
         const annotationId = new AnnotationId(setId, entryId);
-        // Same pre-existing set-state-in-effect pattern as
-        // setAnnotationSetActive(setId) above: ESLint only flags the first
-        // setState call it finds per effect, so this one needs its own
-        // explicit disable too.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+        // Same set-state-in-effect pattern as setAnnotationSetActive(setId)
+        // above. ESLint's react-hooks/set-state-in-effect rule only ever
+        // reports the first setState call it finds per effect, so this line
+        // isn't independently flagged today -- no disable directive here
+        // (it would be reported as unused). If the call above is ever
+        // removed or reordered, this line may need its own disable comment
+        // added at that point.
         setAnnotationActive(annotationId);
         const timer = setTimeout(() => {
           const el = document.getElementById(
@@ -257,9 +259,12 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       return;
     }
 
-    // Default annotation set
-    // Same pre-existing set-state-in-effect pattern as above in this effect.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // Default annotation set. Same set-state-in-effect pattern as above in
+    // this effect. ESLint only ever reports the first setState call it
+    // finds per effect, so this line isn't independently flagged today --
+    // no disable directive here (it would be reported as unused). If an
+    // earlier call in this effect is ever removed or reordered, this line
+    // may need its own disable comment added at that point.
     setAnnotationSetActive('intro');
   }, [setAnnotationSetActive, setAnnotationActive]);
 
@@ -515,9 +520,13 @@ function AnnotationPopper(props: {
       // AnnotationManagerProvider's URL-fragment effect near the top of this file).
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(annotation.title ?? '');
-      // Same pattern; ESLint only flags the first setState call it finds
-      // per effect, so this one needs its own explicit disable too.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // Same set-state-in-effect pattern as setTitle above. ESLint's
+      // react-hooks/set-state-in-effect rule only ever reports the first
+      // setState call it finds per effect, so this line isn't independently
+      // flagged today -- no disable directive here (it would be reported as
+      // unused). If setTitle's call above is ever removed or reordered,
+      // this line becomes the first setState call in the effect and will
+      // need its own eslint-disable-next-line at that point.
       setContent(annotation.content);
     }
   }, [props.annotationId, getAnnotation, setTitle, setContent]);
