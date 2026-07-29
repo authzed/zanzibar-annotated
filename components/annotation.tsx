@@ -16,7 +16,7 @@ import remarkGfm from 'remark-gfm';
 import annotationsIntro from '../content/annotations-intro.yaml';
 import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
 import popperStyles from '../styles/Popper.module.css';
-import { gtag } from './GTag';
+import posthog from 'posthog-js';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 import { Paragraph } from './markdown';
 import { getPathSegments } from './pathsegments';
@@ -217,7 +217,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   const setAnnotationActive = useCallback((id: AnnotationId) => {
     setActiveAnnotationId(id);
 
-    gtag('event', 'annotation_active', {
+    posthog.capture('annotation_active', {
       set_id: id.setId,
       entry_id: id.entryId,
     });
@@ -267,6 +267,10 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
         setAnnotationInactive: (id: AnnotationId) => {
           if (activeAnnotationId?.equalsId(id)) {
             setActiveAnnotationId(undefined);
+            posthog.capture('annotation_inactive', {
+              set_id: id.setId,
+              entry_id: id.entryId,
+            });
           }
         },
         focusedAnnotationId,

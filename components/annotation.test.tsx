@@ -2,12 +2,12 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('./layout', () => ({ ANNOTATIONS_PORTAL_CONTAINER_ID: 'annotations-root' }));
-vi.mock('./GTag', () => ({ gtag: vi.fn() }));
+vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 vi.mock('./SelectionShare', () => ({
   ShareButton: () => null,
 }));
 
-import { gtag } from './GTag';
+import posthog from 'posthog-js';
 import { AnnotationManagerProvider, useAnnotation } from './annotation';
 
 function renderAnnotationHook() {
@@ -40,7 +40,7 @@ describe('AnnotationManagerProvider', () => {
     expect(
       result.current.activeAnnotationId?.equals('intro', 'across-applications')
     ).toBe(true);
-    expect(gtag).toHaveBeenCalledWith('event', 'annotation_active', {
+    expect(posthog.capture).toHaveBeenCalledWith('annotation_active', {
       set_id: 'intro',
       entry_id: 'across-applications',
     });
@@ -64,7 +64,7 @@ describe('AnnotationManagerProvider', () => {
     expect(result.current.activeAnnotationSetIds).toContain('spicedb');
   });
 
-  it('setAnnotationInactive clears activeAnnotationId when it matches', () => {
+  it('setAnnotationInactive clears activeAnnotationId when it matches, and fires annotation_inactive', () => {
     window.location.hash = '#annotations/intro/across-applications';
     const { result } = renderAnnotationHook();
     expect(result.current.activeAnnotationId).toBeDefined();
@@ -73,5 +73,9 @@ describe('AnnotationManagerProvider', () => {
       result.current.setAnnotationInactive(result.current.activeAnnotationId!);
     });
     expect(result.current.activeAnnotationId).toBeUndefined();
+    expect(posthog.capture).toHaveBeenCalledWith('annotation_inactive', {
+      set_id: 'intro',
+      entry_id: 'across-applications',
+    });
   });
 });
