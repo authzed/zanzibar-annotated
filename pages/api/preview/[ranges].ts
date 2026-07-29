@@ -1,8 +1,8 @@
+import chromium from '@sparticuz/chromium';
 import fs from 'fs';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
-
-const chromium = require('chrome-aws-lambda');
+import puppeteer from 'puppeteer-core';
 
 const sharedOptions = {};
 
@@ -39,11 +39,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const fontPath =
     'https://cdn.jsdelivr.net/gh/samkim/Linux-Libertine/LinLibertine_R.ttf';
   await chromium.font(fontPath);
-  const browser = await chromium.puppeteer.launch(
+  const browser = await puppeteer.launch(
     isProd
       ? {
           args: chromium.args,
-          executablePath: await chromium.executablePath,
+          executablePath: await chromium.executablePath(),
           headless: true,
           ...sharedOptions,
         }
@@ -58,8 +58,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   let endpoint = process.env.PREVIEW_ENDPOINT;
-  if (!endpoint) {
+  if (!endpoint && process.env.VERCEL_URL) {
     endpoint = `https://${process.env.VERCEL_URL}`;
+  }
+  // Local dev fallback: neither PREVIEW_ENDPOINT nor VERCEL_URL is set
+  // (VERCEL_URL is only populated by Vercel's own deployment infrastructure).
+  if (!endpoint) {
+    endpoint = 'http://localhost:3000';
   }
 
   const renderURL = `${endpoint}/_render/${ranges}`;
@@ -70,14 +75,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     timeout: 1000,
   });
 
-  const result = await page.screenshot(
-    {
-      type: 'png',
-      encoding: 'binary',
-      captureBeyondViewport: false,
-    },
-    page
-  );
+  const result = await page.screenshot({
+    type: 'png',
+    encoding: 'binary',
+    captureBeyondViewport: false,
+  });
 
   await browser.close();
 
