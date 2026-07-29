@@ -32,7 +32,10 @@ export default withYaml(
 
       return config;
     },
-    publicRuntimeConfig: {
+    // `publicRuntimeConfig`/`getConfig()` were removed in Next.js 16; these
+    // static, non-secret values are now exposed via the `env` config key,
+    // which inlines them into `process.env` on both server and client.
+    env: {
       GAMeasurementId: 'G-SPCEM7FV1Z',
       CanonicalUrlBase: 'https://authzed.com/zanzibar',
     },

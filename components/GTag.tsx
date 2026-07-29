@@ -1,13 +1,10 @@
-import getConfig from 'next/config';
 import Script from 'next/script';
 
 export function GTagScript() {
-  const { publicRuntimeConfig } = getConfig();
-
   return (
     <>
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${publicRuntimeConfig.GAMeasurementId}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GAMeasurementId}`}
         strategy="afterInteractive"
       />
       <Script id="google-analytics" strategy="afterInteractive">
@@ -17,7 +14,7 @@ export function GTagScript() {
           window.gtag = _gtag;
           window.gtag('js', new Date());
 
-          window.gtag('config', '${publicRuntimeConfig.GAMeasurementId}');
+          window.gtag('config', '${process.env.GAMeasurementId}');
         `}
       </Script>
     </>

@@ -1,5 +1,4 @@
 import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import Zanzibar from '../content/zanzibar.mdx';
 
 export default function Default(props: {
@@ -17,11 +16,10 @@ export const getServerSideProps: GetServerSideProps<{
   canonicalUrl: string;
   baseUrl: string;
 }> = async ({ req }) => {
-  const { publicRuntimeConfig } = getConfig();
   return {
     props: {
-      baseUrl: publicRuntimeConfig.CanonicalUrlBase,
-      canonicalUrl: publicRuntimeConfig.CanonicalUrlBase,
+      baseUrl: process.env.CanonicalUrlBase!,
+      canonicalUrl: process.env.CanonicalUrlBase!,
     },
   };
 };
