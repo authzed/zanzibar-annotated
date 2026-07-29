@@ -1,10 +1,10 @@
 import posthog from 'posthog-js';
 import { isEUVisitor, shouldOptOutCapturing } from './util/consent';
-import { isProd } from './util/isProd';
+import { isVercelProduction } from './util/isProd';
 
 function initPostHog() {
-  if (!process.env.NEXT_PUBLIC_POSTHOG_KEY || !isProd) {
-    if (isProd && !process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+  if (!process.env.NEXT_PUBLIC_POSTHOG_KEY || !isVercelProduction) {
+    if (isVercelProduction && !process.env.NEXT_PUBLIC_POSTHOG_KEY) {
       console.warn('NEXT_PUBLIC_POSTHOG_KEY is unset; PostHog will not initialize.');
     }
     return;

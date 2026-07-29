@@ -32,4 +32,23 @@ describe('isEUVisitor', () => {
     const { isEUVisitor } = await import('./eu-detection.js');
     expect(isEUVisitor()).toBe(true);
   });
+
+  it('does not cache the result across calls within the same module instance', async () => {
+    // Regression test for the removed module-level cache: deliberately do NOT
+    // call vi.resetModules() between the two isEUVisitor() calls below, so
+    // both calls hit the exact same module instance. If a module-level cache
+    // were ever reintroduced, the second call would keep returning the first
+    // call's (now-stale) result instead of reflecting the updated timezone.
+    vi.resetModules();
+    let timeZone = 'Europe/Berlin';
+    vi.spyOn(Intl, 'DateTimeFormat').mockImplementation((() => ({
+      resolvedOptions: () => ({ timeZone }),
+    })) as unknown as typeof Intl.DateTimeFormat);
+    const { isEUVisitor } = await import('./eu-detection.js');
+
+    expect(isEUVisitor()).toBe(true);
+
+    timeZone = 'America/New_York';
+    expect(isEUVisitor()).toBe(false);
+  });
 });

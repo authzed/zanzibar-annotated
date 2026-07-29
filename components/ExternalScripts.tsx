@@ -1,7 +1,7 @@
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
 import { isEUVisitor, readConsentCookie, shouldOptOutCapturing } from '../util/consent';
-import { isProd } from '../util/isProd';
+import { isVercelProduction } from '../util/isProd';
 
 declare global {
   interface Window {
@@ -55,12 +55,7 @@ function ConsentModeDefaults() {
 }
 
 function GTMScript() {
-  if (!GTM_ID) {
-    if (isProd) {
-      console.warn('NEXT_PUBLIC_GTM_ID is unset; Google Tag Manager will not load.');
-    }
-    return null;
-  }
+  if (!GTM_ID) return null;
   return (
     <>
       <Script
@@ -135,7 +130,12 @@ function HubSpotLoader() {
 
 export function ExternalScripts() {
   useEffect(() => {
-    if (!GTM_ID) return;
+    if (!GTM_ID) {
+      if (isVercelProduction) {
+        console.warn('NEXT_PUBLIC_GTM_ID is unset; Google Tag Manager will not load.');
+      }
+      return;
+    }
 
     const prefs = readConsentCookie();
     // No cookie means no real decision has been made yet. Don't synthesize
@@ -164,7 +164,7 @@ export function ExternalScripts() {
     });
   }, []);
 
-  if (!isProd) return null;
+  if (!isVercelProduction) return null;
 
   return (
     <>
