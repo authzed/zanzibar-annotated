@@ -24,6 +24,18 @@ export default withYaml(
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     reactStrictMode: true,
     assetPrefix: isProd ? `https://${process.env.VERCEL_URL}` : undefined,
+    async rewrites() {
+      return [
+        {
+          source: '/i/static/:path*',
+          destination: 'https://us-assets.i.posthog.com/static/:path*',
+        },
+        {
+          source: '/i/:path*',
+          destination: 'https://us.i.posthog.com/:path*',
+        },
+      ];
+    },
     webpack(config) {
       config.module.rules.push({
         test: /\.svg$/,
