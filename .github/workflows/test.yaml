@@ -51,6 +51,10 @@ jobs:
           config-file: cypress.config.ts
         env:
           PREVIEW_ENDPOINT: "http://localhost:3000"
+          NEXT_PUBLIC_VERCEL_ENV: "production"
+          NEXT_PUBLIC_GTM_ID: "GTM-TEST0000"
+          NEXT_PUBLIC_POSTHOG_KEY: "phc_test0000"
+          NEXT_PUBLIC_POSTHOG_HOST: "https://us.posthog.com"
       - uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:

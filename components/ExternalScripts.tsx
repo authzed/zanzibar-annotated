@@ -120,7 +120,14 @@ export function ExternalScripts() {
     if (!GTM_ID) return;
 
     const prefs = readConsentCookie();
-    const optedOut = shouldOptOutCapturing(isEUVisitor());
+    // No cookie means no real decision has been made yet. Don't synthesize
+    // one from the isEUVisitor() timezone heuristic and push it as a global
+    // `consent update` -- that would override ConsentModeDefaults' static,
+    // region-scoped default, which is based on Google's own (more
+    // authoritative) server-side IP geolocation. Leave that default standing
+    // until a real cookie-based decision exists.
+    if (!prefs) return;
+
     const granted = (allowed: boolean) => (allowed ? 'granted' : 'denied');
 
     window.dataLayer = window.dataLayer || [];
@@ -129,12 +136,12 @@ export function ExternalScripts() {
     }
 
     gtag('consent', 'update', {
-      analytics_storage: granted(prefs ? prefs.statistics : !optedOut),
-      ad_storage: granted(prefs ? prefs.marketing : !optedOut),
-      ad_user_data: granted(prefs ? prefs.marketing : !optedOut),
-      ad_personalization: granted(prefs ? prefs.marketing : !optedOut),
-      functionality_storage: granted(prefs ? prefs.preferences : !optedOut),
-      personalization_storage: granted(prefs ? prefs.preferences : !optedOut),
+      analytics_storage: granted(prefs.statistics),
+      ad_storage: granted(prefs.marketing),
+      ad_user_data: granted(prefs.marketing),
+      ad_personalization: granted(prefs.marketing),
+      functionality_storage: granted(prefs.preferences),
+      personalization_storage: granted(prefs.preferences),
       security_storage: 'granted',
     });
   }, []);
