@@ -42,9 +42,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const browser = await puppeteer.launch(
     isProd
       ? {
-          args: chromium.args,
+          // `headless: 'shell'` (not `true`) is required: `true` makes
+          // puppeteer-core add `--headless=new`, which the chrome-headless-shell
+          // binary @sparticuz/chromium ships does not support and silently
+          // fails to paint under, producing blank screenshots.
+          args: puppeteer.defaultArgs({ args: chromium.args, headless: 'shell' }),
           executablePath: await chromium.executablePath(),
-          headless: true,
+          headless: 'shell',
           ...sharedOptions,
         }
       : devOptions
