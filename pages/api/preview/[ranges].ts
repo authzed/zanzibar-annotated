@@ -86,6 +86,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const body = document.body;
     const rect = body.getBoundingClientRect();
     const sel = document.getSelection();
+    const anchorEl = sel?.anchorNode?.parentElement ?? null;
+    const anchorStyle = anchorEl ? getComputedStyle(anchorEl) : null;
+    let ancestorInfo: string[] = [];
+    let el: Element | null = anchorEl;
+    let depth = 0;
+    while (el && depth < 8) {
+      const cs = getComputedStyle(el);
+      ancestorInfo.push(
+        `${el.tagName}${el.id ? '#' + el.id : ''}.${el.className || ''} vis=${
+          cs.visibility
+        } disp=${cs.display} op=${cs.opacity} color=${cs.color}`
+      );
+      el = el.parentElement;
+      depth++;
+    }
     return {
       bodyText: (body.innerText ?? '').slice(0, 200),
       bodyHTMLLength: body.innerHTML?.length ?? -1,
@@ -96,7 +111,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       hasFocus: document.hasFocus(),
       selRangeCount: sel?.rangeCount ?? -1,
       selIsCollapsed: sel?.isCollapsed,
-      selAnchorTag: sel?.anchorNode?.parentElement?.tagName,
+      selAnchorTag: anchorEl?.tagName,
+      anchorVisibility: anchorStyle?.visibility,
+      anchorColor: anchorStyle?.color,
+      ancestorInfo,
     };
   });
 
