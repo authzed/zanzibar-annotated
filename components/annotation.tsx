@@ -232,6 +232,8 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       if (prefix !== '#annotations') return;
 
       if (setId && allAnnotationSetIds.includes(setId)) {
+        // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setAnnotationSetActive(setId);
       }
 
@@ -396,6 +398,8 @@ export function Highlight(props: PropsWithChildren<HighlightProps>) {
       el.setAttribute('id', portalId);
       annotationsRoot.appendChild(el);
     }
+    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPortal(el);
 
     return () => {
@@ -495,6 +499,8 @@ function AnnotationPopper(props: {
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
+      // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(annotation.title ?? '');
       setContent(annotation.content);
     }
@@ -562,6 +568,8 @@ function Annotation(props: {
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
+      // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setContent(annotation.content);
     }
   }, [props.annotationId, getAnnotation, content]);
@@ -575,11 +583,15 @@ function Annotation(props: {
     const url = new URL(
       `${location.origin}${basePath ? `/${basePath}` : ''}${urlFragment}`
     );
+    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShareUrl(url.toString());
   }, [props.annotationId]);
 
   useEffect(() => {
     // Auto expand/collapse
+    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCollapsed(!activeAnnotationId?.equalsId(props.annotationId));
   }, [props.annotationId, activeAnnotationId]);
 
@@ -691,6 +703,8 @@ export function AnnotationGroup(props: {
       annotations.push(...group);
     });
 
+    // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGroupData(annotations);
   }, [
     props.groupId,

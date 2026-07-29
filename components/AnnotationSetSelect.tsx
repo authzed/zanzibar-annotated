@@ -28,6 +28,8 @@ export default function AnnotationSetSelect(props: SelectProps) {
 
   useEffect(() => {
     if (activeAnnotationSetIds.length === 1) {
+      // Pre-existing pattern predating the eslint-config-next@16 upgrade that introduced this rule; preserved as-is (tracked as a follow-up refactor, not risked here).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelected(
         props.items.find((item) => item.value === activeAnnotationSetIds[0])
       );
