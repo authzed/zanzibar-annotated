@@ -115,6 +115,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       anchorVisibility: anchorStyle?.visibility,
       anchorColor: anchorStyle?.color,
       ancestorInfo,
+      anchorOffsetTop: anchorEl
+        ? anchorEl.getBoundingClientRect().top + window.scrollY
+        : -1,
+    };
+  });
+
+  const rescroll = await page.evaluate(() => {
+    const sel = document.getSelection();
+    const el = sel?.anchorNode?.parentElement ?? null;
+    el?.scrollIntoView({ block: 'center', behavior: 'auto' });
+    return {
+      scrollYAfterManualRescroll: window.scrollY,
+      elRectTopAfter: el ? el.getBoundingClientRect().top : null,
     };
   });
 
@@ -122,14 +135,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     type: 'png',
     encoding: 'binary',
     captureBeyondViewport: false,
-    fullPage: true,
   });
 
   await browser.close();
 
   res.setHeader('Content-Type', 'image/png');
   res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Debug-Diag', JSON.stringify(diag));
+  res.setHeader('X-Debug-Diag', JSON.stringify({ ...diag, ...rescroll }));
   res.setHeader(
     'X-Debug-Console',
     JSON.stringify(consoleMessages.slice(0, 20))
