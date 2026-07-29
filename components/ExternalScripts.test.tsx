@@ -1,4 +1,5 @@
 import { cleanup, render, waitFor } from '@testing-library/react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/script', () => ({
@@ -34,9 +35,19 @@ describe('ExternalScripts', () => {
     const { container } = render(<ExternalScripts />);
 
     expect(container.querySelector('#gtm-script')).not.toBeNull();
-    expect(container.querySelector('iframe')?.getAttribute('src')).toContain(
-      'GTM-TEST0000'
+
+    // The noscript-wrapped fallback iframe can't be observed through
+    // @testing-library/react's render(): it's a from-scratch client mount
+    // with no SSR/hydration step, and react-dom never reconciles JSX
+    // children into a <noscript> host element on such a mount (browsers do
+    // the same whenever the scripting flag is enabled). Next.js actually
+    // serves this component through SSR, so render it the same way here —
+    // via renderToStaticMarkup — to verify the real, shipped markup.
+    const staticMarkup = renderToStaticMarkup(<ExternalScripts />);
+    expect(staticMarkup).toContain(
+      '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TEST0000"'
     );
+    expect(staticMarkup).toMatch(/<noscript><iframe[^>]*><\/iframe><\/noscript>/);
   });
 
   it('renders no GTM markup in production when NEXT_PUBLIC_GTM_ID is unset', async () => {

@@ -67,26 +67,15 @@ function GTMScript() {
           `,
         }}
       />
-      {/*
-        Not wrapped in a literal <noscript> tag: react-dom treats <noscript>
-        as a raw-text host element (same bucket as <textarea>/<script>) and
-        never reconciles JSX children into it on a from-scratch client mount
-        (confirmed against react-dom 19's shouldSetTextContent), and per the
-        HTML spec noscript content is parsed as text whenever the scripting
-        flag is enabled — true for jsdom and for any JS-enabled browser
-        alike, so a real nested element wouldn't be reachable client-side
-        even in production. Rendering the pixel directly, hidden via style,
-        keeps the fallback discoverable and functionally equivalent; the
-        only cost is a harmless extra ns.html fetch for users who do have
-        JS enabled.
-      */}
-      <iframe
-        src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-        height="0"
-        width="0"
-        style={{ display: 'none', visibility: 'hidden' }}
-        title="gtm-noscript"
-      />
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+          height="0"
+          width="0"
+          style={{ display: 'none', visibility: 'hidden' }}
+          title="gtm-noscript"
+        />
+      </noscript>
     </>
   );
 }
@@ -106,16 +95,23 @@ function HubSpotLoader() {
 
   if (!HUBSPOT_ID || !shouldLoad) return null;
 
-  // `defer` only (no `async`): React 19 treats `<script async src=...>` as a
+  // `defer` only (no `async`): in real production, `next/script`'s default
+  // `afterInteractive` strategy never renders a literal host <script>
+  // element at all — it returns null and loads the script imperatively via
+  // `document.createElement` plus its own dedup cache, so this doesn't
+  // affect production behavior either way. The distinction only matters for
+  // this test file's simplified mock (`vi.mock('next/script', ...)` above),
+  // which does render a raw <script {...props} /> host element — and for
+  // that mock, React 19 treats a rendered `<script async src=...>` as a
   // hoistable "resource" it inserts into <head> and deliberately never
   // removes on unmount (by design, since scripts can't be safely
   // interrupted once started). That permanent-until-navigation behavior
-  // means a script id can leak across unrelated component instances within
+  // would let a script id leak across unrelated component instances within
   // the same document — including across tests in this file, which reuse
-  // one jsdom document — so a later test can observe a script loaded by an
-  // earlier one even though its own render decided not to load it. `defer`
-  // alone still loads the script without blocking parsing and isn't
-  // upgraded to that special resource handling.
+  // one jsdom document — so a later test could observe a script loaded by
+  // an earlier one even though its own render decided not to load it.
+  // `defer` alone still loads the script without blocking parsing and isn't
+  // upgraded to that special resource handling under the mock.
   return <Script id="hs-script-loader" defer src={`//js.hs-scripts.com/${HUBSPOT_ID}.js`} />;
 }
 
