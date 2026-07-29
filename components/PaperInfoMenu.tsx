@@ -2,6 +2,7 @@ import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid';
 import { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import posthog from 'posthog-js';
 import { useAnnotation } from './annotation';
 
 /**
@@ -32,7 +33,11 @@ export function PaperInfoMenu() {
     <div className="inline-block fixed bottom-10 right-10 z-50">
       <button
         onClick={() => {
+          const opening = collapsed;
           setCollapsed(!collapsed);
+          if (opening) {
+            posthog.capture('zanzibar_paper_info_menu_opened');
+          }
         }}
         className="outline-none focus:outline-none flex items-center"
       >
