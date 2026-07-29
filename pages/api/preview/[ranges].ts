@@ -60,12 +60,9 @@ const realHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           // puppeteer-core add `--headless=new`, which the chrome-headless-shell
           // binary @sparticuz/chromium ships does not support and silently
           // fails to paint under, producing blank screenshots.
-          args: puppeteer.defaultArgs({
-            args: chromium.args,
-            headless: 'shell',
-          }),
+          args: chromium.args,
           executablePath,
-          headless: 'shell',
+          headless: true,
           ...sharedOptions,
         }
       : devOptions
