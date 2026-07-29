@@ -4,15 +4,6 @@ import type { Plugin as VitePlugin } from 'vitest/config';
 import { readFileSync } from 'fs';
 import YAML from 'yaml';
 
-const cssModulePlugin: VitePlugin = {
-  name: 'css-modules-mock',
-  resolveId(id: string) {
-    if (id.endsWith('.css') || id.endsWith('.module.css')) {
-      return { id: 'identity-obj-proxy', moduleSideEffects: false };
-    }
-  },
-};
-
 const yamlPlugin: VitePlugin = {
   name: 'yaml-loader',
   resolveId(id: string) {
@@ -29,30 +20,23 @@ const yamlPlugin: VitePlugin = {
   },
 };
 
-const svgPlugin: VitePlugin = {
-  name: 'svg-loader',
-  apply: 'serve',
-  resolveId(id: string) {
-    if (id.endsWith('.svg')) {
-      return { id: 'virtual:svg-stub', moduleSideEffects: false };
-    }
-  },
-  load(id: string) {
-    if (id === 'virtual:svg-stub') {
-      return 'export default () => null';
-    }
-  },
-};
-
 export default defineConfig({
-  plugins: [cssModulePlugin, yamlPlugin, svgPlugin],
+  plugins: [yamlPlugin],
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
   },
   resolve: {
+    // NOTE: `find` must anchor the *entire* specifier (`^.*`), not just the
+    // suffix. Vite's alias resolution does `importee.replace(find, replacement)`
+    // (see @rollup/plugin-alias) — with a suffix-only pattern like /\.svg$/,
+    // only the matched suffix is replaced, mangling the id into something like
+    // "../content/HNIcon" + "<replacement>" concatenated, which then fails to
+    // resolve. Anchoring the match to the full string makes the replacement
+    // apply to the whole id, as intended.
     alias: [
-      { find: /\.svg$/, replacement: 'virtual:svg-stub' },
+      { find: /^.*\.module\.css$/, replacement: 'identity-obj-proxy' },
+      { find: /^.*\.svg$/, replacement: path.resolve(__dirname, 'test/svgStub.tsx') },
     ],
   },
 });
