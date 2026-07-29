@@ -217,7 +217,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   const setAnnotationActive = useCallback((id: AnnotationId) => {
     setActiveAnnotationId(id);
 
-    posthog.capture('annotation_active', {
+    posthog.capture('zanzibar_annotation_active', {
       set_id: id.setId,
       entry_id: id.entryId,
     });
@@ -267,7 +267,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
         setAnnotationInactive: (id: AnnotationId) => {
           if (activeAnnotationId?.equalsId(id)) {
             setActiveAnnotationId(undefined);
-            posthog.capture('annotation_inactive', {
+            posthog.capture('zanzibar_annotation_inactive', {
               set_id: id.setId,
               entry_id: id.entryId,
             });

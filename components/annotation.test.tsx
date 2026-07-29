@@ -40,7 +40,7 @@ describe('AnnotationManagerProvider', () => {
     expect(
       result.current.activeAnnotationId?.equals('intro', 'across-applications')
     ).toBe(true);
-    expect(posthog.capture).toHaveBeenCalledWith('annotation_active', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_annotation_active', {
       set_id: 'intro',
       entry_id: 'across-applications',
     });
@@ -73,7 +73,7 @@ describe('AnnotationManagerProvider', () => {
       result.current.setAnnotationInactive(result.current.activeAnnotationId!);
     });
     expect(result.current.activeAnnotationId).toBeUndefined();
-    expect(posthog.capture).toHaveBeenCalledWith('annotation_inactive', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_annotation_inactive', {
       set_id: 'intro',
       entry_id: 'across-applications',
     });

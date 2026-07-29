@@ -43,7 +43,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
     }
     toggleAnnotationSet(value.value);
     setSelected(value);
-    posthog.capture('annotation_set_selected', {
+    posthog.capture('zanzibar_annotation_set_selected', {
       set_id: value.value,
     });
   };

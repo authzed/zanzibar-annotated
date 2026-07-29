@@ -21,7 +21,7 @@ describe('ShareButton', () => {
     await userEvent.click(screen.getByTitle('Copy'));
 
     expect(writeText).toHaveBeenCalledWith('https://zanzibar.tech/x');
-    expect(posthog.capture).toHaveBeenCalledWith('selection_share_clipboard', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_selection_share_clipboard', {
       share_url: 'https://zanzibar.tech/x',
     });
   });
@@ -32,7 +32,7 @@ describe('ShareButton', () => {
     await userEvent.click(screen.getByTitle('Tweet'));
 
     expect(openSpy).toHaveBeenCalled();
-    expect(posthog.capture).toHaveBeenCalledWith('selection_share_twitter', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_selection_share_twitter', {
       share_url: 'https://zanzibar.tech/x',
     });
   });
@@ -43,7 +43,7 @@ describe('ShareButton', () => {
     await userEvent.click(screen.getByTitle('Reddit'));
 
     expect(openSpy).toHaveBeenCalled();
-    expect(posthog.capture).toHaveBeenCalledWith('selection_share_reddit', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_selection_share_reddit', {
       share_url: 'https://zanzibar.tech/x',
     });
   });
@@ -54,7 +54,7 @@ describe('ShareButton', () => {
     await userEvent.click(screen.getByTitle('HN'));
 
     expect(openSpy).toHaveBeenCalled();
-    expect(posthog.capture).toHaveBeenCalledWith('selection_share_hn', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_selection_share_hn', {
       share_url: 'https://zanzibar.tech/x',
     });
   });
@@ -94,7 +94,7 @@ describe('SelectionShare', () => {
       vi.advanceTimersByTime(250);
     });
 
-    expect(posthog.capture).toHaveBeenCalledWith('selection_share_viewed', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_selection_share_viewed', {
       share_url: document.URL,
       selection_length: 'a selected passage'.length,
     });

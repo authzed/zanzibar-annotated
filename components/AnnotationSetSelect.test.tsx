@@ -24,7 +24,7 @@ describe('AnnotationSetSelect', () => {
     await userEvent.click(screen.getByRole('button'));
     await userEvent.click(await screen.findByText('SpiceDB vs Zanzibar'));
 
-    expect(posthog.capture).toHaveBeenCalledWith('annotation_set_selected', {
+    expect(posthog.capture).toHaveBeenCalledWith('zanzibar_annotation_set_selected', {
       set_id: 'spicedb',
     });
     expect(await screen.findByText('SpiceDB vs Zanzibar')).toBeInTheDocument();

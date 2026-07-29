@@ -48,7 +48,7 @@ export function ShareButton(props: ShareButtonProps) {
     link: () => {
       navigator.clipboard.writeText(shareUrl);
 
-      posthog.capture('selection_share_clipboard', {
+      posthog.capture('zanzibar_selection_share_clipboard', {
         share_url: shareUrl,
       });
     },
@@ -62,7 +62,7 @@ export function ShareButton(props: ShareButtonProps) {
         '_blank'
       );
 
-      posthog.capture('selection_share_twitter', {
+      posthog.capture('zanzibar_selection_share_twitter', {
         share_url: shareUrl,
       });
     },
@@ -76,7 +76,7 @@ export function ShareButton(props: ShareButtonProps) {
         '_blank'
       );
 
-      posthog.capture('selection_share_reddit', {
+      posthog.capture('zanzibar_selection_share_reddit', {
         share_url: shareUrl,
       });
     },
@@ -90,7 +90,7 @@ export function ShareButton(props: ShareButtonProps) {
         '_blank'
       );
 
-      posthog.capture('selection_share_hn', {
+      posthog.capture('zanzibar_selection_share_hn', {
         share_url: shareUrl,
       });
     },
@@ -140,7 +140,7 @@ function SelectionShare() {
           setShareUrl(document.URL);
           setStatusMsg('');
 
-          posthog.capture('selection_share_viewed', {
+          posthog.capture('zanzibar_selection_share_viewed', {
             share_url: document.URL,
             selection_length: range.toString().length,
           });
