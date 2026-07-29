@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('./GTag', () => ({ gtag: vi.fn() }));
+vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 
-import { gtag } from './GTag';
+import posthog from 'posthog-js';
 import { AnnotationManagerProvider, getAvailableAnnotationSets } from './annotation';
 import AnnotationSetSelect from './AnnotationSetSelect';
 
@@ -24,7 +24,7 @@ describe('AnnotationSetSelect', () => {
     await userEvent.click(screen.getByRole('button'));
     await userEvent.click(await screen.findByText('SpiceDB vs Zanzibar'));
 
-    expect(gtag).toHaveBeenCalledWith('event', 'annotation_set_selected', {
+    expect(posthog.capture).toHaveBeenCalledWith('annotation_set_selected', {
       set_id: 'spicedb',
     });
     expect(await screen.findByText('SpiceDB vs Zanzibar')).toBeInTheDocument();
