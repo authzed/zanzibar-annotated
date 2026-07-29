@@ -85,13 +85,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const diag = await page.evaluate(() => {
     const body = document.body;
     const rect = body.getBoundingClientRect();
+    const sel = document.getSelection();
     return {
-      bodyTextLength: body.innerText?.length ?? -1,
+      bodyText: (body.innerText ?? '').slice(0, 200),
       bodyHTMLLength: body.innerHTML?.length ?? -1,
       scrollY: window.scrollY,
       bodyRect: { width: rect.width, height: rect.height },
       bodyBg: getComputedStyle(body).backgroundColor,
       fontsReady: document.fonts.status,
+      hasFocus: document.hasFocus(),
+      selRangeCount: sel?.rangeCount ?? -1,
+      selIsCollapsed: sel?.isCollapsed,
+      selAnchorTag: sel?.anchorNode?.parentElement?.tagName,
     };
   });
 
@@ -99,6 +104,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     type: 'png',
     encoding: 'binary',
     captureBeyondViewport: false,
+    fullPage: true,
   });
 
   await browser.close();
