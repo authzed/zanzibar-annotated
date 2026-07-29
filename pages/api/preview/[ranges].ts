@@ -38,6 +38,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // TODO: Switch to a file hosted in the zanzibar-annotated repo when the repo is public
   const fontPath =
     'https://cdn.jsdelivr.net/gh/samkim/Linux-Libertine/LinLibertine_R.ttf';
+  const executablePath = isProd
+    ? await chromium.executablePath()
+    : undefined;
   await chromium.font(fontPath);
   const browser = await puppeteer.launch(
     isProd
@@ -50,7 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             args: chromium.args.filter((a) => a !== '--single-process'),
             headless: 'shell',
           }),
-          executablePath: await chromium.executablePath(),
+          executablePath,
           headless: 'shell',
           ...sharedOptions,
         }
