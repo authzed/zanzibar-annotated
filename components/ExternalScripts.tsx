@@ -1,6 +1,7 @@
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
 import { isEUVisitor, readConsentCookie, shouldOptOutCapturing } from '../util/consent';
+import { isProd } from '../util/isProd';
 
 declare global {
   interface Window {
@@ -10,8 +11,11 @@ declare global {
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 const HUBSPOT_ID = process.env.NEXT_PUBLIC_HUBSPOT_ID;
-const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
 
+// ISO-3166 country codes for Google Consent Mode's `region` field. This is a
+// different list from util/consent/eu-detection.ts's EU_TIMEZONES (IANA
+// timezone identifiers) and can't be merged with it, but if EU/EEA
+// membership ever changes, check that list too.
 const EU_REGION_CODES = [
   'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU',
   'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES',
@@ -51,7 +55,12 @@ function ConsentModeDefaults() {
 }
 
 function GTMScript() {
-  if (!GTM_ID) return null;
+  if (!GTM_ID) {
+    if (isProd) {
+      console.warn('NEXT_PUBLIC_GTM_ID is unset; Google Tag Manager will not load.');
+    }
+    return null;
+  }
   return (
     <>
       <Script
@@ -89,6 +98,15 @@ function HubSpotLoader() {
     // effect keeps the client's first render matching the server's (always
     // `null`) output, avoiding a hydration mismatch. The resulting extra
     // render is the intended tradeoff.
+    //
+    // Gating on the `statistics` field (via shouldOptOutCapturing), not
+    // `marketing`, is intentional even though HubSpot is a marketing/CRM
+    // tool: this matches the established, deliberate convention already used
+    // by authzed/web (src/consent/vendorSync.ts's `syncHubSpot(prefs.statistics)`)
+    // and authzed/docs (components/scripts.tsx's
+    // `setLoadHs(!shouldOptOutCapturing(isEUVisitor()))`). Don't "fix" this
+    // to `marketing` in isolation -- that would make this property
+    // inconsistent with the other two on this exact point.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setShouldLoad(!shouldOptOutCapturing(isEUVisitor()));
   }, []);

@@ -1,5 +1,10 @@
 import { DEBUG_EU_COOKIE, getDebugCookie } from './debug';
 
+// IANA timezone identifiers used for the timezone-based EU heuristic. This is
+// a different list from components/ExternalScripts.tsx's EU_REGION_CODES
+// (ISO-3166 country codes for Google Consent Mode's `region` field) and
+// can't be merged with it, but if EU/EEA membership ever changes, check that
+// list too.
 const EU_TIMEZONES = new Set([
   'Europe/Vienna', 'Europe/Brussels', 'Europe/Sofia', 'Europe/Zagreb',
   'Asia/Famagusta', 'Asia/Nicosia', 'Europe/Prague', 'Europe/Copenhagen',
@@ -14,23 +19,18 @@ const EU_TIMEZONES = new Set([
   'Europe/Isle_of_Man', 'Europe/Jersey',
 ]);
 
-let cached: boolean | undefined;
-
 export function isEUVisitor(): boolean {
   if (typeof window === 'undefined') return true;
-  if (cached !== undefined) return cached;
 
   const debugOverride = getDebugCookie(DEBUG_EU_COOKIE);
   if (debugOverride !== null) {
-    cached = debugOverride === 'true';
-    return cached;
+    return debugOverride === 'true';
   }
 
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    cached = EU_TIMEZONES.has(tz);
+    return EU_TIMEZONES.has(tz);
   } catch {
-    cached = true;
+    return true;
   }
-  return cached;
 }

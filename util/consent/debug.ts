@@ -8,5 +8,5 @@ export function getDebugCookie(name: string): string | null {
     if (env === 'production') return null;
   }
   const match = document.cookie.split('; ').find((row) => row.startsWith(`${name}=`));
-  return match ? match.split('=')[1] : null;
+  return match ? match.split('=').slice(1).join('=') : null;
 }
