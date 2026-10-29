@@ -16,9 +16,6 @@ import {SelectRangesOptions} from './lib/selectranges';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
 
-const SOCIAL_CARD_COLUMN_WIDTH = 412; // pixels
-const SOCIAL_CARD_COLUMN_PADDING = 8; // pixels
-
 /**
  * SelectionContext is the context associated with the current selection, if any.
  */
@@ -48,13 +45,18 @@ export type LayoutProps = {
   selectionContext?: SelectionContext | undefined | null;
 };
 
+function getAssetUrl() {
+  return process.env.NEXT_PUBLIC_VERCEL_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    : '';
+}
+
 function getDefaultPreviewImageUrl() {
   return process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}/preview.png`
     : '/preview.png';
 }
 
-const forRenderingHighlightOptions = { block: 'center', behavior: 'auto' } satisfies SelectRangesOptions
 const defaultHighlightOptions = { block: 'center', behavior: 'smooth' } satisfies SelectRangesOptions
 
 /**
@@ -73,31 +75,6 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         </div>
       );
 
-    case RenderingState.FOR_RENDERING:
-      return (
-        <>
-          <div
-            className="font-serif"
-            style={{
-              width: `${
-                SOCIAL_CARD_COLUMN_WIDTH + SOCIAL_CARD_COLUMN_PADDING * 2
-              }px`,
-              padding: `${SOCIAL_CARD_COLUMN_PADDING}px`,
-              backgroundColor: 'white',
-            }}
-          >
-            <NoAnnotationManagerProvider>
-              {props.children}
-            </NoAnnotationManagerProvider>
-            <HighlightProvidedSelection
-              options={forRenderingHighlightOptions}
-              skipSelectionMonitoring
-              pathPrefix="_render/"
-            />
-          </div>
-        </>
-      );
-
     default:
       let previewText: string | undefined = undefined;
       if (props.selectionContext?.previewText) {
@@ -114,6 +91,12 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           <Head>
             <title>The Google Zanzibar Paper, annotated by AuthZed</title>
             <link rel="canonical" href={props.canonicalUrl} />
+            <link
+              rel="icon"
+              href={`${getAssetUrl()}/favicon.ico`}
+              type="image/x-icon"
+              sizes="48x48"
+            />
             <meta
               name="viewport"
               content="width=device-width, initial-scale=1.0"
@@ -184,11 +167,6 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
  * Single page layout
  */
 export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
-  const renderState = useRenderState();
-  if (renderState.isForSocialCardRendering) {
-    return <div>{props.children}</div>;
-  }
-
   return (
     <div className="relative z-100">
       <div className="hidden lg:block absolute h-full w-80 -left-[20rem] top-0 z-10">

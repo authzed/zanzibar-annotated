@@ -172,6 +172,7 @@ function SelectionShare() {
         >
           <div
             className={popperStyles.tooltip}
+            data-testid="selection-share"
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}

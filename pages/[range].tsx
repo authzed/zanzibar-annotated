@@ -1,8 +1,8 @@
 import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
 import { LayoutProps } from '../components/layout';
 import { fragmentToRangeList } from '../components/lib/deeplinks';
 import Zanzibar from '../content/zanzibar.mdx';
+import { CANONICAL_URL_BASE } from '../util/siteconfig';
 import { getParsedPaperDOM } from '../util/parseddom';
 
 export default function Default(props: LayoutProps) {
@@ -19,7 +19,6 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
   res,
   req,
 }) => {
-  const { publicRuntimeConfig } = getConfig();
   let endpoint = process.env.PREVIEW_ENDPOINT;
   if (!endpoint) {
     endpoint = `https://${process.env.VERCEL_URL}`;
@@ -34,8 +33,8 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
   if (fragment?.startsWith('_next')) {
     return {
       props: {
-        baseUrl: publicRuntimeConfig.CanonicalUrlBase,
-        canonicalUrl: publicRuntimeConfig.CanonicalUrlBase,
+        baseUrl: CANONICAL_URL_BASE,
+        canonicalUrl: CANONICAL_URL_BASE,
         selectionContext: null,
       },
     };
@@ -69,10 +68,10 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
 
   return {
     props: {
-      baseUrl: publicRuntimeConfig.CanonicalUrlBase,
+      baseUrl: CANONICAL_URL_BASE,
       canonicalUrl: fragment
-        ? `${publicRuntimeConfig.CanonicalUrlBase}/${fragment}`
-        : publicRuntimeConfig.CanonicalUrlBase,
+        ? `${CANONICAL_URL_BASE}/${fragment}`
+        : CANONICAL_URL_BASE,
       selectionContext: selectionRanges
         ? {
             previewImageUrl: fragment

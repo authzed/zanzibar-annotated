@@ -7,7 +7,7 @@ describe('selection view', () => {
 
   it('renders selection', () => {
     // Shows share options
-    cy.get('[class^="Popper_tooltip"]');
+    cy.get('[data-testid="selection-share"]').should('be.visible');
 
     // Selection is highlighted
     cy.window().then((w) => {
