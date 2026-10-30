@@ -6,8 +6,12 @@ describe('selection view', () => {
   });
 
   it('renders selection', () => {
-    // Shows share options
-    cy.get('[data-testid="selection-share"]').should('be.visible');
+    // Shows share options. The page smooth-scrolls to the selection on load,
+    // which can be cut short on slow CI runners, so bring the share options
+    // into view before checking they're visible.
+    cy.get('[data-testid="selection-share"]')
+      .scrollIntoView()
+      .should('be.visible');
 
     // Selection is highlighted
     cy.window().then((w) => {
