@@ -1,35 +1,26 @@
-import { PropsWithChildren, UIEvent, useState } from 'react';
-import { BannerHeights } from './Banner';
+import { PropsWithChildren } from 'react';
 
-const CONTAINER_ELEMENT_ID = 'paper-container';
+export const CONTAINER_ELEMENT_ID = 'paper-container';
 const CONTENT_CONTAINER_CLASS_NAME = 'paper-content-container';
+
+// How far, in pixels, the paper scrolls before it no longer counts as the top
+// of the content and the banner collapses.
+export const TOP_OF_CONTENT_THRESHOLD = 80;
 
 /**
  * Container is the scrollable container element for the content of the paper.
+ * The banner overlays it, and sets its padding to keep the paper below the
+ * expanded banner.
  */
-export function Container(
-  props: PropsWithChildren<{
-    onScrolled: (isTopOfContent: boolean) => void;
-  }>
-) {
-  const [isTopOfContent, setIsTopOfContent] = useState(false);
-
-  const handleScrolled = (e: UIEvent<HTMLDivElement>) => {
-    props.onScrolled(e.currentTarget.scrollTop === 0);
-    setIsTopOfContent(e.currentTarget.scrollTop === 0);
-  };
-
+export function Container(props: PropsWithChildren) {
   return (
     <div
-      onScroll={handleScrolled}
       id={CONTAINER_ELEMENT_ID}
-      className="transition-all"
+      // Until the banner measures itself, estimate its expanded height.
+      className="pt-[150px] md:pt-[65px]"
       style={{
         position: 'absolute',
-        height: isTopOfContent
-          ? `calc(100vh - ${BannerHeights.Large})`
-          : `calc(100vh - ${BannerHeights.Small})`,
-        top: isTopOfContent ? BannerHeights.Large : BannerHeights.Small,
+        top: '0px',
         left: '0px',
         right: '0px',
         bottom: '0px',

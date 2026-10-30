@@ -4,17 +4,11 @@ import { isUnderContentContainer } from './Container';
 import { fragmentToRangeList, selectionToFragment } from './lib/deeplinks';
 import { selectRanges, SelectRangesOptions } from './lib/selectranges';
 import { getPathSegments } from './pathsegments';
-import { useRenderState } from './renderstate';
 
 export function HighlightProvidedSelection(props: {
   options?: SelectRangesOptions | undefined;
-  skipSelectionMonitoring?: boolean;
-  pathPrefix: string;
   onSelectionChanged?: (fragement: string) => void;
 }) {
-  const renderState = useRenderState();
-  const ranges = renderState.ranges;
-
   useEffect(() => {
     const pathSegments = getPathSegments(window.location.pathname);
 
@@ -24,27 +18,11 @@ export function HighlightProvidedSelection(props: {
         pathSegments.selectionId
       );
       selectRanges(selectionRanges, props.options);
-      return;
     }
-
-    if (ranges !== undefined && ranges.length > 0) {
-      try {
-        const selectionRanges = fragmentToRangeList(document, ranges[0]);
-        selectRanges(selectionRanges, props.options);
-        (window as any)._scrolled = true;
-      } catch (e) {
-        // Ignore.
-      }
-      return;
-    }
-  }, [ranges, props.pathPrefix, props.options]);
+  }, [props.options]);
 
   useEffect(() => {
-    if (props.skipSelectionMonitoring) {
-      return;
-    }
-
-    const { basePath, pathPrefix } = getPathSegments(window.location.pathname);
+    const { basePath } = getPathSegments(window.location.pathname);
 
     // Based on the fragment in the original deeplinks.ts library.
     const timeoutHandle = setTimeout(() => {
@@ -72,7 +50,7 @@ export function HighlightProvidedSelection(props: {
           if (fragment && fragment.includes(':') && fragment.startsWith('#')) {
             const newPath = `${location.origin}${
               basePath ? `/${basePath}` : ''
-            }${pathPrefix ? `/${pathPrefix}` : ''}/${fragment.substring(1)}`;
+            }/${fragment.substring(1)}`;
 
             // replaceState is used instead of setting location.hash to avoid scrolling.
             history.replaceState(null, '', newPath);
@@ -87,7 +65,7 @@ export function HighlightProvidedSelection(props: {
         clearTimeout(timeoutHandle);
       };
     }, 0);
-  }, [props.skipSelectionMonitoring, props.onSelectionChanged, props]);
+  }, [props.onSelectionChanged, props]);
 
   return <></>;
 }

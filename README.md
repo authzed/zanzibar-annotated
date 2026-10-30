@@ -18,11 +18,21 @@ Looking to contribute? See [CONTRIBUTING.md].
 First, run the development server:
 
 ```bash
-yarn install
-PREVIEW_ENDPOINT=http://localhost:3000 yarn run dev
+cp .env.example .env.local
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the paper.
+
+### Configuration
+
+All configuration is through environment variables, documented in [`.env.example`](.env.example).
+None are required for local development.
+
+| Variable | Description |
+| --- | --- |
+| `PREVIEW_ENDPOINT` | Public base URL of the site, used in share preview image URLs. Defaults to `https://$VERCEL_URL` on Vercel, and otherwise to `http://localhost:$PORT`. Set it when self-hosting so previews use your public URL. |
 
 ## Overview
 
@@ -104,14 +114,13 @@ An individual annotation can be directly linked using:
 
 ### Open Graph Support
 
-Chromium and [Puppeteer] are used to dynamically generate a screenshot preview for selections and preview text is dynamically generated using [NextJS] server side rendering and [JSDOM].
+Preview images for selections are generated with [`next/og`](https://nextjs.org/docs/app/api-reference/functions/image-response), and preview text is generated using [NextJS] server side rendering and [JSDOM].
 This provides a rich preview of the paper content when a shareable link is posted to another site.
 
-In the dev environment, set the PREVIEW_ENDPOINT env variable to your local instance (usually localhost:3000).
+The server renders the paper in-process to resolve selections, so no configuration is needed in the dev environment.
 
-_Note: The paper viewer app relies on a serverless function to generated the previews. Currently, [Vercel] is the only tested hosting service._
+_Note: The paper viewer app relies on a serverless function to generate the previews. Currently, [Vercel] is the only tested hosting service._
 
-[Puppeteer]: https://pptr.dev/
 [JSDOM]: https://github.com/jsdom/jsdom
 [Vercel]: https://vercel.com/
 

@@ -7,7 +7,6 @@ import { usePopper } from 'react-popper';
 import HNIcon from '../content/HNIcon.svg';
 import RedditIcon from '../content/RedditIcon.svg';
 import TwitterIcon from '../content/TwitterIcon.svg';
-import popperStyles from '../styles/Popper.module.css';
 import { isUnderContentContainer } from './Container';
 import { gtag } from './GTag';
 
@@ -171,7 +170,8 @@ function SelectionShare() {
           onClickAway={() => setVisible(false)}
         >
           <div
-            className={popperStyles.tooltip}
+            className="popper-tooltip"
+            data-testid="selection-share"
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}
@@ -181,8 +181,8 @@ function SelectionShare() {
                 <ShareButton
                   type="link"
                   shareUrl={shareUrl}
-                  className={`${popperStyles.button} border-l-0`}
-                  iconClassName={popperStyles.icon}
+                  className="popper-button border-l-0"
+                  iconClassName="popper-icon"
                   callback={() => setStatusMsg('URL copied to your clipboard!')}
                   title="Copy share URL to clipboard"
                 />
@@ -190,32 +190,32 @@ function SelectionShare() {
                   type="twitter"
                   title="Tweet your selection"
                   shareUrl={shareUrl}
-                  className={popperStyles.button}
-                  iconClassName={popperStyles.icon}
+                  className="popper-button"
+                  iconClassName="popper-icon"
                 />
                 <ShareButton
                   type="hn"
                   title="Post to Hacker News"
                   shareUrl={shareUrl}
-                  className={popperStyles.button}
-                  iconClassName={popperStyles.icon}
+                  className="popper-button"
+                  iconClassName="popper-icon"
                 />
                 <ShareButton
                   type="reddit"
                   title="Submit on Reddit"
                   shareUrl={shareUrl}
-                  className={popperStyles.button}
-                  iconClassName={popperStyles.icon}
+                  className="popper-button"
+                  iconClassName="popper-icon"
                 />
                 <div
                   ref={setArrowElement}
-                  className={popperStyles.arrow}
+                  className="popper-arrow"
                   style={styles.arrow}
                 />
               </>
             )}
             {statusMsg && (
-              <div className={popperStyles.statusMsg}>{statusMsg}</div>
+              <div className="popper-status-msg">{statusMsg}</div>
             )}
           </div>
         </ClickAwayListener>

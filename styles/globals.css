@@ -48,6 +48,59 @@
   }
 }
 
+/* Shared popper tooltip styles. They're in the components layer so they
+   override the base styles and utility classes override them. */
+@layer components {
+  .popper-tooltip {
+    @apply inline-block p-3 bg-gray-700 shadow-md align-middle z-50;
+  }
+
+  .popper-arrow,
+  .popper-arrow::before {
+    @apply absolute bg-inherit w-3 h-3 z-50;
+  }
+
+  .popper-arrow {
+    visibility: hidden;
+  }
+
+  .popper-arrow::before {
+    content: '';
+    @apply visible rotate-45 z-50;
+  }
+
+  .popper-tooltip[data-popper-placement^='top'] > .popper-arrow {
+    bottom: -4px;
+  }
+
+  .popper-tooltip[data-popper-placement^='bottom'] > .popper-arrow {
+    top: -4px;
+  }
+
+  .popper-tooltip[data-popper-placement^='left'] > .popper-arrow {
+    right: -4px;
+  }
+
+  .popper-tooltip[data-popper-placement^='right'] > .popper-arrow {
+    left: -4px;
+  }
+
+  .popper-button {
+    @apply text-sm p-2 border-l border-gray-500 ;
+  }
+
+  .popper-icon {
+    @apply w-5 fill-white;
+  }
+  .popper-icon:hover {
+    @apply w-5 fill-gray-400;
+  }
+
+  .popper-status-msg {
+    @apply text-white
+  }
+}
+
 html {
   scroll-behavior: auto !important;
 }
@@ -89,11 +142,3 @@ a[id] {
   border-bottom: 0px;
 }
 
-div.annotation-markdown p {
-  display: inline-block;
-  font-weight: normal;
-}
-
-div.annotation-markdown a {
-  color: black;
-}

@@ -65,10 +65,10 @@ In order to protect both you and ourselves, all contributions will require an ex
 
 ### Adding dependencies
 
-This project uses [yarn] to manage dependencies.
+This project uses [pnpm] to manage dependencies.
 
-[yarn]: https://yarnpkg.com/
+[pnpm]: https://pnpm.io/
 
 ```sh
-yarn add <package>
+pnpm add <package>
 ```

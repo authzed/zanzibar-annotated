@@ -15,7 +15,6 @@ import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
 import annotationsIntro from '../content/annotations-intro.yaml';
 import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
-import popperStyles from '../styles/Popper.module.css';
 import { gtag } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 import { Paragraph } from './markdown';
@@ -149,6 +148,7 @@ const _availableAnnotationSets = [annotationsIntro, annotationsSpiceDb].map(
     return {
       value: set.id,
       label: set.label,
+      description: set.cta,
       color: set.highlightColor,
     };
   }
@@ -513,7 +513,7 @@ function AnnotationPopper(props: {
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}
-            className={`annotation ${popperStyles.tooltip} max-w-xs min-w-lg bg-gray-50 p-0 block z-10 outline outline-1 outline-slate-400 border-t-4 border-${props.colorClass}-400 lg:hidden`}
+            className={`annotation popper-tooltip max-w-xs min-w-lg bg-gray-50 p-0 block z-10 outline outline-1 outline-slate-400 border-t-4 border-${props.colorClass}-400 lg:hidden`}
           >
             <div className="content px-3 pb-3 block text-sm">
               <span className="inline-block">{title}</span>

@@ -1,7 +1,6 @@
 import { Placement } from '@popperjs/core';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 import { usePopper } from 'react-popper';
-import popperStyles from '../styles/Popper.module.css';
 
 type PreviewLinkProps = {
   previewComponent: ReactNode;
@@ -50,7 +49,7 @@ export default function PreviewLink(
           ref={setPopperElement}
           style={styles.popper}
           {...attributes.popper}
-          className={`previewlink ${popperStyles.tooltip} bg-gray-50 p-4 rounded z-10`}
+          className="previewlink popper-tooltip bg-gray-50 p-4 rounded z-10"
         >
           {props.previewComponent}
         </div>
