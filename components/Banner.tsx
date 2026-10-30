@@ -1,126 +1,96 @@
 import clsx from 'clsx';
-import { useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { useEffect, useRef } from 'react';
 import AnnotationSetSelect from './AnnotationSetSelect';
-import { getAvailableAnnotationSets, useAnnotation } from './annotation';
-
-export enum BannerHeights {
-  Large = '55px',
-  Small = '44px',
-}
+import { AuthZedLogo, AuthZedMark } from './AuthZedLogo';
+import { getAvailableAnnotationSets } from './annotation';
 
 /**
  * Banner displayed above the first page of the paper.
  * The annotation set nav bar assumes only one annotation set is active at a time.
  */
-export function Banner(props: { isTopOfContent: boolean }) {
-  const { activeAnnotationSetIds, getAnnotationSet } = useAnnotation();
+export function Banner(props: {
+  isTopOfContent: boolean;
+  onHeightChange: (height: number) => void;
+}) {
+  const { isTopOfContent, onHeightChange } = props;
   const availableAnnotationSets = getAvailableAnnotationSets();
-  const assetUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-    : '';
 
-  const annotationSet = useMemo(() => {
-    if (activeAnnotationSetIds.length === 1) {
-      return getAnnotationSet(activeAnnotationSetIds[0]);
+  // The paper container is positioned below the banner, whose height depends
+  // on the scroll state and the viewport width.
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) {
+      return;
     }
-
-    return undefined;
-  }, [getAnnotationSet, activeAnnotationSetIds]);
+    const observer = new ResizeObserver(() =>
+      onHeightChange(element.offsetHeight)
+    );
+    observer.observe(element, { box: 'border-box' });
+    return () => observer.disconnect();
+  }, [onHeightChange]);
 
   return (
-    <>
-      <div
+    <div
+      ref={ref}
+      className={clsx(
+        'w-full flex bg-white text-black font-sans border-b border-[#d9d6e3] z-100',
+        {
+          'flex-col md:flex-row': isTopOfContent,
+          scrolled: !isTopOfContent,
+        }
+      )}
+    >
+      <a
+        href="https://authzed.com?utm_source=za&utm_medium=toolbar"
+        target="_blank"
+        rel="noopener"
+        aria-label="AuthZed"
         className={clsx(
-          'w-full transition-shadow p-1 pl-2 pr-2 bg-white text-black font-sans text-sm grid grid-cols-[auto,1fr,auto] gap-0 border-solid items-center border-b-2 border-[#cccccc] z-100',
-          {
-            scrolled: !props.isTopOfContent,
-          }
+          'flex shrink-0 bg-[#17141f] transition-all',
+          isTopOfContent
+            ? 'min-h-[52px] md:min-h-16 items-center justify-between gap-3 px-4 md:flex-col md:items-start md:justify-center md:gap-1 md:px-7'
+            : 'min-h-[52px] md:min-h-16 w-14 md:w-auto items-center justify-center md:px-5'
         )}
       >
-        <div>
-          {/* Use img to allow resizing */}
-          <img
-            src={`${assetUrl}/favicon.svg`}
-            alt="logo for zanzibar"
-            className={clsx('transition-all', {
-              'h-10': props.isTopOfContent,
-              'h-5': !props.isTopOfContent,
-            })}
-          />
-        </div>
-        <div className="text-left pl-2 truncate text-ellipsis">
+        <AuthZedLogo
+          className={clsx('text-[#f3f1ff] transition-all', {
+            'h-6 md:h-8': isTopOfContent,
+            'hidden md:block h-7': !isTopOfContent,
+          })}
+        />
+        {!isTopOfContent && <AuthZedMark className="h-6 md:hidden" />}
+        {isTopOfContent && (
+          <span className="block text-[10px] leading-4 font-semibold tracking-[.14em] uppercase text-[#cfc9e0]">
+            Annotated edition
+          </span>
+        )}
+      </a>
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 py-2.5 pl-4 pr-2.5 md:py-0 md:px-0">
+        <div className="flex-1 min-w-0 md:px-6">
           <h2
-            className={clsx('transition-all m-0', {
-              'text-lg': props.isTopOfContent,
-              'text-sm': !props.isTopOfContent,
-            })}
-          >
-            Zanzibar
-            <span
-              className={clsx('hidden xl:inline-block', {
-                'lg:inline-block': props.isTopOfContent,
-              })}
-            >
-              : Google’s Consistent, Global Authorization System
-            </span>
-            {!props.isTopOfContent && (
-              <div className="annotation-markdown hidden md:inline-block">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    a: (props) => (
-                      <a
-                        href={props.href}
-                        target="_blank"
-                        rel="noopener"
-                        className="text-black hover:text-indigo-200 underline"
-                      >
-                        {props.children}
-                      </a>
-                    ),
-                  }}
-                >
-                  {annotationSet?.cta ?? ''}
-                </ReactMarkdown>
-              </div>
-            )}
-          </h2>
-          <h4
             className={clsx(
-              'mb-0 transition-all overflow-hidden hidden lg:block',
-              {
-                'h-[20px]': props.isTopOfContent,
-                'h-[0px]': !props.isTopOfContent,
-              }
+              'm-0 font-serif font-bold leading-tight transition-all',
+              isTopOfContent
+                ? 'text-[17px] md:text-[19px] md:truncate'
+                : 'text-[17px] md:text-base truncate'
             )}
           >
-            Annotated by{' '}
-            <a
-              href="https://authzed.com"
-              target="_blank"
-              rel="noopener"
-              className="text-black hover:text-indigo-200 underline"
-            >
-              AuthZed
-            </a>
-            &nbsp;| Originally presented at 2019 USENIX Annual Technical
-            Conference
-          </h4>
-        </div>
-        <div className="text-right">
-          {props.isTopOfContent && (
-            <span className="hidden lg:inline-block">
-              Choose annotations:&nbsp;&nbsp;
-            </span>
+            Zanzibar: Google’s Consistent, Global Authorization System
+          </h2>
+          {isTopOfContent && (
+            <p className="m-0 mt-0.5 text-xs md:text-[13px] text-gray-600 md:truncate">
+              Originally presented at 2019 USENIX Annual Technical Conference
+            </p>
           )}
+        </div>
+        <div className="shrink-0 md:py-1 md:pr-4">
           <AnnotationSetSelect
             items={availableAnnotationSets}
             default="intro"
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }

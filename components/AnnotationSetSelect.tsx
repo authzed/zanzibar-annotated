@@ -1,6 +1,11 @@
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Transition } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import {
+  ChatBubbleLeftEllipsisIcon,
+  CheckIcon,
+  ChevronUpDownIcon,
+} from '@heroicons/react/20/solid';
 import { Fragment, useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useAnnotation } from './annotation';
 import { gtag } from './GTag';
 
@@ -11,8 +16,28 @@ function classNames(...classes: string[]) {
 type SelectItem = {
   value: string;
   label: string;
+  description?: string;
   color?: string;
 };
+
+// Renders an item's markdown description inline. Links are shown as text since
+// the description sits inside the select's button and options.
+function Description(props: { children: string }) {
+  return (
+    <ReactMarkdown
+      allowedElements={['p', 'a', 'em', 'strong']}
+      unwrapDisallowed
+      components={{
+        p: ({ children }) => <>{children}</>,
+        a: ({ children }) => (
+          <span className="underline underline-offset-2">{children}</span>
+        ),
+      }}
+    >
+      {props.children}
+    </ReactMarkdown>
+  );
+}
 
 type SelectProps = {
   items: SelectItem[];
@@ -51,17 +76,32 @@ export default function AnnotationSetSelect(props: SelectProps) {
       {({ open }) => (
         <>
           <div className="relative inline-block">
-            <ListboxButton className="relative cursor-default rounded border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-0">
+            <ListboxButton
+              aria-label={`Choose annotations: ${selected?.label ?? ''}`}
+              className="relative flex items-center cursor-default rounded border border-gray-300 bg-white p-2.5 md:py-1 md:pl-3 md:pr-9 text-left focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-0"
+            >
+              {/* Phones show an icon in place of the selected set. */}
+              <ChatBubbleLeftEllipsisIcon
+                className="h-5 w-5 md:hidden"
+                aria-hidden="true"
+              />
               <span
                 className={classNames(
                   selected?.color ? `bg-${selected?.color}-300` : '',
-                  'hidden lg:inline-block w-2 mr-2'
+                  'absolute top-1.5 right-1.5 h-2 w-2 rounded-full md:static md:h-auto md:w-2 md:self-stretch md:rounded-sm md:mr-2 md:shrink-0'
                 )}
-              >
-                &nbsp;
+              />
+              <span className="hidden md:flex flex-col w-52">
+                <span className="truncate text-[13px] leading-4 font-semibold">
+                  {selected?.label}
+                </span>
+                {selected?.description && (
+                  <span className="text-[11px] leading-[14px] text-gray-500">
+                    <Description>{selected.description}</Description>
+                  </span>
+                )}
               </span>
-              <span className="truncate ">{selected?.label}</span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
+              <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 hidden md:flex items-center pr-2">
                 <ChevronUpDownIcon className="h-5 w-5" aria-hidden="true" />
               </span>
             </ListboxButton>
@@ -73,7 +113,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <ListboxOptions className="absolute w-fit z-10 mt-1 max-h-56 overflow-auto rounded bg-white py-1 right-0 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <ListboxOptions className="absolute w-72 z-10 mt-1 max-h-56 overflow-auto rounded bg-white py-1 right-0 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {props.items.map((item) => (
                   <ListboxOption
                     key={item.value}
@@ -82,22 +122,27 @@ export default function AnnotationSetSelect(props: SelectProps) {
                   >
                     {({ selected }) => (
                       <>
-                        <div className="flex items-center">
+                        <div className="flex">
                           <span
                             className={classNames(
                               item.color ? `bg-${item.color}-300` : '',
-                              'block w-2'
+                              'block w-2 shrink-0 rounded-sm'
                             )}
-                          >
-                            &nbsp;
-                          </span>
-                          <span
-                            className={classNames(
-                              selected ? 'font-semibold' : 'font-normal',
-                              'ml-3 block truncate'
+                          />
+                          <span className="ml-3 block">
+                            <span
+                              className={classNames(
+                                selected ? 'font-semibold' : 'font-normal',
+                                'block'
+                              )}
+                            >
+                              {item.label}
+                            </span>
+                            {item.description && (
+                              <span className="block mt-0.5 text-xs text-gray-500">
+                                <Description>{item.description}</Description>
+                              </span>
                             )}
-                          >
-                            {item.label}
                           </span>
                         </div>
 

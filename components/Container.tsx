@@ -1,22 +1,24 @@
-import { PropsWithChildren, UIEvent, useState } from 'react';
-import { BannerHeights } from './Banner';
+import { PropsWithChildren, UIEvent } from 'react';
 
 const CONTAINER_ELEMENT_ID = 'paper-container';
 const CONTENT_CONTAINER_CLASS_NAME = 'paper-content-container';
+
+// How far, in pixels, the paper scrolls before it no longer counts as the top
+// of the content and the banner collapses.
+const TOP_OF_CONTENT_THRESHOLD = 80;
 
 /**
  * Container is the scrollable container element for the content of the paper.
  */
 export function Container(
   props: PropsWithChildren<{
+    /** Offset from the top of the page, in pixels, below the banner. */
+    top: number;
     onScrolled: (isTopOfContent: boolean) => void;
   }>
 ) {
-  const [isTopOfContent, setIsTopOfContent] = useState(false);
-
   const handleScrolled = (e: UIEvent<HTMLDivElement>) => {
-    props.onScrolled(e.currentTarget.scrollTop === 0);
-    setIsTopOfContent(e.currentTarget.scrollTop === 0);
+    props.onScrolled(e.currentTarget.scrollTop < TOP_OF_CONTENT_THRESHOLD);
   };
 
   return (
@@ -26,10 +28,7 @@ export function Container(
       className="transition-all"
       style={{
         position: 'absolute',
-        height: isTopOfContent
-          ? `calc(100vh - ${BannerHeights.Large})`
-          : `calc(100vh - ${BannerHeights.Small})`,
-        top: isTopOfContent ? BannerHeights.Large : BannerHeights.Small,
+        top: `${props.top}px`,
         left: '0px',
         right: '0px',
         bottom: '0px',

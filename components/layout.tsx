@@ -64,6 +64,7 @@ const defaultHighlightOptions = { block: 'center', behavior: 'smooth' } satisfie
  */
 export function Layout(props: PropsWithChildren<LayoutProps>) {
   const [isTopOfContent, setIsTopOfContent] = useState(true);
+  const [bannerHeight, setBannerHeight] = useState(64);
   const renderState = useRenderState();
   switch (renderState.state) {
     case RenderingState.FOR_SELECTION:
@@ -144,14 +145,17 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
           </Head>
           <GTagScript />
           <AnnotationManagerProvider>
-            <Container onScrolled={setIsTopOfContent}>
+            <Container top={bannerHeight} onScrolled={setIsTopOfContent}>
               <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
                 <SelectionShare />
                 {props.children}
               </div>
               <Footer />
             </Container>
-            <Banner isTopOfContent={isTopOfContent} />
+            <Banner
+              isTopOfContent={isTopOfContent}
+              onHeightChange={setBannerHeight}
+            />
           </AnnotationManagerProvider>
           <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
           <HighlightProvidedSelection

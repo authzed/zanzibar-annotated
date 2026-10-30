@@ -149,6 +149,7 @@ const _availableAnnotationSets = [annotationsIntro, annotationsSpiceDb].map(
     return {
       value: set.id,
       label: set.label,
+      description: set.cta,
       color: set.highlightColor,
     };
   }
