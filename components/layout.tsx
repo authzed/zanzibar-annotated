@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren } from 'react';
 import { Banner } from './Banner';
 import { Container, ContentContainer } from './Container';
 import { Footer } from './Footer';
@@ -9,10 +9,9 @@ import SelectionShare from './SelectionShare';
 import {
   AnnotationGroup,
   AnnotationManagerProvider,
-  NoAnnotationManagerProvider,
 } from './annotation';
-import { RenderingState, useRenderState } from './renderstate';
 import {SelectRangesOptions} from './lib/selectranges';
+import { CANONICAL_URL_BASE, getAssetUrl } from '../util/siteconfig';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
 
@@ -45,16 +44,10 @@ export type LayoutProps = {
   selectionContext?: SelectionContext | undefined | null;
 };
 
-function getAssetUrl() {
-  return process.env.NEXT_PUBLIC_VERCEL_URL
-    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-    : '';
-}
-
+// Social crawlers require an absolute URL, so fall back to the canonical site
+// when the deployment URL isn't known.
 function getDefaultPreviewImageUrl() {
-  return process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/preview.png`
-    : '/preview.png';
+  return `${getAssetUrl() || CANONICAL_URL_BASE}/preview.png`;
 }
 
 const defaultHighlightOptions = { block: 'center', behavior: 'smooth' } satisfies SelectRangesOptions
@@ -63,108 +56,89 @@ const defaultHighlightOptions = { block: 'center', behavior: 'smooth' } satisfie
  * Paper layout
  */
 export function Layout(props: PropsWithChildren<LayoutProps>) {
-  const [isTopOfContent, setIsTopOfContent] = useState(true);
-  const [bannerHeight, setBannerHeight] = useState(64);
-  const renderState = useRenderState();
-  switch (renderState.state) {
-    case RenderingState.FOR_SELECTION:
-      return (
-        <div className="font-serif">
-          <NoAnnotationManagerProvider>
-            {props.children}
-          </NoAnnotationManagerProvider>
-        </div>
-      );
-
-    default:
-      let previewText: string | undefined = undefined;
-      if (props.selectionContext?.previewText) {
-        previewText = props.selectionContext.previewText
-          .split('\n')
-          .map((l) => `> ${l}`)
-          .join('\n')
-          .substring(0, 200);
-      }
-      const previewImageUrl =
-        props.selectionContext?.previewImageUrl ?? getDefaultPreviewImageUrl();
-      return (
-        <>
-          <Head>
-            <title>The Google Zanzibar Paper, annotated by AuthZed</title>
-            <link rel="canonical" href={props.canonicalUrl} />
-            <link
-              rel="icon"
-              href={`${getAssetUrl()}/favicon.ico`}
-              type="image/x-icon"
-              sizes="48x48"
-            />
-            <meta
-              name="viewport"
-              content="width=device-width, initial-scale=1.0"
-            />
-            <meta
-              name="description"
-              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
-            />
-            <meta property="og:type" content="website" />
-            <meta
-              property="og:title"
-              content="The Google Zanzibar Paper, annotated by AuthZed"
-            />
-            <meta property="twitter:card" content="summary_large_image" />
-            <meta property="twitter:site" content="@authzed" />
-            <meta
-              property="twitter:description"
-              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
-            />
-            <meta
-              property="og:description"
-              content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
-            />
-            <meta
-              property="twitter:title"
-              content="The Google Zanzibar Paper, annotated by AuthZed"
-            />
-            <meta property="og:image" content={previewImageUrl} />
-            <meta property="twitter:image" content={previewImageUrl} />
-            {!!previewText && (
-              <meta property="og:image:alt" content={previewText} />
-            )}
-            {!!previewText && (
-              <meta property="twitter:image:alt" content={previewText} />
-            )}
-            {!!props.selectionContext?.previewSection && (
-              <>
-                <meta name="twitter:label1" content="Section" />
-                <meta
-                  name="twitter:data1"
-                  content={props.selectionContext.previewSection}
-                />
-              </>
-            )}
-          </Head>
-          <GTagScript />
-          <AnnotationManagerProvider>
-            <Container top={bannerHeight} onScrolled={setIsTopOfContent}>
-              <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
-                <SelectionShare />
-                {props.children}
-              </div>
-              <Footer />
-            </Container>
-            <Banner
-              isTopOfContent={isTopOfContent}
-              onHeightChange={setBannerHeight}
-            />
-          </AnnotationManagerProvider>
-          <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
-          <HighlightProvidedSelection
-            options={defaultHighlightOptions}
-            pathPrefix="/"
-          />
-        </>
-      );
+  let previewText: string | undefined = undefined;
+  if (props.selectionContext?.previewText) {
+    previewText = props.selectionContext.previewText
+      .split('\n')
+      .map((l) => `> ${l}`)
+      .join('\n')
+      .substring(0, 200);
   }
+  const previewImageUrl =
+    props.selectionContext?.previewImageUrl ?? getDefaultPreviewImageUrl();
+  return (
+    <>
+      <Head>
+        <title>The Google Zanzibar Paper, annotated by AuthZed</title>
+        <link rel="canonical" href={props.canonicalUrl} />
+        <link
+          rel="icon"
+          href={`${getAssetUrl()}/favicon.ico`}
+          type="image/x-icon"
+          sizes="48x48"
+        />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0"
+        />
+        <meta
+          name="description"
+          content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
+        />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:title"
+          content="The Google Zanzibar Paper, annotated by AuthZed"
+        />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:site" content="@authzed" />
+        <meta
+          property="twitter:description"
+          content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
+        />
+        <meta
+          property="og:description"
+          content="Zanzibar: Google’s Consistent, Global Authorization System. An annotated copy of the original paper submitted to USENIX 2019."
+        />
+        <meta
+          property="twitter:title"
+          content="The Google Zanzibar Paper, annotated by AuthZed"
+        />
+        <meta property="og:image" content={previewImageUrl} />
+        <meta property="twitter:image" content={previewImageUrl} />
+        {!!previewText && (
+          <meta property="og:image:alt" content={previewText} />
+        )}
+        {!!previewText && (
+          <meta property="twitter:image:alt" content={previewText} />
+        )}
+        {!!props.selectionContext?.previewSection && (
+          <>
+            <meta name="twitter:label1" content="Section" />
+            <meta
+              name="twitter:data1"
+              content={props.selectionContext.previewSection}
+            />
+          </>
+        )}
+      </Head>
+      <GTagScript />
+      <AnnotationManagerProvider>
+        <Container>
+          <div className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
+            <SelectionShare />
+            {props.children}
+          </div>
+          <Footer />
+        </Container>
+        <Banner />
+      </AnnotationManagerProvider>
+      <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
+      <HighlightProvidedSelection
+        options={defaultHighlightOptions}
+      />
+    </>
+  );
 }
 
 /**

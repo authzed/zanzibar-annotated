@@ -7,7 +7,6 @@ import { getPathSegments } from './pathsegments';
 
 export function HighlightProvidedSelection(props: {
   options?: SelectRangesOptions | undefined;
-  pathPrefix: string;
   onSelectionChanged?: (fragement: string) => void;
 }) {
   useEffect(() => {
@@ -20,10 +19,10 @@ export function HighlightProvidedSelection(props: {
       );
       selectRanges(selectionRanges, props.options);
     }
-  }, [props.pathPrefix, props.options]);
+  }, [props.options]);
 
   useEffect(() => {
-    const { basePath, pathPrefix } = getPathSegments(window.location.pathname);
+    const { basePath } = getPathSegments(window.location.pathname);
 
     // Based on the fragment in the original deeplinks.ts library.
     const timeoutHandle = setTimeout(() => {
@@ -51,7 +50,7 @@ export function HighlightProvidedSelection(props: {
           if (fragment && fragment.includes(':') && fragment.startsWith('#')) {
             const newPath = `${location.origin}${
               basePath ? `/${basePath}` : ''
-            }${pathPrefix ? `/${pathPrefix}` : ''}/${fragment.substring(1)}`;
+            }/${fragment.substring(1)}`;
 
             // replaceState is used instead of setting location.hash to avoid scrolling.
             history.replaceState(null, '', newPath);

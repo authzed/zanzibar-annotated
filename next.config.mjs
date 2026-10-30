@@ -19,7 +19,22 @@ export default withMDX({
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   reactStrictMode: true,
-  assetPrefix: isProd ? `https://${process.env.VERCEL_URL}` : undefined,
+  // Don't generate AGENTS.md when `next dev` detects a coding agent.
+  agentRules: false,
+  // Serve assets from the deployment's own URL on Vercel, since the site is
+  // also served under authzed.com/zanzibar.
+  assetPrefix:
+    isProd && process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : undefined,
+  // The preview API reads its font, and the default preview image it falls
+  // back to, from disk.
+  outputFileTracingIncludes: {
+    '/api/preview/[ranges]': [
+      './public/LinLibertine_R.ttf',
+      './public/preview.png',
+    ],
+  },
   turbopack: {
     rules: {
       '*.svg': {

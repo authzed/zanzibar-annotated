@@ -20,8 +20,9 @@ type SelectItem = {
   color?: string;
 };
 
-// Renders an item's markdown description inline. Links are shown as text since
-// the description sits inside the select's button and options.
+// Renders an item's markdown description inline. Links are shown as emphasized
+// text rather than links since the description sits inside the select's button
+// and options.
 function Description(props: { children: string }) {
   return (
     <ReactMarkdown
@@ -30,7 +31,7 @@ function Description(props: { children: string }) {
       components={{
         p: ({ children }) => <>{children}</>,
         a: ({ children }) => (
-          <span className="underline underline-offset-2">{children}</span>
+          <span className="font-semibold text-gray-700">{children}</span>
         ),
       }}
     >

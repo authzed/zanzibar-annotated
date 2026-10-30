@@ -28,18 +28,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### Configuration
 
 All configuration is through environment variables, documented in [`.env.example`](.env.example).
-None are required for local development, but `PREVIEW_ENDPOINT` must point at your running instance for shareable links to render their previews.
+None are required for local development.
 
 | Variable | Description |
 | --- | --- |
-| `PREVIEW_ENDPOINT` | Base URL the server fetches the rendered paper from. Defaults to `https://$VERCEL_URL`. |
-| `NEXT_PUBLIC_POSTHOG_KEY` | [PostHog] project API key. Analytics are disabled when unset. |
-| `NEXT_PUBLIC_POSTHOG_HOST` | PostHog API host, or the path of a reverse proxy on the same host (for example `/ingest`). Defaults to `https://us.i.posthog.com`. |
-| `NEXT_PUBLIC_POSTHOG_UI_HOST` | PostHog app URL, used for toolbar links when events go through a proxy. |
-
-Visitors are tracked anonymously, without cookies, unless an `az-consent` cookie (set by the authzed.com consent banner) records consent to statistics cookies.
-
-[PostHog]: https://posthog.com/
+| `PREVIEW_ENDPOINT` | Public base URL of the site, used in share preview image URLs. Defaults to `https://$VERCEL_URL` on Vercel, and otherwise to `http://localhost:$PORT`. Set it when self-hosting so previews use your public URL. |
 
 ## Overview
 
@@ -124,7 +117,7 @@ An individual annotation can be directly linked using:
 Preview images for selections are generated with [`next/og`](https://nextjs.org/docs/app/api-reference/functions/image-response), and preview text is generated using [NextJS] server side rendering and [JSDOM].
 This provides a rich preview of the paper content when a shareable link is posted to another site.
 
-In the dev environment, set the PREVIEW_ENDPOINT env variable to your local instance (usually localhost:3000).
+The server renders the paper in-process to resolve selections, so no configuration is needed in the dev environment.
 
 _Note: The paper viewer app relies on a serverless function to generate the previews. Currently, [Vercel] is the only tested hosting service._
 

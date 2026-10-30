@@ -1,30 +1,27 @@
 export type PathSegments = {
   basePath?: string;
-  pathPrefix?: string;
   selectionId?: string;
 };
 
 /**
  * Parses a pathname into parts used to highlight selections.
- * basePath: The base path for the siet. Only supports a single level base path.
- * pathPrefix: The prefix that identifies that type of selection. Must start with '_'
+ * basePath: The base path for the site. Only supports a single level base path.
  * selectionId: The content selection id
  */
 export function getPathSegments(pathname: string): PathSegments {
   // Only handle deeplink paths (identified by the presence of ':')
   // to allow default behavior for all other fragments such as anchor links
-  let basePath, pathPrefix, selectionId;
+  let basePath, selectionId;
   const pathParts = pathname.split('/').filter((part) => part);
-  const partCount = pathParts.length;
-  let part = pathParts.pop();
-  switch (partCount) {
+  const part = pathParts[pathParts.length - 1];
+  switch (pathParts.length) {
     case 0:
       // No parts present
       break;
     case 1:
       // /<selection id>
       // /<base path>
-      if (part?.includes(':')) {
+      if (part.includes(':')) {
         selectionId = part;
       } else {
         basePath = part;
@@ -32,42 +29,20 @@ export function getPathSegments(pathname: string): PathSegments {
       break;
     case 2:
       // /<base path>/<selection id>
-      // /<path prefix>/<selection id>
-      if (part?.includes(':')) {
+      basePath = pathParts[0];
+      if (part.includes(':')) {
         selectionId = part;
-        const baseOrPrefix = pathParts.pop();
-        // path prefixes must start with an underscore
-        if (baseOrPrefix?.startsWith('_')) {
-          pathPrefix = baseOrPrefix;
-        } else {
-          basePath = baseOrPrefix;
-        }
-      } else {
-        // <unknown format>
-        // Preserve base path, ignore remainder of path
-        basePath = pathParts.pop();
-      }
-      break;
-    case 3:
-      // /<base path>/<path prefix>/<selection id>
-      if (part?.includes(':')) {
-        selectionId = part;
-        pathPrefix = pathParts.pop();
-        basePath = pathParts.pop();
-      } else {
-        // <unknown format>
-        // Preserve base path, ignore remainder of path
-        basePath = pathParts[0];
       }
       break;
     default:
-      console.log('Unsupported path format');
+      // <unknown format>
+      // Preserve base path, ignore remainder of path
+      basePath = pathParts[0];
       break;
   }
 
   return {
     basePath,
-    pathPrefix,
     selectionId,
   };
 }

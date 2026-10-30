@@ -48,22 +48,31 @@ export function getSelectionPreview(ranges: Range[]): SelectionPreview | null {
   afterRange.selectNodeContents(endBlock);
   afterRange.setStart(last.endContainer, last.endOffset);
 
+  // Neighboring blocks are only shown when the selection is within a block;
+  // otherwise its position among the blocks is unknown.
   const blocks = Array.from(doc.querySelectorAll(BLOCK_SELECTOR));
+  const startIndex = blocks.indexOf(startBlock);
+  const endIndex = blocks.indexOf(endBlock);
   const isUnrelated = (block: Element, to: Element) =>
     !block.contains(to) && !to.contains(block) && !!blockText(block);
-  const previous = blocks
-    .slice(0, blocks.indexOf(startBlock))
-    .reverse()
-    .find((b) => isUnrelated(b, startBlock));
-  const next = blocks
-    .slice(blocks.indexOf(endBlock) + 1)
-    .find((b) => isUnrelated(b, endBlock));
+  const previous =
+    startIndex >= 0
+      ? blocks
+          .slice(0, startIndex)
+          .reverse()
+          .find((b) => isUnrelated(b, startBlock))
+      : undefined;
+  const next =
+    endIndex >= 0
+      ? blocks.slice(endIndex + 1).find((b) => isUnrelated(b, endBlock))
+      : undefined;
 
   const preview: SelectionPreview = {
     before: trimBefore(rangeText(beforeRange).trimStart()),
     selected: ranges.map(rangeText).join(' ').trim(),
     after: trimAfter(rangeText(afterRange).trimEnd()),
-    isHeading: isHeading(startBlock),
+    // A selection spanning several blocks is shown as body text.
+    isHeading: startBlock === endBlock && isHeading(startBlock),
   };
   if (previous) {
     preview.previous = {
@@ -83,9 +92,10 @@ function blockText(block: Element): string {
   return rangeText(range).trim();
 }
 
-// Returns the visible text in a range with whitespace collapsed. Rendered math
-// is skipped: KaTeX output includes MathML and TeX source that would otherwise
-// show up as raw markup.
+// Returns the visible text in a range with whitespace collapsed, separating
+// text from different blocks with a space. Rendered math is skipped: KaTeX
+// output includes MathML and TeX source that would otherwise show up as raw
+// markup.
 function rangeText(range: Range): string {
   const root = range.commonAncestorContainer;
   const textNodes: Node[] = [];
@@ -102,10 +112,16 @@ function rangeText(range: Range): string {
   }
 
   let text = '';
+  let block: Element | undefined;
   for (const node of textNodes) {
     if (!range.intersectsNode(node) || node.parentElement?.closest(MATH_SELECTOR)) {
       continue;
     }
+    const nodeBlock = findBlock(node);
+    if (block && nodeBlock !== block) {
+      text += ' ';
+    }
+    block = nodeBlock;
     const value = node.textContent ?? '';
     const start = node === range.startContainer ? range.startOffset : 0;
     const end = node === range.endContainer ? range.endOffset : value.length;
@@ -147,7 +163,8 @@ function trimAfter(text: string): string {
     return text;
   }
   const head = text.slice(0, MAX_CONTEXT_LENGTH);
-  return `${head.slice(0, head.lastIndexOf(' ')).trimEnd()}…`;
+  const end = head.lastIndexOf(' ');
+  return `${(end >= 0 ? head.slice(0, end) : head).trimEnd()}…`;
 }
 
 /**

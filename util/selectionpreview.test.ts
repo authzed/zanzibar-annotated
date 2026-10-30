@@ -27,6 +27,9 @@ const doc = new JSDOM(`<body>
   <p>Inline <span class="katex"><span class="katex-mathml">MATHML</span><span class="katex-html">x</span></span> math and ⟨object id⟩ brackets.</p>
   <p><span class="katex">\\lang only math \\rang</span></p>
   <p>After math.</p>
+  <div>Loose text outside any block.</div>
+  <p>Last paragraph ${'x'.repeat(320)} end.</p>
+  <h2>Joined heading</h2><p>Joined body.</p>
 </body>`).window.document;
 
 describe('getSelectionPreview', () => {
@@ -83,6 +86,34 @@ describe('getSelectionPreview', () => {
     });
     // The math-only paragraph is skipped as a neighbor.
     expect(preview?.next).toEqual({ text: 'After math.', isHeading: false });
+  });
+
+  test('selection outside any block has no neighbors', () => {
+    const preview = getSelectionPreview([rangeOver(doc, 'Loose text')]);
+    expect(preview).toMatchObject({
+      before: '',
+      selected: 'Loose text',
+      after: ' outside any block.',
+    });
+    expect(preview?.previous).toBeUndefined();
+    expect(preview?.next).toBeUndefined();
+  });
+
+  test('trims context without spaces at the length limit', () => {
+    const preview = getSelectionPreview([rangeOver(doc, 'Last paragraph ')])!;
+    expect(preview.after).toBe(`${'x'.repeat(300)}…`);
+  });
+
+  test('selection across blocks is body text with blocks separated', () => {
+    const range = doc.createRange();
+    const heading = rangeOver(doc, 'Joined heading');
+    const body = rangeOver(doc, 'Joined body.');
+    range.setStart(heading.startContainer, heading.startOffset);
+    range.setEnd(body.endContainer, body.endOffset);
+    expect(getSelectionPreview([range])).toMatchObject({
+      selected: 'Joined heading Joined body.',
+      isHeading: false,
+    });
   });
 
   test('no ranges', () => {

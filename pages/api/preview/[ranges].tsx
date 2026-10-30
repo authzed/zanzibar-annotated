@@ -4,6 +4,7 @@ import { ImageResponse } from 'next/og';
 import path from 'path';
 import { fragmentToRangeList } from '../../../components/lib/deeplinks';
 import { getParsedPaperDOM } from '../../../util/parseddom';
+import { getAssetUrl } from '../../../util/siteconfig';
 import {
   getSelectionPreview,
   SelectionPreview,
@@ -21,23 +22,17 @@ const FADE_HEIGHT = 32;
 const SELECTION_COLOR = '#b4d5fe';
 
 const MAX_AGE = 31536000;
+// The fallback is cached briefly so a transient failure isn't cached for long.
+const FALLBACK_MAX_AGE = 3600;
 
-let fontData: Promise<ArrayBuffer> | undefined;
+let fontData: Buffer | undefined;
 
-// The open source Times New Roman alternative used by the paper, served from
-// this deployment's public directory.
-function loadFont(endpoint: string): Promise<ArrayBuffer> {
-  if (!fontData) {
-    fontData = fetch(`${endpoint}/LinLibertine_R.ttf`).then((res) => {
-      if (!res.ok) {
-        throw new Error(`failed to load font: ${res.status}`);
-      }
-      return res.arrayBuffer();
-    });
-    fontData.catch(() => {
-      fontData = undefined;
-    });
-  }
+// The open source Times New Roman alternative used by the paper. It's read
+// from disk rather than fetched from the deployment, which may be protected.
+function loadFont(): Buffer {
+  fontData ??= fs.readFileSync(
+    path.join(process.cwd(), 'public/LinLibertine_R.ttf')
+  );
   return fontData;
 }
 
@@ -68,25 +63,47 @@ function toParagraphs(preview: SelectionPreview): Paragraph[] {
   return paragraphs;
 }
 
-function sendEmptyImage(res: NextApiResponse) {
-  const filePath = path.resolve('.', 'assets/empty.png');
-  const imageBuffer = fs.readFileSync(filePath);
+// Sends the default preview image, which shows the top of the paper, when a
+// selection preview can't be rendered.
+function sendDefaultImage(res: NextApiResponse) {
+  let image: Buffer;
+  try {
+    image = fs.readFileSync(path.join(process.cwd(), 'public/preview.png'));
+  } catch (e) {
+    // Fall back to the statically served copy of the image.
+    console.error(e);
+    res.setHeader('Cache-Control', 'no-store');
+    return res.redirect(307, `${getAssetUrl()}/preview.png`);
+  }
   res.setHeader('Content-Type', 'image/png');
-  res.send(imageBuffer);
+  res.setHeader('Cache-Control', `s-maxage=${FALLBACK_MAX_AGE}`);
+  res.send(image);
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ranges } = req.query;
   if (typeof ranges !== 'string' || !ranges.includes(':')) {
-    return sendEmptyImage(res);
+    return sendDefaultImage(res);
   }
 
-  let endpoint = process.env.PREVIEW_ENDPOINT;
-  if (!endpoint) {
-    endpoint = `https://${process.env.VERCEL_URL}`;
+  try {
+    const image = await renderPreview(ranges);
+    if (!image) {
+      return sendDefaultImage(res);
+    }
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', `s-maxage=${MAX_AGE}`);
+    res.send(image);
+  } catch (e) {
+    console.error(e);
+    sendDefaultImage(res);
   }
+};
 
-  const dom = await getParsedPaperDOM(endpoint);
+// Renders the preview image for the given ranges, or returns null if the
+// ranges don't resolve to a selection in the paper.
+async function renderPreview(ranges: string): Promise<Buffer | null> {
+  const dom = getParsedPaperDOM();
 
   let preview = null;
   try {
@@ -97,7 +114,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log(e);
   }
   if (!preview?.selected) {
-    return sendEmptyImage(res);
+    return null;
   }
 
   const image = new ImageResponse(
@@ -176,7 +193,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       fonts: [
         {
           name: 'Linux Libertine',
-          data: await loadFont(endpoint),
+          data: loadFont(),
           style: 'normal',
           weight: 400,
         },
@@ -184,9 +201,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   );
 
-  res.setHeader('Content-Type', 'image/png');
-  res.setHeader('Cache-Control', `s-maxage=${MAX_AGE}`);
-  res.send(Buffer.from(await image.arrayBuffer()));
-};
+  return Buffer.from(await image.arrayBuffer());
+}
 
 export default handler;
