@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
     "cypress": "cypress run",
     "e2e": "start-server-and-test 'dev' 'http-get://localhost:3000' 'cypress'",
     "test": "vitest"
