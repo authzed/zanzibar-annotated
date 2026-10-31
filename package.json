@@ -23,7 +23,7 @@
     "@popperjs/core": "^2.11.8",
     "clsx": "^2.1.1",
     "jsdom": "26.1.0",
-    "katex": "^0.16.47",
+    "katex": "^0.18.2",
     "lodash.debounce": "^4.0.8",
     "next": "16.4.3",
     "posthog-js": "^1.442.1",
