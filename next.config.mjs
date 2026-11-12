@@ -34,6 +34,16 @@ export default withMDX({
       './public/LinLibertine_R.ttf',
       './public/preview.png',
     ],
+    // The markdown edition is converted from the paper's source.
+    '/api/markdown': ['./content/zanzibar.mdx'],
+  },
+  // The markdown edition of the paper and llms.txt are generated, but served
+  // at the paths of files.
+  async rewrites() {
+    return [
+      { source: '/paper.md', destination: '/api/markdown' },
+      { source: '/llms.txt', destination: '/api/llms' },
+    ];
   },
   turbopack: {
     rules: {
