@@ -1,6 +1,7 @@
 import Image from 'next/image';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import { getAssetUrl } from '../util/siteconfig';
+import { getAnnotationAuthors } from './annotation';
 
 /**
  * Displayed after the last page of the paper.
@@ -12,9 +13,23 @@ export function Footer() {
   }, []);
   return (
     <>
-      <div className="footer w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
+      <footer className="footer w-full p-3 bg-black text-white font-sans grid grid-cols-[auto,1fr,auto] gap-x-5 items-center text-sm">
         <div>
-          Annotations &copy; {year}{' '}
+          Annotations by{' '}
+          {getAnnotationAuthors().map((author, index) => (
+            <Fragment key={author.url}>
+              {index > 0 && ' & '}
+              <a
+                href={author.url}
+                target="_blank"
+                rel="author noopener"
+                className="text-white hover:text-indigo-200 underline"
+              >
+                {author.name}
+              </a>
+            </Fragment>
+          ))}
+          , &copy; {year}{' '}
           <a
             href="https://authzed.com"
             target="_blank"
@@ -49,7 +64,7 @@ export function Footer() {
             alt="AuthZed"
           />
         </a>
-      </div>
+      </footer>
     </>
   );
 }

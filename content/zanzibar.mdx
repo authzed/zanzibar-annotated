@@ -192,7 +192,7 @@ Specifically, our clients care about preventing the
 <div className="md:col-span-2 mb-10 mx-auto overflow-auto">
 
 <a id="table-1" />
-<Table1 />
+<Table1 role="img" aria-label="Table 1: Example relation tuples. “#...” represents a relation that does not affect the semantics of the tuple." />
 
 </div>
 
@@ -317,7 +317,7 @@ For example, this allows the userset expression for a `viewer` relation to refer
 <Section titles={["2 Model, Language, and API", "2.3 Namespace Configuration", "2.3.1 Relation Configs and Userset Rewrites"]}>
 
 <a id="figure-1" />
-<Figure1 className="mb-10 w-full mt-10 md:mt-0" />
+<Figure1 role="img" aria-label="Figure 1: Simple namespace configuration with concentric relations on documents. All owners are editors, and all editors are viewers. Further, viewers of the parent folder are also viewers of the document." className="mb-10 w-full mt-10 md:mt-0" />
 
 * <Highlight setId="spicedb" entryId="tuple-to-userset">`tuple_to_userset`</Highlight>: Computes a tupleset ([§2.4.1](#2.4.1-read))
 from the input object, fetches relation tuples matching the tupleset, and computes a userset from every fetched relation tuple.
@@ -440,7 +440,7 @@ One such function is to <Highlight setId="intro" entryId="backup">produce dumps 
 
 <div className="md:col-span-2 mx-auto mb-10">
 <a id="figure-2" />
-<Figure2 className="mb-10 w-full" />
+<Figure2 role="img" aria-label="Figure 2: Zanzibar architecture. Arrows indicate the direction of data flow." className="mb-10 w-full" />
 </div>
 
 <Column>
@@ -733,7 +733,7 @@ Therefore we do not hedge requests between Zanzibar servers, but rely on the pre
 </Column>
 <Column>
 <a id="figure-3" />
-<Figure3 className="mb-10 w-full mt-10 md:mt-0" />
+<Figure3 role="img" aria-label="Figure 3: Rate of Check Safe and Check Recent requests over a 7-day period in December 2018." className="mb-10 w-full mt-10 md:mt-0" />
 
 <Section titles={["4 Experience"]}>
 ## 4 Experience
@@ -778,7 +778,7 @@ As our storage
 <Section titles={["4 Experience", "4.1 Requests"]}>
 
 <a id="figure-4" />
-<Figure4 className="mb-10 w-full" />
+<Figure4 role="img" aria-label="Figure 4: Latency of Check Safe responses at different percentiles over a 7-day period in December 2018." className="mb-10 w-full" />
 
 is configured with replication heartbeats with 8-second intervals, we divide our requests into two categories: _Safe_ requests have zookies more than 10 seconds old and can be served within the region most of time, while _Recent_ requests have zookies less than 10 seconds old and often require interregion round trips.
 We report separate statistics for each.
@@ -809,7 +809,7 @@ Writes are the least frequently used of all the APIs, and the slowest because th
 </Column>
 <Column>
 <a id="table-2" />
-<Table2 className="mb-10 w-full mt-10 md:mt-0" />
+<Table2 role="img" aria-label="Table 2: Mean and standard deviation of RPC response latency over a 7-day period in December 2018." className="mb-10 w-full mt-10 md:mt-0" />
 
 <Section titles={["4 Experience", "4.3 Availability"]}>
 ### 4.3 Availability
@@ -848,7 +848,7 @@ In-memory caching handles approximately 200 million lookups per second at peak, 
 <Column>
 <Section titles={["4 Experience", "4.4 Internals"]}>
 <a id="figure-5" />
-<Figure5 className="mb-10 w-full" />
+<Figure5 role="img" aria-label="Figure 5: Zanzibar’s availability over the past three years has remained above 99.999%." className="mb-10 w-full" />
 
 <Highlight setId="spicedb" entryId="cache-hit-rates">checks has a 10% hit rate on the delegate’s side, with an additional 12% saved by the lock table.</Highlight>
 Meanwhile, caching on the delegator’s side has a 2% hit rate with an additional 3% from the lock table.

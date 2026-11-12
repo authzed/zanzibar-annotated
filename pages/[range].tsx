@@ -41,12 +41,22 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
   // selection parse error.
   let selectionRanges: Range[] | undefined = undefined;
   let paperRendered = false;
+  let dom: ReturnType<typeof getParsedPaperDOM> | undefined = undefined;
   try {
-    const dom = getParsedPaperDOM();
+    dom = getParsedPaperDOM();
     paperRendered = true;
-    selectionRanges = fragmentToRangeList(dom.window.document, fragment!);
   } catch (e) {
     console.log(e);
+  }
+
+  // This route matches every path, so a path that isn't a selection is a page
+  // that doesn't exist rather than another copy of the paper.
+  if (dom) {
+    try {
+      selectionRanges = fragmentToRangeList(dom.window.document, fragment!);
+    } catch (e) {
+      return { notFound: true };
+    }
   }
 
   const selectionText = selectionRanges
@@ -71,6 +81,10 @@ export const getServerSideProps: GetServerSideProps<LayoutProps> = async ({
       canonicalUrl: fragment
         ? `${CANONICAL_URL_BASE}/${fragment}`
         : CANONICAL_URL_BASE,
+      // Every selection is the same paper at a different URL, so only the
+      // paper itself is indexed. The selection keeps its own canonical URL,
+      // which social crawlers read its preview from.
+      noIndex: true,
       selectionContext: selectionRanges
         ? {
             previewImageUrl: fragment
