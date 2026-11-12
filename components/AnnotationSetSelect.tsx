@@ -43,6 +43,8 @@ function Description(props: { children: string }) {
 type SelectProps = {
   items: SelectItem[];
   default?: string;
+  // Hides the selected set's description, leaving only its label.
+  compact?: boolean;
 };
 
 // Adapted from https://tailwindui.com/components/application-ui/forms/select-menus
@@ -96,9 +98,18 @@ export default function AnnotationSetSelect(props: SelectProps) {
                 <span className="truncate text-[13px] leading-4 font-semibold">
                   {selected?.label}
                 </span>
+                {/* The description collapses with the banner, animating a
+                    single grid row to zero, so the button fits on one line. */}
                 {selected?.description && (
-                  <span className="text-[11px] leading-[14px] text-gray-500">
-                    <Description>{selected.description}</Description>
+                  <span
+                    className={classNames(
+                      'grid transition-all duration-500 ease-[cubic-bezier(0.33,1,0.68,1)]',
+                      props.compact ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'
+                    )}
+                  >
+                    <span className="min-h-0 overflow-hidden text-[11px] leading-[14px] text-gray-500">
+                      <Description>{selected.description}</Description>
+                    </span>
                   </span>
                 )}
               </span>
