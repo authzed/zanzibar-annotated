@@ -9,6 +9,10 @@ description: |
 
   Learn more about [SpiceDB](https://authzed.com/spicedb?utm_source=za&utm_medium=menu).
 highlightColor: 'sky'
+author:
+  name: 'Joseph Schorr'
+  url: 'https://www.linkedin.com/in/joseph-s-4324904/'
+  avatar: '/authors/joseph-schorr.jpg'
 groups:
   page-1-col-1:
     config-language:

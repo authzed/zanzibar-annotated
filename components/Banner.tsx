@@ -55,7 +55,7 @@ export function Banner() {
   // paper doesn't move as the banner animates. The first measurement is taken
   // before the page paints, so scrolling to a linked selection on load uses
   // the real height rather than the estimate.
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const element = ref.current;
     if (!element) {
@@ -92,7 +92,7 @@ export function Banner() {
   }, []);
 
   return (
-    <div
+    <header
       ref={ref}
       className={clsx(
         'w-full flex flex-col md:flex-row bg-white text-black font-sans border-b border-[#d9d6e3] z-100',
@@ -193,7 +193,8 @@ export function Banner() {
               isTopOfContent ? 'translate-x-0' : 'max-md:translate-x-14'
             )}
           >
-            <h2
+            {/* Not a heading: the paper's own title is the page's heading. */}
+            <div
               className={clsx(
                 'm-0 overflow-hidden font-serif font-bold text-[17px] leading-[22px] md:truncate',
                 TRANSITION,
@@ -203,7 +204,7 @@ export function Banner() {
               )}
             >
               Zanzibar: Google’s Consistent, Global Authorization System
-            </h2>
+            </div>
             <div className={collapsible(isTopOfContent)}>
               <p className="min-h-0 overflow-hidden m-0 indent-0 text-xs leading-4 md:text-[13px] text-gray-600">
                 <span className="block pt-0.5 md:truncate">
@@ -222,6 +223,6 @@ export function Banner() {
           />
         </div>
       </div>
-    </div>
+    </header>
   );
 }

@@ -6,8 +6,9 @@ import {
 } from '@heroicons/react/20/solid';
 import { Fragment, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { useAnnotation } from './annotation';
+import { AnnotationAuthor, useAnnotation } from './annotation';
 import { gtag } from './GTag';
+import { getAssetUrl } from '../util/siteconfig';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -18,7 +19,24 @@ type SelectItem = {
   label: string;
   description?: string;
   color?: string;
+  author?: AnnotationAuthor;
 };
+
+// The picture of a set's author. The author's name is shown beside it, so it
+// has no description of its own.
+function Avatar(props: { author: AnnotationAuthor; className: string }) {
+  return (
+    // A plain image, since it's small and served as is.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`${getAssetUrl()}${props.author.avatar}`}
+      alt=""
+      width={28}
+      height={28}
+      className={classNames('shrink-0 rounded-full', props.className)}
+    />
+  );
+}
 
 // Renders an item's markdown description inline. Links are shown as emphasized
 // text rather than links since the description sits inside the select's button
@@ -43,7 +61,7 @@ function Description(props: { children: string }) {
 type SelectProps = {
   items: SelectItem[];
   default?: string;
-  // Hides the selected set's description, leaving only its label.
+  // Hides the selected set's author or description, leaving only its label.
   compact?: boolean;
 };
 
@@ -94,13 +112,23 @@ export default function AnnotationSetSelect(props: SelectProps) {
                   'absolute top-1.5 right-1.5 h-2 w-2 rounded-full md:static md:h-auto md:w-2 md:self-stretch md:rounded-sm md:mr-2 md:shrink-0'
                 )}
               />
+              {selected?.author && (
+                <Avatar
+                  author={selected.author}
+                  className={classNames(
+                    'hidden md:block mr-2 transition-all duration-500 ease-[cubic-bezier(0.33,1,0.68,1)]',
+                    props.compact ? 'h-5 w-5' : 'h-7 w-7'
+                  )}
+                />
+              )}
               <span className="hidden md:flex flex-col w-52">
                 <span className="truncate text-[13px] leading-4 font-semibold">
                   {selected?.label}
                 </span>
-                {/* The description collapses with the banner, animating a
-                    single grid row to zero, so the button fits on one line. */}
-                {selected?.description && (
+                {/* The set's author, or its description if it has none,
+                    collapses with the banner, animating a single grid row to
+                    zero, so the button fits on one line. */}
+                {(selected?.author || selected?.description) && (
                   <span
                     className={classNames(
                       'grid transition-all duration-500 ease-[cubic-bezier(0.33,1,0.68,1)]',
@@ -108,7 +136,13 @@ export default function AnnotationSetSelect(props: SelectProps) {
                     )}
                   >
                     <span className="min-h-0 overflow-hidden text-[11px] leading-[14px] text-gray-500">
-                      <Description>{selected.description}</Description>
+                      {selected.author ? (
+                        <span className="block truncate pt-0.5">
+                          {`by ${selected.author.name}`}
+                        </span>
+                      ) : (
+                        <Description>{selected.description ?? ''}</Description>
+                      )}
                     </span>
                   </span>
                 )}
@@ -125,7 +159,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <ListboxOptions className="absolute w-72 z-10 mt-1 max-h-56 overflow-auto rounded bg-white py-1 right-0 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <ListboxOptions className="absolute w-72 z-10 mt-1 max-h-80 overflow-auto rounded bg-white py-1 right-0 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {props.items.map((item) => (
                   <ListboxOption
                     key={item.value}
@@ -153,6 +187,15 @@ export default function AnnotationSetSelect(props: SelectProps) {
                             {item.description && (
                               <span className="block mt-0.5 text-xs text-gray-500">
                                 <Description>{item.description}</Description>
+                              </span>
+                            )}
+                            {item.author && (
+                              <span className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-700">
+                                <Avatar
+                                  author={item.author}
+                                  className="h-5 w-5"
+                                />
+                                {item.author.name}
                               </span>
                             )}
                           </span>
