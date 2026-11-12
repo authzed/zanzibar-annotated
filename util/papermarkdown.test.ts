@@ -119,3 +119,48 @@ describe('getLlmsTxt', () => {
     expect(llms).toContain('annotated by Ada Author of AuthZed');
   });
 });
+
+describe('addenda', () => {
+  const markdown = paperToMarkdown(
+    '<Column>\n\nSome <Highlight setId="intro" entryId="noted">noted words</Highlight> here.\n\n</Column>',
+    [
+      {
+        id: 'intro',
+        title: 'Introduction',
+        groups: {
+          'page-1-col-1': {
+            noted: {
+              content: 'The original note.\n',
+              addenda: [
+                { date: '2026-11-12', content: 'First addendum.\n' },
+                {
+                  date: '2026-12-01',
+                  author: 'Ada Author',
+                  content: 'Second\n\naddendum.\n',
+                },
+              ],
+            },
+          },
+        },
+      },
+    ]
+  );
+
+  test('follow the annotation they were added to, in order', () => {
+    expect(markdown).toContain(
+      [
+        '> The original note.',
+        '>',
+        '> _Addendum · Nov 12, 2026:_',
+        '>',
+        '> First addendum.',
+        '>',
+        '> _Addendum · Dec 1, 2026 · Ada Author:_',
+        '>',
+        '> Second',
+        '>',
+        '> addendum.',
+      ].join('\n')
+    );
+  });
+});

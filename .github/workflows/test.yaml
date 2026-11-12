@@ -29,6 +29,8 @@ jobs:
         run: pnpm typecheck
       - name: Run Yarn Build
         run: pnpm build
+      - name: Check that edit mode is not in the build
+        run: pnpm check:build
   cypress:
     name: Cypress Tests
     runs-on: ubuntu-latest

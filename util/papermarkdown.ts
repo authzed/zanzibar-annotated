@@ -1,3 +1,4 @@
+import { Addendum, addendumLabel } from './addendum';
 import {
   PAPER_CONFERENCE,
   PAPER_SOURCE_URL,
@@ -17,7 +18,11 @@ export type AnnotationSetSource = {
   subtitle?: string;
   author?: { name: string; url: string };
   // Annotations by entry id, grouped by where they appear on the page.
-  groups: Record<string, Record<string, { content: string }>>;
+  // A set that has no annotations yet has no groups.
+  groups: Record<
+    string,
+    Record<string, { content: string; addenda?: Addendum[] }>
+  > | null;
 };
 
 // A block of the paper's markdown, with the annotations made on it.
@@ -97,7 +102,7 @@ export function paperToMarkdown(
       {
         set,
         annotations: new Map(
-          Object.values(set.groups).flatMap((group) => Object.entries(group))
+          Object.values(set.groups ?? {}).flatMap((group) => Object.entries(group))
         ),
       },
     ])
@@ -136,7 +141,14 @@ export function paperToMarkdown(
             : quoted;
         annotations.push(
           quote(
-            `**${byline(found.set)}** on “${shortened}”:\n\n${annotation.content.trim()}`
+            [
+              `**${byline(found.set)}** on “${shortened}”:`,
+              annotation.content.trim(),
+              ...(annotation.addenda ?? []).flatMap((addendum) => [
+                `_${addendumLabel(addendum)}:_`,
+                addendum.content.trim(),
+              ]),
+            ].join('\n\n')
           )
         );
       }
@@ -179,7 +191,7 @@ export function paperToMarkdown(
 
 This is the annotated edition of the Zanzibar paper, published by AuthZed at ${CANONICAL_URL_BASE}. The paper was originally presented at the ${PAPER_CONFERENCE}: ${PAPER_SOURCE_URL}. The paper is © USENIX and its original authors; the annotations are © AuthZed, Inc.
 
-Each annotation appears as a block quote after the paragraph it comments on, and quotes the text it refers to. Figures and tables are drawings on the web page, so only their captions appear here. There are two sets of annotations:
+Each annotation appears as a block quote after the paragraph it comments on, and quotes the text it refers to. Figures and tables are drawings on the web page, so only their captions appear here. The annotations are in ${sets.length === 1 ? 'one set' : `${sets.length} sets`}:
 
 ${setList}
 

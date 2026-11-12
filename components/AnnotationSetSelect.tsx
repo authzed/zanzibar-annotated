@@ -112,7 +112,7 @@ export default function AnnotationSetSelect(props: SelectProps) {
                   'absolute top-1.5 right-1.5 h-2 w-2 rounded-full md:static md:h-auto md:w-2 md:self-stretch md:rounded-sm md:mr-2 md:shrink-0'
                 )}
               />
-              {selected?.author && (
+              {selected?.author?.avatar && (
                 <Avatar
                   author={selected.author}
                   className={classNames(
@@ -191,10 +191,12 @@ export default function AnnotationSetSelect(props: SelectProps) {
                             )}
                             {item.author && (
                               <span className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-700">
-                                <Avatar
-                                  author={item.author}
-                                  className="h-5 w-5"
-                                />
+                                {item.author.avatar && (
+                                  <Avatar
+                                    author={item.author}
+                                    className="h-5 w-5"
+                                  />
+                                )}
                                 {item.author.name}
                               </span>
                             )}

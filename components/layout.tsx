@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { PropsWithChildren } from 'react';
 import { Banner } from './Banner';
@@ -6,6 +7,7 @@ import { Footer } from './Footer';
 import { GTagScript } from './GTag';
 import { HighlightProvidedSelection } from './HighlightProvidedSelection';
 import SelectionShare from './SelectionShare';
+import { EditModeProvider } from './editmode';
 import {
   AnnotationGroup,
   AnnotationManagerProvider,
@@ -25,6 +27,16 @@ import { MARKDOWN_URL } from '../util/papermarkdown';
 import { CANONICAL_URL_BASE, getAssetUrl } from '../util/siteconfig';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
+
+// The editor for the paper's edit mode. It's only imported under `next dev`,
+// so it isn't part of the built site.
+const AnnotationEditor =
+  process.env.NODE_ENV === 'development'
+    ? dynamic(
+        () => import('./AnnotationEditor.js').then((mod) => mod.AnnotationEditor),
+        { ssr: false }
+      )
+    : null;
 
 /**
  * SelectionContext is the context associated with the current selection, if any.
@@ -150,14 +162,17 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
       </Head>
       <GTagScript />
       <AnnotationManagerProvider>
-        <Container>
-          <main className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
-            <SelectionShare />
-            <article>{props.children}</article>
-          </main>
-          <Footer />
-        </Container>
-        <Banner />
+        <EditModeProvider>
+          <Container>
+            <main className="container mx-auto max-w-5xl mt-0 mb-20 font-serif">
+              <SelectionShare />
+              {AnnotationEditor && <AnnotationEditor />}
+              <article>{props.children}</article>
+            </main>
+            <Footer />
+          </Container>
+          <Banner />
+        </EditModeProvider>
       </AnnotationManagerProvider>
       <div id={ANNOTATIONS_PORTAL_CONTAINER_ID} />
       <HighlightProvidedSelection
@@ -172,7 +187,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
  */
 export function Page(props: PropsWithChildren<{ pageNumber: number }>) {
   return (
-    <div className="relative z-100">
+    <div className="relative z-100" data-page-number={props.pageNumber}>
       <aside
         aria-label="Annotations"
         className="hidden lg:block absolute h-full w-80 -left-[20rem] top-0 z-10"

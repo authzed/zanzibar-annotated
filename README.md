@@ -93,6 +93,14 @@ highlightColor: A tailwind color class name used to color code the annotations a
 groups:
   page-1-col-2:
     across-applications:
+      content: |
+        Markdown string for the annotation.
+      (Optionally, later additions to the annotation, which are shown after it, oldest first.)
+      addenda:
+        - date: '2026-11-12'
+          author: 'Who wrote the addendum (optional)'
+          content: |
+            Markdown string for the addendum.
     ...
   page-2-col-1:
     ...
@@ -101,6 +109,30 @@ groups:
 See the [content] directory for example.
 
 [content]: https://github.com/authzed/zanzibar-annotated/tree/main/content
+
+#### Adding annotations
+
+Annotations, addenda and new annotation sets can be written on the page itself when developing locally:
+
+1. Run `pnpm dev` and open `http://localhost:3000/?edit`.
+   Edit mode stays on in that tab until you choose `Exit` on its badge.
+2. To add an annotation, select the text to annotate, within a single column of the paper.
+   Choose the annotation set, adjust the entry id, write the annotation and save it.
+3. To add an addendum, choose `Add addendum` on an annotation beside the paper.
+4. To add an annotation set, choose `New set` in the top bar.
+   Only its label is needed; the rest can be filled in later in its YAML file.
+   The page reloads once the set is created.
+
+Saving writes to the annotation set's YAML file and, for a new annotation, wraps the selected text in a `<Highlight>` in `content/zanzibar.mdx`.
+A new set is written to `content/annotations-<id>.yaml` and added to the list of sets in `content/annotation-sets.ts`, which is the one place a set has to be listed.
+Its highlight color is one of those kept by the safelist in `tailwind.config.js`.
+Review the result with `git diff` and commit it.
+
+A selection is refused, and nothing is written, if it can't be placed safely: if the same text appears more than once in the column and the text around it doesn't tell which is meant, or if it crosses a paragraph break, includes math or a figure, or cuts through italic text, code, a link or an existing highlight.
+Those highlights are still added by hand.
+
+Edit mode and the endpoint it saves to only exist under `next dev`.
+The endpoint is in a file with the extension `.dev.mts`, which is only a route under `next dev`, so it isn't part of a build, and it only answers requests made from the same machine.
 
 #### Linking
 
