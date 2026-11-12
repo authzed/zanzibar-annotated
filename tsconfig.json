@@ -24,6 +24,7 @@
     "types.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.mts",
     "cypress/tsconfig.json"
   ],
   "exclude": [

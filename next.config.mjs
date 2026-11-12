@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 import nextMDX from '@next/mdx';
+import { PHASE_DEVELOPMENT_SERVER } from 'next/constants.js';
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -15,9 +16,22 @@ const withMDX = nextMDX({
   },
 });
 
-export default withMDX({
+// The configuration depends on whether it's for `next dev`.
+const config = (phase) => withMDX({
   // Append the default value with md extensions
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  // Files ending in .dev.mts are routes only under `next dev`: no other
+  // extension here matches them, so a build leaves them out, whatever
+  // NODE_ENV it's made with. The paper's edit mode, which writes to the files
+  // under content/, relies on it.
+  pageExtensions: [
+    'ts',
+    'tsx',
+    'js',
+    'jsx',
+    'md',
+    'mdx',
+    ...(phase === PHASE_DEVELOPMENT_SERVER ? ['dev.mts'] : []),
+  ],
   reactStrictMode: true,
   // Don't generate AGENTS.md when `next dev` detects a coding agent.
   agentRules: false,
@@ -58,3 +72,5 @@ export default withMDX({
     },
   },
 });
+
+export default config;

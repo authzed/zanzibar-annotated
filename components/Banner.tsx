@@ -4,6 +4,7 @@ import AnnotationSetSelect from './AnnotationSetSelect';
 import { AuthZedLogo, AuthZedMark } from './AuthZedLogo';
 import { getAvailableAnnotationSets } from './annotation';
 import { CONTAINER_ELEMENT_ID, TOP_OF_CONTENT_THRESHOLD } from './Container';
+import { useEditMode } from './editmode';
 
 const AUTHZED_URL = 'https://authzed.com?utm_source=za&utm_medium=toolbar';
 
@@ -28,6 +29,7 @@ function collapsible(open: boolean) {
  */
 export function Banner() {
   const availableAnnotationSets = getAvailableAnnotationSets();
+  const editMode = useEditMode();
 
   // The scroll state lives here rather than in the layout so that collapsing
   // the banner only re-renders the banner, not the whole paper.
@@ -215,6 +217,16 @@ export function Banner() {
             </div>
           </div>
         </div>
+        {/* Only in the paper's edit mode, under `next dev`. */}
+        {process.env.NODE_ENV === 'development' && editMode.enabled && (
+          <button
+            data-testid="new-annotation-set"
+            className="shrink-0 mr-2.5 rounded border border-emerald-600 px-2.5 py-1 text-[13px] leading-4 font-semibold text-emerald-700 hover:bg-emerald-50"
+            onClick={() => editMode.setCreatingSet(true)}
+          >
+            New set
+          </button>
+        )}
         <div className="shrink-0 px-2.5 md:pl-0 md:py-1 md:pr-4">
           <AnnotationSetSelect
             items={availableAnnotationSets}

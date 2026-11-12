@@ -12,9 +12,13 @@ module.exports = {
     },
     extend: {},
   },
+  // The colors an annotation set can be highlighted in, whose classes are put
+  // together when the page is rendered. Keep in step with HIGHLIGHT_COLORS in
+  // util/annotationedit/sets.ts.
   safelist: [
     {
-      pattern: /(bg|border|text)-(amber|sky)-(100|200|300|400)/,
+      pattern:
+        /(bg|border|text)-(amber|sky|emerald|rose|violet|lime|orange|teal|fuchsia)-(100|200|300|400)/,
     },
   ],
 };

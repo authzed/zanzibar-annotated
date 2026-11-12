@@ -13,8 +13,10 @@ import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import { usePopper } from 'react-popper';
 import remarkGfm from 'remark-gfm';
-import annotationsIntro from '../content/annotations-intro.yaml';
-import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
+import { ANNOTATION_SETS } from '../content/annotation-sets';
+import { Addendum } from '../util/addendum';
+import { AnnotationAddenda } from './AnnotationAddenda';
+import { useEditMode } from './editmode';
 import { gtag } from './GTag';
 import { ANNOTATIONS_PORTAL_CONTAINER_ID } from './layout';
 import { Paragraph } from './markdown';
@@ -48,6 +50,8 @@ type AnnotationData = {
   entryId: string;
   title?: string;
   content: string;
+  // Later additions to the annotation, oldest first.
+  addenda?: Addendum[];
 };
 
 /**
@@ -57,8 +61,9 @@ export type AnnotationAuthor = {
   name: string;
   // The author's profile page.
   url: string;
-  // Path of the author's picture under the site's public assets.
-  avatar: string;
+  // Path of the author's picture under the site's public assets, if they
+  // have one.
+  avatar?: string;
 };
 
 type AnnotationSet = {
@@ -80,7 +85,8 @@ function loadAnnotationData(data: any): AnnotationSet {
   const setId = data.id;
   const annotationMap = new Map<string, AnnotationData>();
   const annotationGroups = new Map<string, AnnotationData[]>();
-  for (const [groupId, group] of Object.entries(data['groups'])) {
+  // A set that has no annotations yet has no groups.
+  for (const [groupId, group] of Object.entries(data['groups'] ?? {})) {
     const groupList = [];
     for (const [key, annotationData] of Object.entries(group as object)) {
       const obj = { setId, entryId: key, ...annotationData };
@@ -156,7 +162,7 @@ export const NoAnnotationManagerProvider: React.FC<PropsWithChildren> = (
   );
 };
 
-const _availableAnnotationSets = [annotationsIntro, annotationsSpiceDb].map(
+const _availableAnnotationSets = ANNOTATION_SETS.map(
   (set) => {
     return {
       value: set.id,
@@ -176,9 +182,7 @@ export function getAvailableAnnotationSets() {
  * getAnnotationAuthors returns the authors of the annotation sets.
  */
 export function getAnnotationAuthors(): AnnotationAuthor[] {
-  return [annotationsIntro, annotationsSpiceDb]
-    .map((set) => set.author)
-    .filter(Boolean);
+  return ANNOTATION_SETS.map((set) => set.author).filter(Boolean);
 }
 
 const allAnnotationSetIds = getAvailableAnnotationSets().map(
@@ -212,10 +216,10 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
   // Note: This is populated from an imported object so it should not be modified.
   const annotationSets = useMemo(() => {
     const map = new Map<string, AnnotationSet>();
-    const intro = loadAnnotationData(annotationsIntro);
-    const spicedb = loadAnnotationData(annotationsSpiceDb);
-    map.set(intro.id, intro);
-    map.set(spicedb.id, spicedb);
+    for (const data of ANNOTATION_SETS) {
+      const set = loadAnnotationData(data);
+      map.set(set.id, set);
+    }
     return map;
   }, []);
 
@@ -516,12 +520,14 @@ function AnnotationPopper(props: {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [addenda, setAddenda] = useState<Addendum[] | undefined>(undefined);
 
   useEffect(() => {
     const annotation = getAnnotation(props.annotationId);
     if (annotation) {
       setTitle(annotation.title ?? '');
       setContent(annotation.content);
+      setAddenda(annotation.addenda);
     }
   }, [props.annotationId, getAnnotation, setTitle, setContent]);
 
@@ -545,6 +551,7 @@ function AnnotationPopper(props: {
               <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
                 {content}
               </ReactMarkdown>
+              <AnnotationAddenda addenda={addenda} />
             </div>
           </div>
         </ClickAwayListener>
@@ -574,7 +581,9 @@ function Annotation(props: {
     activeAnnotationSetIds,
   } = useAnnotation();
   const [collapsed, setCollapsed] = useState(true);
-  const content = getAnnotation(props.annotationId)?.content ?? '';
+  const annotation = getAnnotation(props.annotationId);
+  const content = annotation?.content ?? '';
+  const editMode = useEditMode();
   const [shareUrl, setShareUrl] = useState('');
 
   const bgColorClass = useMemo(() => {
@@ -647,12 +656,30 @@ function Annotation(props: {
         <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={true}>
           {content}
         </ReactMarkdown>
+        <AnnotationAddenda addenda={annotation?.addenda} />
       </div>
       <div className="toggle relative text-xs mt-4">
         {collapsed ? (
           <span className="inline-block mt-2 cursor-pointer">...</span>
         ) : (
           <span className="inline-block mt-2 cursor-pointer">&nbsp;</span>
+        )}
+        {process.env.NODE_ENV === 'development' &&
+          editMode.enabled &&
+          !props.hidden && (
+          <button
+            data-testid="add-addendum"
+            className="ml-2 underline text-slate-600 hover:text-black"
+            onClick={(e) => {
+              e.stopPropagation();
+              editMode.requestAddendum(
+                props.annotationId.setId,
+                props.annotationId.entryId
+              );
+            }}
+          >
+            Add addendum
+          </button>
         )}
         {/* The share URL depends on where the page is served from, so the
             buttons are left out of the server-rendered page. */}

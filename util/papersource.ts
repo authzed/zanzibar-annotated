@@ -1,14 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import annotationsIntro from '../content/annotations-intro.yaml';
-import annotationsSpiceDb from '../content/annotations-spicedb.yaml';
+import { ANNOTATION_SETS } from '../content/annotation-sets';
 import { AnnotationSetSource, paperToMarkdown } from './papermarkdown';
 
 /**
  * getAnnotationSetSources returns the annotation sets as written. Server only.
  */
 export function getAnnotationSetSources(): AnnotationSetSource[] {
-  return [annotationsIntro, annotationsSpiceDb];
+  return ANNOTATION_SETS;
 }
 
 let markdown: string | undefined;

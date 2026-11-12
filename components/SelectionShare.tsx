@@ -8,6 +8,7 @@ import HNIcon from '../content/HNIcon.svg';
 import RedditIcon from '../content/RedditIcon.svg';
 import TwitterIcon from '../content/TwitterIcon.svg';
 import { isUnderContentContainer } from './Container';
+import { useEditMode } from './editmode';
 import { gtag } from './GTag';
 
 type VirtualElement = {
@@ -119,6 +120,8 @@ function SelectionShare() {
   const [visible, setVisible] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
+  // In edit mode, a selection is for annotating rather than sharing.
+  const { enabled: editing } = useEditMode();
   const { styles, attributes } = usePopper(virtualRef, popperElement, {
     placement: 'top',
     modifiers: [{ name: 'arrow', options: { element: arrowElement } }],
@@ -163,7 +166,7 @@ function SelectionShare() {
 
   return (
     <>
-      {visible && (
+      {visible && !(process.env.NODE_ENV === 'development' && editing) && (
         <ClickAwayListener
           mouseEvent="mousedown"
           touchEvent="touchend"
