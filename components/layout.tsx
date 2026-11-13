@@ -21,6 +21,7 @@ import {
   SITE_DESCRIPTION,
   SITE_TITLE,
 } from '../util/papermetadata';
+import { getMarkdownUrl } from '../util/papermarkdown';
 import { CANONICAL_URL_BASE, getAssetUrl } from '../util/siteconfig';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
@@ -90,6 +91,12 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         <title>{SITE_TITLE}</title>
         <link rel="canonical" href={props.canonicalUrl} />
         {props.noIndex && <meta name="robots" content="noindex, follow" />}
+        <link
+          rel="alternate"
+          type="text/markdown"
+          href={getMarkdownUrl()}
+          title="The paper and its annotations in Markdown"
+        />
         <link
           rel="icon"
           href={`${getAssetUrl()}/favicon.ico`}
