@@ -1,7 +1,8 @@
-import { describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import {
   AnnotationSetSource,
   getLlmsTxt,
+  getMarkdownUrl,
   paperToMarkdown,
 } from './papermarkdown';
 
@@ -117,5 +118,39 @@ describe('getLlmsTxt', () => {
     const llms = getLlmsTxt(sets);
     expect(llms).toContain('](https://authzed.com/zanzibar/paper.md)');
     expect(llms).toContain('annotated by Ada Author of AuthZed');
+  });
+});
+
+describe('getMarkdownUrl', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test('uses the canonical URL in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_URL', 'zanzibar-abc.vercel.app');
+    expect(getMarkdownUrl()).toBe('https://authzed.com/zanzibar/paper.md');
+  });
+
+  test("uses a preview deployment's own URL", () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'preview');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_URL', 'zanzibar-abc.vercel.app');
+    expect(getMarkdownUrl()).toBe('https://zanzibar-abc.vercel.app/paper.md');
+  });
+
+  test('uses a path on this server in development', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', '');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_URL', '');
+    expect(getMarkdownUrl()).toBe('/paper.md');
+  });
+
+  test('falls back to the canonical URL outside Vercel', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', '');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_URL', '');
+    expect(getMarkdownUrl()).toBe('https://authzed.com/zanzibar/paper.md');
   });
 });

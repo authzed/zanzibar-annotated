@@ -6,7 +6,26 @@ import {
 import { CANONICAL_URL_BASE } from './siteconfig';
 
 export const MARKDOWN_PATH = '/paper.md';
-export const MARKDOWN_URL = `${CANONICAL_URL_BASE}${MARKDOWN_PATH}`;
+
+/**
+ * getMarkdownUrl returns the URL of the markdown edition of the paper served by
+ * this deployment: the canonical URL in production, the deployment's own URL on
+ * Vercel previews, and a path on this server in development. Safe to call on
+ * the server and the client.
+ */
+export function getMarkdownUrl(): string {
+  // Each variable must be referenced literally so Next.js can inline it into
+  // the client bundle.
+  const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
+  const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (vercelEnv === 'preview' && vercelUrl) {
+    return `https://${vercelUrl}${MARKDOWN_PATH}`;
+  }
+  if (process.env.NODE_ENV === 'development') {
+    return MARKDOWN_PATH;
+  }
+  return `${CANONICAL_URL_BASE}${MARKDOWN_PATH}`;
+}
 
 /**
  * AnnotationSetSource is an annotation set as written in its YAML file.
@@ -204,7 +223,7 @@ export function getLlmsTxt(sets: AnnotationSetSource[]): string {
 
 ## Paper
 
-- [Annotated paper in Markdown](${MARKDOWN_URL}): The whole paper, with every annotation following the paragraph it comments on
+- [Annotated paper in Markdown](${getMarkdownUrl()}): The whole paper, with every annotation following the paragraph it comments on
 - [Annotated paper](${CANONICAL_URL_BASE}): The paper as a web page, with annotations beside the text
 
 ## Optional

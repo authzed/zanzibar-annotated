@@ -21,7 +21,7 @@ import {
   SITE_DESCRIPTION,
   SITE_TITLE,
 } from '../util/papermetadata';
-import { MARKDOWN_URL } from '../util/papermarkdown';
+import { getMarkdownUrl } from '../util/papermarkdown';
 import { CANONICAL_URL_BASE, getAssetUrl } from '../util/siteconfig';
 
 export const ANNOTATIONS_PORTAL_CONTAINER_ID = 'annotations-root';
@@ -94,7 +94,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         <link
           rel="alternate"
           type="text/markdown"
-          href={MARKDOWN_URL}
+          href={getMarkdownUrl()}
           title="The paper and its annotations in Markdown"
         />
         <link
