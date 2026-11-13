@@ -121,7 +121,7 @@ export function Banner() {
           className={clsx(
             'min-h-0 overflow-hidden flex flex-col justify-end bg-[#17141f] md:h-full md:justify-center',
             TRANSITION,
-            isTopOfContent ? 'md:px-7' : 'md:px-5'
+            isTopOfContent ? 'md:px-7' : 'md:px-4'
           )}
         >
           <div className="shrink-0 h-[52px] flex items-center justify-between gap-3 px-4 md:h-auto md:flex-col md:items-start md:gap-0 md:px-0">
@@ -129,23 +129,33 @@ export function Banner() {
               className={clsx(
                 'shrink-0 h-6 text-[#f3f1ff]',
                 TRANSITION,
-                isTopOfContent ? 'md:h-8' : 'md:h-7'
+                isTopOfContent ? 'md:h-8' : 'md:h-6'
               )}
             />
+            {/* On larger screens the tagline collapses in both directions, so
+                the logo is left centered in a block only as wide as itself.
+                Its top spacing is padding so that it collapses too. */}
             <span
               className={clsx(
                 collapsible(isTopOfContent),
-                'max-md:grid-rows-[1fr]'
+                'max-md:grid-rows-[1fr] grid-cols-[1fr]',
+                !isTopOfContent && 'md:grid-cols-[0fr]'
               )}
             >
-              <span className="min-h-0 overflow-hidden block text-[10px] leading-4 font-semibold tracking-[.14em] uppercase whitespace-nowrap text-[#cfc9e0] md:mt-1">
-                Annotated edition
+              <span className="min-h-0 min-w-0 overflow-hidden block text-[10px] leading-4 font-semibold tracking-[.14em] uppercase whitespace-nowrap text-[#cfc9e0]">
+                <span className="block md:pt-1">Annotated edition</span>
               </span>
             </span>
           </div>
         </a>
       </div>
-      <div className="relative flex flex-1 min-w-0 items-center min-h-[52px] md:min-h-16">
+      <div
+        className={clsx(
+          'relative flex flex-1 min-w-0 items-center min-h-[52px]',
+          TRANSITION,
+          isTopOfContent ? 'md:min-h-16' : 'md:min-h-10'
+        )}
+      >
         {/* Phones slide the AuthZed mark in over the left edge in place of the
             collapsed brand row. It overlays the title rather than taking up
             space, so the title doesn't rewrap while the bar animates. */}
@@ -208,6 +218,7 @@ export function Banner() {
           <AnnotationSetSelect
             items={availableAnnotationSets}
             default="intro"
+            compact={!isTopOfContent}
           />
         </div>
       </div>
