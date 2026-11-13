@@ -50,6 +50,17 @@ type AnnotationData = {
   content: string;
 };
 
+/**
+ * AnnotationAuthor is the person who wrote a set's annotations.
+ */
+export type AnnotationAuthor = {
+  name: string;
+  // The author's profile page.
+  url: string;
+  // Path of the author's picture under the site's public assets.
+  avatar: string;
+};
+
 type AnnotationSet = {
   id: string;
   title: string;
@@ -57,6 +68,7 @@ type AnnotationSet = {
   description: string;
   cta: string;
   highlightColor?: string;
+  author?: AnnotationAuthor;
   groups: Map<string, AnnotationData[]>;
   annotations: Map<string, AnnotationData>;
 };
@@ -85,6 +97,7 @@ function loadAnnotationData(data: any): AnnotationSet {
     description: data['description'],
     cta: data['cta'],
     highlightColor: data['highlightColor'] ?? 'sky',
+    author: data['author'],
     groups: annotationGroups,
     annotations: annotationMap,
   };
@@ -150,6 +163,7 @@ const _availableAnnotationSets = [annotationsIntro, annotationsSpiceDb].map(
       label: set.label,
       description: set.cta,
       color: set.highlightColor,
+      author: set.author as AnnotationAuthor | undefined,
     };
   }
 );
@@ -158,9 +172,21 @@ export function getAvailableAnnotationSets() {
   return _availableAnnotationSets;
 }
 
+/**
+ * getAnnotationAuthors returns the authors of the annotation sets.
+ */
+export function getAnnotationAuthors(): AnnotationAuthor[] {
+  return [annotationsIntro, annotationsSpiceDb]
+    .map((set) => set.author)
+    .filter(Boolean);
+}
+
 const allAnnotationSetIds = getAvailableAnnotationSets().map(
   (item) => item.value
 );
+
+// The annotation set shown unless the URL fragment names another.
+const DEFAULT_ANNOTATION_SET_ID = 'intro';
 
 /**
  * Provider that holds global annotation view state and annotation data.
@@ -177,9 +203,11 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
 
   // Annotation sets are defined using imported objects.
   // TODO: Load and manage sets dynamically.
-  const [activeAnnotationSets, setActiveAnnotationSets] = useState<string[]>(
-    []
-  );
+  // The default set is active from the first render, so its annotations are
+  // part of the server-rendered page.
+  const [activeAnnotationSets, setActiveAnnotationSets] = useState<string[]>([
+    DEFAULT_ANNOTATION_SET_ID,
+  ]);
 
   // Note: This is populated from an imported object so it should not be modified.
   const annotationSets = useMemo(() => {
@@ -232,7 +260,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
       if (prefix !== '#annotations') return;
 
       if (setId && allAnnotationSetIds.includes(setId)) {
-        setAnnotationSetActive(setId);
+        setActiveAnnotationSets([setId]);
       }
 
       if (entryId) {
@@ -249,10 +277,7 @@ export const AnnotationManagerProvider: React.FC<PropsWithChildren> = (
 
       return;
     }
-
-    // Default annotation set
-    setAnnotationSetActive('intro');
-  }, [setAnnotationSetActive, setAnnotationActive]);
+  }, [setAnnotationActive]);
 
   return (
     <AnnotationManagerContext.Provider
@@ -534,6 +559,9 @@ function AnnotationPopper(props: {
 function Annotation(props: {
   annotationId: AnnotationId;
   orientation: 'left' | 'right';
+  // Whether the annotation's set isn't showing. Its content is still rendered
+  // so that it's in the page's HTML.
+  hidden: boolean;
 }) {
   const {
     getAnnotationSet,
@@ -546,7 +574,7 @@ function Annotation(props: {
     activeAnnotationSetIds,
   } = useAnnotation();
   const [collapsed, setCollapsed] = useState(true);
-  const [content, setContent] = useState('');
+  const content = getAnnotation(props.annotationId)?.content ?? '';
   const [shareUrl, setShareUrl] = useState('');
 
   const bgColorClass = useMemo(() => {
@@ -558,13 +586,6 @@ function Annotation(props: {
 
     return 'clear';
   }, [getAnnotationSet, props.annotationId, activeAnnotationSetIds]);
-
-  useEffect(() => {
-    const annotation = getAnnotation(props.annotationId);
-    if (annotation) {
-      setContent(annotation.content);
-    }
-  }, [props.annotationId, getAnnotation, content]);
 
   useEffect(() => {
     const { basePath } = getPathSegments(window.location.pathname);
@@ -600,6 +621,7 @@ function Annotation(props: {
 
   return (
     <div
+      hidden={props.hidden}
       className={`annotation mt-4 p-4 z-50
       bg-white border-t-4 border-${bgColorClass}-400 outline outline-slate-400
       transition transition-transform ease-in-out duration-[250ms]
@@ -632,37 +654,41 @@ function Annotation(props: {
         ) : (
           <span className="inline-block mt-2 cursor-pointer">&nbsp;</span>
         )}
-        <span className="ml-2 absolute bottom-0 right-0">
-          <ShareButton
-            type="link"
-            shareUrl={shareUrl}
-            title="Copy share URL to clipboard"
-            className="text-sm p-1 pb-0"
-            iconClassName="w-4 hover:fill-black fill-gray-300"
-            callback={() => (window.location.href = shareUrl)}
-          />
-          <ShareButton
-            title="Tweet this annotation"
-            type="twitter"
-            shareUrl={shareUrl}
-            className="text-sm p-1 pb-0"
-            iconClassName="w-4 hover:fill-black fill-gray-300"
-          />
-          <ShareButton
-            type="hn"
-            title="Post annotation to Hacker News"
-            shareUrl={shareUrl}
-            className="text-sm p-1 pb-0"
-            iconClassName="w-4 hover:fill-black fill-gray-300"
-          />
-          <ShareButton
-            type="reddit"
-            title="Submit on Reddit"
-            shareUrl={shareUrl}
-            className="text-sm p-1 pb-0"
-            iconClassName="w-4 hover:fill-black fill-gray-300"
-          />
-        </span>
+        {/* The share URL depends on where the page is served from, so the
+            buttons are left out of the server-rendered page. */}
+        {shareUrl && (
+          <span className="ml-2 absolute bottom-0 right-0">
+            <ShareButton
+              type="link"
+              shareUrl={shareUrl}
+              title="Copy share URL to clipboard"
+              className="text-sm p-1 pb-0"
+              iconClassName="w-4 hover:fill-black fill-gray-300"
+              callback={() => (window.location.href = shareUrl)}
+            />
+            <ShareButton
+              title="Tweet this annotation"
+              type="twitter"
+              shareUrl={shareUrl}
+              className="text-sm p-1 pb-0"
+              iconClassName="w-4 hover:fill-black fill-gray-300"
+            />
+            <ShareButton
+              type="hn"
+              title="Post annotation to Hacker News"
+              shareUrl={shareUrl}
+              className="text-sm p-1 pb-0"
+              iconClassName="w-4 hover:fill-black fill-gray-300"
+            />
+            <ShareButton
+              type="reddit"
+              title="Submit on Reddit"
+              shareUrl={shareUrl}
+              className="text-sm p-1 pb-0"
+              iconClassName="w-4 hover:fill-black fill-gray-300"
+            />
+          </span>
+        )}
       </div>
     </div>
   );
@@ -681,23 +707,21 @@ export function AnnotationGroup(props: {
   groupId: string;
   orientation: 'left' | 'right';
 }) {
-  const { getAnnotationGroup, activeAnnotationSetIds } = useAnnotation();
-  const [groupData, setGroupData] = useState<AnnotationData[]>([]);
-  useEffect(() => {
-    const annotations: AnnotationData[] = [];
-    const groupId = _groupId(props.pageNumber, props.groupId);
-    activeAnnotationSetIds.forEach((setId) => {
-      const group = getAnnotationGroup(setId, groupId);
-      annotations.push(...group);
-    });
+  const { getAnnotationGroup, activeAnnotationSetIds, allAnnotationSetIds } =
+    useAnnotation();
 
-    setGroupData(annotations);
-  }, [
-    props.groupId,
-    props.pageNumber,
-    getAnnotationGroup,
-    activeAnnotationSetIds,
-  ]);
+  // Every set's annotations are rendered, with the active sets' first, so that
+  // they're all in the page's HTML. Only the active sets' are shown.
+  const groupId = _groupId(props.pageNumber, props.groupId);
+  const setIds = [
+    ...activeAnnotationSetIds,
+    ...allAnnotationSetIds.filter(
+      (setId) => !activeAnnotationSetIds.includes(setId)
+    ),
+  ];
+  const groupData = setIds.flatMap((setId) =>
+    getAnnotationGroup(setId, groupId)
+  );
 
   return (
     <div className="sticky top-10 annotation">
@@ -708,6 +732,7 @@ export function AnnotationGroup(props: {
             key={annotationId.key()}
             annotationId={annotationId}
             orientation={props.orientation}
+            hidden={!activeAnnotationSetIds.includes(data.setId)}
           />
         );
       })}

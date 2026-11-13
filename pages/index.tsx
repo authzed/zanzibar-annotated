@@ -16,7 +16,13 @@ export default function Default(props: {
 export const getServerSideProps: GetServerSideProps<{
   canonicalUrl: string;
   baseUrl: string;
-}> = async ({ req }) => {
+}> = async ({ res }) => {
+  // The page is the same for everyone, so let the CDN serve it.
+  res.setHeader(
+    'Cache-Control',
+    's-maxage=3600, stale-while-revalidate=86400'
+  );
+
   return {
     props: {
       baseUrl: CANONICAL_URL_BASE,

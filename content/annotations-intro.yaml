@@ -6,6 +6,10 @@ cta: |
   Highlights and commentary on notable portions of the paper by [AuthZed](https://authzed.com?utm_source=za&utm_medium=toolbar)
 description: 'This paper is hosted by [AuthZed](https://authzed.com?utm_source=za&utm_medium=menu), the creator of the open source, Zanzibar inspired, fine-grained permissions database [SpiceDB](https://github.com/authzed/spicedb).'
 highlightColor: 'amber'
+author:
+  name: 'Jake Moshenko'
+  url: 'https://www.linkedin.com/in/jake-moshenko/'
+  avatar: '/authors/jake-moshenko.jpg'
 groups:
   page-1-col-2:
     across-applications:

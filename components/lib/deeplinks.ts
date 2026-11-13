@@ -24,6 +24,13 @@ function hashNode(n: Text): string {
   return fromNumber(cyrb53(n.wholeText.trim()));
 }
 
+// Text that isn't rendered can't be selected, so it's left out of matching.
+// This keeps links stable when hidden content, such as the annotations of sets
+// that aren't showing, is added to the page.
+function isHidden(node: Text): boolean {
+  return !!node.parentElement?.closest('[hidden]');
+}
+
 function countLeadingWhitespace(node: Text): number {
   return node.wholeText.length - node.wholeText.trimStart().length;
 }
@@ -176,6 +183,9 @@ export function selectionToFragment(
   let node;
   while ((node = walk.nextNode() as Text)) {
     // eslint-disable-line no-cond-assign
+    if (isHidden(node)) {
+      continue;
+    }
     const hash = hashNode(node);
     for (const [[startHash, startNode], [endHash, endNode], dupes] of ranges) {
       if (startNode == node) {
@@ -243,6 +253,9 @@ function getRangeFromFragmentPart(doc: Document, fragmentPart: string): Range {
     numEndNodes = 0;
   while ((node = walk.nextNode() as Text)) {
     // eslint-disable-line no-cond-assign
+    if (isHidden(node)) {
+      continue;
+    }
     const hash = hashNode(node);
     if (hash == startHash) {
       nodes.push([node, true]);
